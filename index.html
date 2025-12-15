@@ -25,7 +25,7 @@
             --border-color: rgba(153, 153, 153, 0.15);
             --card-radius: 14px;
             --pinned-height: 45px; 
-            --ad-pinned-height: 100px; 
+            --ad-pinned-height: 100px; /* Sabit tutuldu, ancak metinsel afiş daha kısa olacaktır */
         }
         html, body { height: 100%; overflow: hidden; margin: 0; padding: 0; }
         body { 
@@ -171,21 +171,6 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         
-        .ad-image-container {
-            width: 100%;
-            height: 100px; 
-            overflow: hidden;
-            border-radius: 10px;
-            margin-bottom: 10px;
-        }
-
-        .ad-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover; 
-            display: block;
-        }
-        
         .ad-button {
             background-color: #34C759;
             color: white;
@@ -202,7 +187,7 @@
         .ad-button:hover {
              background-color: #2fb94f;
         }
-        /* İndirme Görev Modal Stili */
+        /* İndirme Görev Modal Stili (Kullanılmıyor ancak JS için korundu) */
         .task-modal-content {
             background-color: var(--secondary-color); 
             padding: 20px; 
@@ -212,24 +197,7 @@
             width: 350px;
             box-sizing: border-box;
         }
-        .task-button {
-            display: flex;
-            align-items: center;
-            padding: 12px 15px;
-            margin-bottom: 10px;
-            border-radius: 10px;
-            border: 2px solid var(--primary-color);
-            background-color: #f7f7f7;
-            cursor: pointer;
-            transition: background-color 0.1s;
-        }
-        .task-button:hover { background-color: #e5e5e5; }
-        .task-button:disabled { opacity: 0.6; cursor: not-allowed; border-color: var(--hint-color); }
-        .task-button .material-symbols-rounded { margin-right: 15px; font-size: 24px; color: var(--primary-color); }
-        .task-info { text-align: left; }
-        .task-info .name { font-weight: 700; font-size: 16px; color: var(--text-color); }
-        .task-info .detail { font-size: 13px; color: var(--hint-color); }
-
+        
         /* Admin Analiz Kartı Stilleri */
         .analysis-card {
             background-color: var(--secondary-color);
@@ -293,28 +261,8 @@
 <div class="modal-overlay hidden" id="taskModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 100;">
     <div class="task-modal-content">
         <h3 style="color: var(--primary-color); margin-top: 0; text-align: center;"><span class="material-symbols-rounded" style="font-size: 24px; vertical-align: middle;">task_alt</span> İndirme Görevlerini Tamamlayın</h3>
-        <p style="font-size: 14px; color: var(--text-color); text-align: center; margin-bottom: 20px;">PDF'i indirmek için aşağıdaki zorunlu görevleri tamamlayın.</p>
-
-        <div id="taskJoinButton" class="task-button" style="display: none;">
-            <span class="material-symbols-rounded">group_add</span>
-            <div class="task-info">
-                <div class="name">SPONSOR KANALLARA KATIL</div>
-                <div class="detail" id="joinsRequiredText"></div>
-            </div>
-        </div>
-        
-        <div id="taskAdButton" class="task-button" style="display: none;">
-            <span class="material-symbols-rounded">play_circle</span>
-            <div class="task-info">
-                <div class="name">REKLAM LİNKLERİNİ ZİYARET ET</div>
-                <div class="detail" id="adsRequiredText"></div>
-            </div>
-        </div>
-        
-        <p id="taskStatus" style="font-size: 13px; color: #FF3B30; margin-top: 15px; text-align: center; display: none; font-weight: 600;"></p>
-
+        <p style="font-size: 14px; color: var(--text-color); text-align: center; margin-bottom: 20px;">PDF'i indirmek için aşağıdaki zorunlu görevleri tamamlayın. (Bu içerik artık kullanılmamaktadır)</p>
         <button onclick="document.getElementById('taskModal').classList.add('hidden')" class="action-button" style="margin-top: 10px; background-color: var(--tg-theme-hint-color);">İptal</button>
-        
     </div>
 </div>
 
@@ -364,7 +312,7 @@
             <div class="list-card hidden" id="adminControlCard">
                 <div class="list-item" onclick="openAdminModal()">
                     <div class="list-icon" style="background-color: #FF9500;"><span class="material-symbols-rounded">shield</span></div>
-                    <div class="list-info"><div class="list-name">Admin Yönetimi Paneli</div><div class="list-detail">Kullanıcı, PDF ve Reklam Ayarları.</div></div>
+                    <div class="list-info"><div class="list-name">Admin Yönetimi Paneli</div><div class="list-detail">Kullanıcı ve Reklam Ayarları.</div></div>
                     <div class="list-meta" style="color: var(--primary-color);">Aç</div>
                 </div>
             </div>
@@ -392,9 +340,6 @@
              
              <div id="chatAdBanner" style="display: none;">
                 <div class="ad-content">
-                    <div class="ad-image-container">
-                        <img id="adBannerImage" class="ad-image" src="" alt="Sponsorlu Afiş Reklamı" onerror="handleAdImageError(this)">
-                    </div>
                     <h4 id="adBannerTitle" style="margin: 0; font-size: 16px; color: var(--text-color);">YENİ NOTLAR, TEKRARLAR VE FASİKÜLLER</h4>
                     <p id="adBannerDesc" style="font-size: 13px; color: var(--hint-color); margin: 5px 0 0 0;">Krallar PDF - Tüm Sınav Hazırlığı Kaynakları</p>
                     <button id="adBannerButton" class="ad-button" onclick="handleAdBannerClick()">HEMEN GÖR! →</button>
@@ -445,7 +390,7 @@
             <div class="list-card hidden" id="adminControlCardProfile">
                 <div class="list-item" onclick="openAdminModal()">
                     <div class="list-icon" style="background-color: #FF9500;"><span class="material-symbols-rounded">shield</span></div>
-                    <div class="list-info"><div class="list-name">Admin Yönetimi Paneli</div><div class="list-detail">Kullanıcı, PDF ve Reklam Ayarları.</div></div>
+                    <div class="list-info"><div class="list-name">Admin Yönetimi Paneli</div><div class="list-detail">Kullanıcı ve Reklam Ayarları.</div></div>
                     <div class="list-meta" style="color: var(--primary-color);">Aç</div>
                 </div>
             </div>
@@ -470,7 +415,7 @@
                 </div>
                 <div class="nav-item" data-admin-tab="ads" onclick="changeAdminTab('ads')">
                     <span class="material-symbols-rounded">campaign</span>
-                    <span>Reklamlar & Görevler</span>
+                    <span>Sohbet Afişi</span>
                 </div>
             </div>
         </div>
@@ -478,19 +423,13 @@
         <div style="padding: 15px;">
             
             <div id="admin-tab-pdf" class="admin-tab active">
-                <div class="list-section-title">PDF KAYDI EKLE (DİNAMİK GÖREVLER)</div>
+                <div class="list-section-title">PDF KAYDI EKLE</div>
                 <div class="list-card" style="padding: 15px;">
                     <input type="text" id="pdfTitle" placeholder="1. PDF Başlığını Girin (Örn: TYT Matematik)" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: var(--background-color); color: var(--text-color);">
-                    <input type="url" id="pdfUrl" placeholder="2. PDF İndirme URL'sini Yapıştırın (Görevi Tamamlayınca Açılır)" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: var(--background-color); color: var(--text-color);">
+                    <input type="url" id="pdfUrl" placeholder="2. PDF İndirme URL'sini Yapıştırın" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: var(--background-color); color: var(--text-color);">
                     
-                    <label for="joinLinksCount" style="font-size: 14px; font-weight: 600; display: block; margin-bottom: 5px;">3. Kanala Katılma Görevi (Kaç Link/Kanal Eklenecek?)</label>
-                    <input type="number" id="joinLinksCount" min="0" max="10" value="0" oninput="updateDynamicLinkInputs('join', this.value)" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: var(--background-color); color: var(--text-color);">
-                    <div id="joinLinksContainer"></div>
-                    
-                    <label for="adLinksCount" style="font-size: 14px; font-weight: 600; display: block; margin-top: 15px; margin-bottom: 5px;">4. Reklam Görüntüleme Görevi (Kaç Reklam/Link Eklenecek?)</label>
-                    <input type="number" id="adLinksCount" min="0" max="50" value="0" oninput="updateDynamicLinkInputs('ad', this.value)" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: var(--background-color); color: var(--text-color);">
-                    <div id="adLinksContainer"></div>
-                    
+                    <p style="font-size: 14px; color: var(--hint-color); margin-top: 5px;">**Not:** Artık PDF indirme için dinamik görev/link ekleme zorunluluğu yoktur. İndirmeler direkt gerçekleşir.</p>
+
                     <button class="action-button" id="uploadPdfButton" onclick="uploadPDF()" style="margin-top: 20px;">PDF Kaydını Ekle</button>
                 </div>
                 
@@ -530,30 +469,20 @@
 
             <div id="admin-tab-ads" class="admin-tab hidden">
                 
-                <div class="list-section-title">PDF İNDİRME GÖREV AYARLARI</div>
+                <div class="list-section-title">SOHBET AFİŞİ (SPONSORLU)</div>
                 <div class="list-card" style="padding: 15px;">
-                     <label for="adsPerDownload" style="font-size: 14px; font-weight: 600; display: block; margin-bottom: 5px;">Reklam Görüntüleme Zorunluluğu (Kaç Reklam Linki İstenmeli?)</label>
-                     <input type="number" id="adsPerDownload" min="0" max="100" placeholder="Örn: 1 (Her indirme için 1 reklam), 0 (Devre Dışı)" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: var(--background-color); color: var(--text-color);">
-                     <p style="font-size: 12px; color: var(--hint-color);">Bu değer, Adminin PDF eklerken kaç adet "Reklam Linki" girmesi gerektiğini belirtir.</p>
-                     
-                     <label for="requiredJoins" style="font-size: 14px; font-weight: 600; display: block; margin-top: 15px; margin-bottom: 5px;">Kanala Katılma Zorunluluğu (Kaç Kanal Linki İstenmeli?)</label>
-                     <input type="number" id="requiredJoins" min="0" max="10" placeholder="Örn: 1 (Görevin olması için 1), 0 (Devre Dışı)" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: var(--background-color); color: var(--text-color);">
-                     <p style="font-size: 12px; color: var(--hint-color);">Bu değer, Adminin PDF eklerken kaç adet "Kanala Katılma Linki" girmesi gerektiğini belirtir. (0 = Pasif)</p>
-                     
-                     <button class="action-button" id="saveTasksButton" onclick="saveTaskConfig()" style="margin-top: 15px;">Görev Ayarlarını Kaydet</button>
-                     <p id="taskConfigStatus" style="font-size: 13px; color: var(--hint-color); text-align: center; margin-top: 10px;"></p>
-                </div>
-                <div class="list-section-title">SOHBET AFİŞ REKLAMI (GÖRSEL BANNER)</div>
-                <div class="list-card" style="padding: 15px;">
-                    <p style="font-size: 14px; color: var(--hint-color);">Sohbet ekranının en üstünde sabit duracak görsel afişi yönetin. **(SPONSORLU)**</p>
+                    <p style="font-size: 14px; color: var(--hint-color);">Sohbet ekranının en üstünde sabit duracak metinsel afişi yönetin. **(SPONSORLU)**</p>
                     
-                    <label for="adBannerImageAdmin" style="font-size: 14px; font-weight: 600; display: block; margin-top: 10px;">Afiş Görsel URL'si (https://...)</label>
-                    <input type="url" id="adBannerImageAdmin" placeholder="Görsel linkini yapıştırın..." style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: var(--background-color); color: var(--text-color);">
+                    <label for="adBannerTitleAdmin" style="font-size: 14px; font-weight: 600; display: block; margin-top: 10px;">Afiş Başlığı</label>
+                    <input type="text" id="adBannerTitleAdmin" placeholder="Başlık (Örn: KRALLAR PDF GRUBU)" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: var(--background-color); color: var(--text-color);">
                     
+                    <label for="adBannerDescAdmin" style="font-size: 14px; font-weight: 600; display: block; margin-top: 10px;">Afiş Açıklaması</label>
+                    <input type="text" id="adBannerDescAdmin" placeholder="Açıklama (Örn: Tüm derslerin notları burada...)" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: var(--background-color); color: var(--text-color);">
+
                     <label for="adBannerLinkAdmin" style="font-size: 14px; font-weight: 600; display: block; margin-top: 10px;">Yönlendirme Linki (HEMEN GÖR! butonu için)</label>
                     <input type="url" id="adBannerLinkAdmin" placeholder="Tıklanınca gidilecek link..." style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: var(--background-color); color: var(--text-color);">
                     
-                    <button class="action-button" id="saveAdBannerButton" onclick="saveAdBannerConfig()">Afiş Reklamı Kaydet/Güncelle</button>
+                    <button class="action-button" id="saveAdBannerButton" onclick="saveAdBannerConfig()">Afiş Kaydet/Güncelle</button>
                     <p id="adStatus" style="font-size: 13px; color: var(--hint-color); text-align: center; margin-top: 10px;"></p>
                 </div>
                 
@@ -564,14 +493,11 @@
                 <div class="list-section-title">ÖN İZLEME</div>
                  <div class="list-card" style="padding: 10px;">
                      <div class="ad-content" style="padding: 10px; background-color: var(--background-color);">
-                        <div class="ad-image-container" style="height: 60px;">
-                            <img id="adBannerPreview" class="ad-image" src="" alt="Afiş Ön İzleme" style="width: 100%; height: 100%; border-radius: 8px; display: none;" onerror="this.style.display='none';" onload="this.style.display='block';">
-                        </div>
-                        <h4 style="margin: 0; font-size: 14px;">ÖN İZLEME BAŞLIĞI</h4>
-                        <p style="font-size: 12px; color: var(--hint-color); margin: 3px 0 0 0;">Önizleme Açıklaması</p>
+                        <h4 id="previewTitle" style="margin: 0; font-size: 14px;">ÖN İZLEME BAŞLIĞI</h4>
+                        <p id="previewDesc" style="font-size: 12px; color: var(--hint-color); margin: 3px 0 0 0;">Önizleme Açıklaması</p>
                         <button class="ad-button" style="padding: 6px 10px; font-size: 12px; margin-top: 8px;">HEMEN GÖR! →</button>
                     </div>
-                    <p id="previewHint" style="font-size: 13px; color: var(--hint-color); text-align: center; margin-top: 5px;">Görsel URL'si girildikten sonra önizleme burada görünecektir.</p>
+                    <p id="previewHint" style="font-size: 13px; color: var(--hint-color); text-align: center; margin-top: 5px;">Afiş Başlığı ve Açıklaması girildikten sonra önizleme burada görünecektir.</p>
                  </div>
             </div>
 
@@ -652,10 +578,8 @@
     let currentChatIsReadonly = true; 
     let currentPinnedMessageKey = null;
     
-    // GÜNCELLENDİ: PDF indirme görev verilerini tutar
-    let pendingDownload = { key: null, name: null, url: null, required_links: { join: [], ad: [] } }; 
-    // GÜNCELLENDİ: Adminin belirlediği global görev zorunlulukları
-    let taskConfig = { ads_per_download: 0, required_joins: 0 }; 
+    // Basitleştirilmiş: Artık dinamik görevler tutulmuyor
+    let pendingDownload = { key: null, name: null, url: null }; 
     
     function initializeApp() {
         const loadingStatus = document.getElementById('loadingStatus');
@@ -700,12 +624,6 @@
             document.getElementById('adminControlCard').classList.remove('hidden');
             document.getElementById('adminControlCardProfile').classList.remove('hidden');
         }
-        
-        // Dinamik form alanlarını sıfırla/başlat
-        updateDynamicLinkInputs('join', 0);
-        updateDynamicLinkInputs('ad', 0);
-
-        loadTaskConfig(); 
     }
     
     // #############################
@@ -749,189 +667,21 @@
     }
     
     // #############################
-    // ##### İNDİRME GÖREV LOJİĞİ (GÜNCELLENDİ) #####
+    // ##### İNDİRME AKIŞI (BASİTLEŞTİRİLDİ) #####
     // #############################
     
-    window.loadTaskConfig = function() {
-        if (!db) return;
-        db.ref('settings/tasks').on('value', (snapshot) => {
-             const config = snapshot.val();
-             if (config) {
-                 taskConfig.ads_per_download = parseInt(config.ads_per_download) || 0;
-                 taskConfig.required_joins = parseInt(config.required_joins) || 0;
-             }
-             if (document.getElementById('adsPerDownload')) {
-                 document.getElementById('adsPerDownload').value = taskConfig.ads_per_download;
-                 document.getElementById('requiredJoins').value = taskConfig.required_joins;
-             }
-        }, (error) => {
-             console.error("Görev ayarları yüklenemedi:", error);
-        });
-    }
-
-    // GÜNCELLENDİ: PDF indirme modalını açar, PDF'e tanımlı linkleri çeker
+    // GÜNCELLENDİ: PDF indirme modalını atlar, direk indirmeyi başlatır.
     window.handlePDFDownload = function(key, name, url) {
         if (!currentUser) return;
         
-        // Admin ise görevleri atla
-        if (is_admin) {
-             finalizeDownload(name, url, key); 
-             return;
-        }
-
-        const taskModal = document.getElementById('taskModal');
-        const taskAdButton = document.getElementById('taskAdButton');
-        const taskJoinButton = document.getElementById('taskJoinButton');
-        const taskStatus = document.getElementById('taskStatus');
+        // Admin olsa da olmasa da direkt indirmeyi başlat
+        finalizeDownload(name, url, key); 
         
-        taskStatus.style.display = 'none';
-
-        db.ref('pdfs/' + key).once('value').then(snapshot => {
-            const pdf = snapshot.val();
-            if (!pdf) {
-                 showErrorModal("Hata", "PDF kaydı bulunamadı.");
-                 return;
-            }
-            
-            pendingDownload = { key, name: pdf.title, url: pdf.url, required_links: pdf.required_links || { join: [], ad: [] } };
-            
-            const joinLinks = pendingDownload.required_links.join || [];
-            const adLinks = pendingDownload.required_links.ad || [];
-            
-            // Kanala Katılma Görevi Ayarları
-            const isJoinTaskActive = joinLinks.length > 0 && taskConfig.required_joins > 0;
-            if (isJoinTaskActive) {
-                document.getElementById('joinsRequiredText').textContent = `${joinLinks.length} adet sponsora katılarak indirme hakkı kazanın.`;
-                taskJoinButton.style.display = 'flex';
-                taskJoinButton.setAttribute('onclick', `startDownloadTask('join_channel', ${joinLinks.length})`);
-                taskJoinButton.disabled = false;
-            } else {
-                taskJoinButton.style.display = 'none';
-            }
-
-            // Reklam Görüntüleme Görevi Ayarları
-            const isAdTaskActive = adLinks.length > 0 && taskConfig.ads_per_download > 0;
-            if (isAdTaskActive) {
-                document.getElementById('adsRequiredText').textContent = `${adLinks.length} adet reklam linkine tıklayarak indirme hakkı kazanın.`;
-                taskAdButton.style.display = 'flex';
-                taskAdButton.setAttribute('onclick', `startDownloadTask('watch_ads', ${adLinks.length})`);
-                taskAdButton.disabled = false;
-            } else {
-                taskAdButton.style.display = 'none';
-            }
-            
-            // Görev yoksa direkt indir
-            if (!isJoinTaskActive && !isAdTaskActive) {
-                 finalizeDownload(pendingDownload.name, pendingDownload.url, pendingDownload.key);
-                 return;
-            }
-
-            taskModal.classList.remove('hidden');
-
-        }).catch(error => {
-             showErrorModal("Veri Hatası", "PDF görev bilgileri yüklenemedi: " + error.message);
-        });
+        // GÜVENLİK/ZORUNLULUK NOTU: Bot API olmadan kanala katılım kontrolü yapılamaz.
+        // Bu yüzden tüm PDF'ler için ek görevsiz direkt indirme akışı uygulanmaktadır.
     }
     
-    // GÜNCELLENDİ: Görevleri sırayla açtırır (Admin'in belirlediği sayıda link kontrolü ile)
-    window.startDownloadTask = function(taskType, requiredCount) {
-        const statusElement = document.getElementById('taskStatus');
-        const taskButton = taskType === 'join_channel' ? document.getElementById('taskJoinButton') : document.getElementById('taskAdButton');
-        
-        if (taskButton.disabled) return; 
-
-        const taskLinks = taskType === 'join_channel' ? pendingDownload.required_links.join : pendingDownload.required_links.ad;
-        const requiredCheckCount = taskType === 'join_channel' ? taskConfig.required_joins : taskConfig.ads_per_download;
-        
-        if (taskLinks.length !== requiredCount || requiredCount < requiredCheckCount) {
-             showErrorModal("Görev Hatası", "Admin ayarları veya PDF linkleri hatalı. Lütfen Admin ile iletişime geçin.");
-             return;
-        }
-        
-        taskButton.disabled = true;
-        statusElement.style.display = 'block';
-        if (window.Telegram && Telegram.WebApp) Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-
-        if (taskType === 'join_channel') {
-            
-            let completedJoins = 0;
-            statusElement.innerHTML = `Kanala Katılma Görevi: Lütfen sırayla **${requiredCount} linki** ziyaret edin ve katılın. Geri döndüğünüzde kontrol edilir.`;
-            
-            taskLinks.forEach((link, index) => {
-                 setTimeout(() => {
-                      window.open(link, '_blank');
-                      statusElement.innerHTML = `<span style="color: #FF9500;">(${index + 1}/${requiredCount})</span> Kanala Yönlendiriliyor... Lütfen katılın ve geri gelin.`;
-                      
-                      setTimeout(() => {
-                          completedJoins++;
-                          if (completedJoins === requiredCount) {
-                                // Kanala katılım kontrolü simülasyonu
-                                statusElement.textContent = "Katılım görevi tamamlandı olarak işaretlendi.";
-                                taskButton.disabled = false; 
-                                checkAllTasksCompleted(); 
-                          }
-                      }, 1000); 
-                 }, index * 2000); 
-            });
-            
-        } else if (taskType === 'watch_ads') {
-             
-            let completedAds = 0;
-            statusElement.innerHTML = `Reklam Görüntüleme Görevi: Lütfen sırayla **${requiredCount} linki** ziyaret edin ve 3 saniye bekleyin.`;
-
-            taskLinks.forEach((link, index) => {
-                 setTimeout(() => {
-                      window.open(link, '_blank');
-                      statusElement.innerHTML = `<span style="color: #FF9500;">(${index + 1}/${requiredCount})</span> Reklam görüntüleniyor... (3 saniye bekleyin)`;
-                      
-                      setTimeout(() => {
-                          completedAds++;
-                          if (completedAds === requiredCount) {
-                                // Reklam kontrolü simülasyonu
-                                statusElement.textContent = "Reklam görüntüleme görevi tamamlandı olarak işaretlendi.";
-                                taskButton.disabled = false; 
-                                checkAllTasksCompleted(); 
-                          }
-                      }, 3000); 
-
-                 }, index * 3500); 
-            });
-            
-        } else {
-             statusElement.textContent = "Hata: Görev başlatılamadı.";
-             taskButton.disabled = false;
-        }
-    }
-    
-    // YENİ: Görevlerin bitip bitmediğini kontrol eder
-    function checkAllTasksCompleted() {
-        const taskModal = document.getElementById('taskModal');
-        const taskAdButton = document.getElementById('taskAdButton');
-        const taskJoinButton = document.getElementById('taskJoinButton');
-        const taskStatus = document.getElementById('taskStatus');
-        
-        const isAdTaskActive = taskAdButton.style.display !== 'none';
-        const isJoinTaskActive = taskJoinButton.style.display !== 'none';
-        
-        const isAdCompleted = isAdTaskActive ? taskAdButton.disabled : true;
-        const isJoinCompleted = isJoinTaskActive ? taskJoinButton.disabled : true;
-        
-        if (isAdCompleted && isJoinCompleted) {
-            taskStatus.style.color = '#34C759';
-            taskStatus.textContent = "Tebrikler! Tüm görevler tamamlandı. İndirme başlatılıyor...";
-            
-            setTimeout(() => {
-                 taskModal.classList.add('hidden');
-                 finalizeDownload(pendingDownload.name, pendingDownload.url, pendingDownload.key); 
-            }, 1500);
-            
-        } else {
-            taskStatus.style.color = '#FF3B30';
-            taskStatus.textContent = "Görevleri Eksik Veya Hatalı Yaptınız (Lütfen tüm aktif görevleri tamamlayın).";
-            
-        }
-    }
-    
+    // GÜNCELLENDİ: İndirmeyi sonlandırır ve sayacı günceller
     window.finalizeDownload = function(name, url, key) {
          if (!url) return;
          
@@ -946,7 +696,7 @@
              Telegram.WebApp.HapticFeedback.notificationOccurred('success');
          }
          
-         pendingDownload = { key: null, name: null, url: null, required_links: { join: [], ad: [] } }; 
+         pendingDownload = { key: null, name: null, url: null }; 
     }
 
     // #############################
@@ -1040,17 +790,7 @@
                 
                 const onclickAction = `handlePDFDownload('${key}', '${pdf.title.replace(/'/g, "\\'").replace(/"/g, '\\"')}', '${pdf.url}')`;
                 
-                const requiredLinks = pdf.required_links || { join: [], ad: [] };
-                const isTaskRequired = (requiredLinks.join.length >= taskConfig.required_joins && taskConfig.required_joins > 0) || 
-                                     (requiredLinks.ad.length >= taskConfig.ads_per_download && taskConfig.ads_per_download > 0);
-                
                 let taskText = 'Direk İndirilebilir';
-                if (isTaskRequired) {
-                    let taskDetail = [];
-                    if (requiredLinks.join.length > 0) taskDetail.push(`${requiredLinks.join.length} Kanal`);
-                    if (requiredLinks.ad.length > 0) taskDetail.push(`${requiredLinks.ad.length} Reklam`);
-                    taskText = `Görevli İndirme (${taskDetail.join(' + ')})`;
-                }
                 
                 const detailText = `${taskText} | Yükleyen: ${pdf.uploaded_by || 'Admin'}`;
 
@@ -1064,7 +804,7 @@
                         <div class="list-name">${pdf.title}</div>
                         <div class="list-detail">${detailText}</div>
                     </div>
-                    <div class="list-meta"><span class="material-symbols-rounded">${isTaskRequired ? 'task_alt' : 'download'}</span></div>
+                    <div class="list-meta"><span class="material-symbols-rounded">download</span></div>
                 `;
                 listCard.appendChild(listItem);
             });
@@ -1114,9 +854,11 @@
         }, 100);
     }
     
+    // GÜNCELLENDİ: Sadece Başlık, Açıklama ve Link'i çekecek
     window.loadChatAdBanner = function() {
         const bannerContainer = document.getElementById('chatAdBanner');
-        const bannerImage = document.getElementById('adBannerImage');
+        const adTitle = document.getElementById('adBannerTitle');
+        const adDesc = document.getElementById('adBannerDesc');
         const adButton = document.getElementById('adBannerButton');
         
         if (!db) return;
@@ -1126,13 +868,15 @@
         db.ref('settings/pinned_ads').on('value', (snapshot) => {
             const ad = snapshot.val();
             
-            if (ad && ad.image_url && ad.link) {
-                bannerImage.src = ad.image_url;
+            if (ad && ad.title && ad.link) {
+                adTitle.textContent = ad.title;
+                adDesc.textContent = ad.description || '';
                 adButton.setAttribute('data-link', ad.link);
                 bannerContainer.style.display = 'block';
             } else {
                 bannerContainer.style.display = 'none';
-                bannerImage.src = '';
+                adTitle.textContent = '';
+                adDesc.textContent = '';
             }
 
             updateChatPadding();
@@ -1147,13 +891,6 @@
         }
     }
     
-    window.handleAdImageError = function(img) {
-        img.style.display='none'; 
-        document.getElementById('chatAdBanner').style.display='none'; 
-        updateChatPadding();
-    }
-
-
     function updateChatPadding() {
          const bannerContainer = document.getElementById('chatAdBanner');
          const pinnedContainer = document.getElementById('pinnedMessageContainer');
@@ -1165,12 +902,11 @@
          
          if (bannerContainer.style.display !== 'none' && document.getElementById('page-chat-container').classList.contains('active')) {
              const adContent = bannerContainer.querySelector('.ad-content');
-             // Basit bir yaklaşımla banner yüksekliğini hesaplayalım.
              if (adContent) {
                   totalOffset += adContent.offsetHeight + 10; 
              } else {
-                  // Fallback: CSS'teki varsayılan yüksekliği kullan
-                  totalOffset += parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ad-pinned-height'));
+                  // Fallback
+                  totalOffset += 80;
              }
          }
          if (pinnedContainer.style.display !== 'none') {
@@ -1397,71 +1133,16 @@
     // ##### ADMIN PANEL LOJİĞİ (GÜNCELLENDİ) #####
     // #############################
     
-    // YENİ: Dinamik olarak link giriş alanlarını oluşturur
-    window.updateDynamicLinkInputs = function(type, count) {
-        const containerId = type === 'join' ? 'joinLinksContainer' : 'adLinksContainer';
-        const placeholderText = type === 'join' ? 'Kanala Katılma Linki (1/X)' : 'Reklam Görüntüleme Linki (1/X)';
-        const container = document.getElementById(containerId);
-        container.innerHTML = '';
-        
-        const num = parseInt(count);
-        if (isNaN(num) || num <= 0) return;
-
-        for (let i = 1; i <= num; i++) {
-            const input = document.createElement('input');
-            input.type = 'url';
-            input.id = `${type}Link${i}`;
-            input.placeholder = `${i}. ${placeholderText}`;
-            input.classList.add('dynamic-link-input');
-            input.style.cssText = `width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: var(--background-color); color: var(--text-color);`;
-            container.appendChild(input);
-        }
-    }
-
-    // GÜNCELLENDİ: Dinamik linkleri toplayıp kaydeder (Görev Zorunluluğu Kontrolü Eklendi)
+    // YENİ: PDF'i basitçe kaydeder (Görev linkleri kaldırıldı)
     window.uploadPDF = function() {
         if (!is_admin || !db) { showErrorModal("Yetkisiz Erişim", "Sadece yöneticiler dosya yükleyebilir."); return; }
         
         const title = document.getElementById('pdfTitle').value.trim();
         const pdfUrl = document.getElementById('pdfUrl').value.trim();
-        const joinCount = parseInt(document.getElementById('joinLinksCount').value) || 0;
-        const adCount = parseInt(document.getElementById('adLinksCount').value) || 0;
         
         if (!title || !pdfUrl) { showErrorModal("Eksik Bilgi", "Lütfen Başlık ve Ana PDF URL'sini eksiksiz girin."); return; }
         if (!pdfUrl.startsWith('http')) { showErrorModal("URL Hatası", "Lütfen geçerli bir ana PDF URL'si girin."); return; }
         
-        const requiredLinks = { join: [], ad: [] };
-
-        // 1. Kanala Katılma Linklerini Topla ve Kontrol Et
-        for (let i = 1; i <= joinCount; i++) {
-            const linkInput = document.getElementById(`joinLink${i}`);
-            if (!linkInput || !linkInput.value.trim().startsWith('http')) {
-                showErrorModal("Eksik/Hatalı Link", `${i}. Kanala Katılma Linki hatalı veya eksik. Lütfen tüm ${joinCount} adet linki doğru girin.`);
-                return;
-            }
-            requiredLinks.join.push(linkInput.value.trim());
-        }
-
-        // 2. Reklam Görüntüleme Linklerini Topla ve Kontrol Et
-        for (let i = 1; i <= adCount; i++) {
-            const linkInput = document.getElementById(`adLink${i}`);
-            if (!linkInput || !linkInput.value.trim().startsWith('http')) {
-                showErrorModal("Eksik/Hatalı Link", `${i}. Reklam Görüntüleme Linki hatalı veya eksik. Lütfen tüm ${adCount} adet linki doğru girin.`);
-                return;
-            }
-            requiredLinks.ad.push(linkInput.value.trim());
-        }
-        
-        // GÖREV ZORUNLULUĞU KONTROLÜ (Admin Ayarlarına göre)
-        if (taskConfig.required_joins > 0 && joinCount < taskConfig.required_joins) {
-             showErrorModal("Görev Eksikliği", `Kanala katılma zorunluluğu **${taskConfig.required_joins}** olarak ayarlanmış. Lütfen bu sayıda kanal linki ekleyin.`);
-             return;
-        }
-        if (taskConfig.ads_per_download > 0 && adCount < taskConfig.ads_per_download) {
-             showErrorModal("Görev Eksikliği", `Reklam görüntüleme zorunluluğu **${taskConfig.ads_per_download}** olarak ayarlanmış. Lütfen bu sayıda reklam linki ekleyin.`);
-             return;
-        }
-
         const uploadButton = document.getElementById('uploadPdfButton');
         uploadButton.textContent = 'Kaydediliyor...';
         uploadButton.disabled = true;
@@ -1470,19 +1151,15 @@
         newPdfRef.set({
             title: title,
             url: pdfUrl, 
-            required_links: requiredLinks, 
             timestamp: firebase.database.ServerValue.TIMESTAMP,
             uploaded_by: currentUser.username || currentUser.id,
             downloads: 0 
+            // required_links alanı artık eklenmiyor/kullanılmıyor
         }).then(() => {
             showErrorModal("Başarılı", `PDF "${title}" kaydı başarıyla eklendi.`);
             // Formu sıfırla
             document.getElementById('pdfTitle').value = ''; 
             document.getElementById('pdfUrl').value = '';
-            document.getElementById('joinLinksCount').value = 0;
-            document.getElementById('adLinksCount').value = 0;
-            updateDynamicLinkInputs('join', 0); 
-            updateDynamicLinkInputs('ad', 0);
             
             uploadButton.textContent = 'PDF Kaydını Ekle';
             uploadButton.disabled = false;
@@ -1492,30 +1169,6 @@
             showErrorModal("Kaydetme Hatası", "PDF kaydı Firebase'e yazılamadı: " + error.message);
             uploadButton.textContent = 'PDF Kaydını Ekle';
             uploadButton.disabled = false;
-        });
-    }
-    
-    window.saveTaskConfig = function() {
-        if (!is_admin || !db) return;
-        
-        const ads = parseInt(document.getElementById('adsPerDownload').value) || 0;
-        const joins = parseInt(document.getElementById('requiredJoins').value) || 0;
-        
-        if (ads < 0 || joins < 0) {
-             showErrorModal("Geçersiz Değer", "Reklam ve Katılma zorunlulukları 0 veya pozitif bir sayı olmalıdır.");
-             return;
-        }
-
-        db.ref('settings/tasks').set({
-             ads_per_download: ads,
-             required_joins: joins,
-             updated_by: currentUser.username || currentUser.id,
-             updated_at: firebase.database.ServerValue.TIMESTAMP
-        }).then(() => {
-             document.getElementById('taskConfigStatus').textContent = `Görev Ayarları Başarıyla Kaydedildi! (Reklam Link Sayısı: ${ads}, Kanal Link Sayısı: ${joins})`;
-             loadTaskConfig(); 
-        }).catch(e => {
-             document.getElementById('taskConfigStatus').textContent = 'Kaydetme Hatası: ' + e.message;
         });
     }
 
@@ -1542,11 +1195,6 @@
                 const date = new Date(pdf.timestamp).toLocaleDateString('tr-TR');
                 const downloadCount = pdf.downloads || 0;
                 
-                const requiredLinks = pdf.required_links || { join: [], ad: [] };
-                let taskSummary = [];
-                if (requiredLinks.join.length > 0) taskSummary.push(`Katılma: ${requiredLinks.join.length}`);
-                if (requiredLinks.ad.length > 0) taskSummary.push(`Reklam: ${requiredLinks.ad.length}`);
-
                 const listItem = document.createElement('div');
                 listItem.classList.add('list-item');
                 listItem.style.flexWrap = 'wrap';
@@ -1558,7 +1206,7 @@
                         <div class="list-name">${pdf.title}</div>
                         <div class="list-detail">
                             <span style="color: ${downloadCount > 0 ? '#34C759' : '#FF9500'}; font-weight: 600;">İndirme Sayısı: ${downloadCount}</span> 
-                            | Görevler: ${taskSummary.join(' / ') || 'Yok'}
+                            | Görevler: Yok
                         </div>
                         <div class="list-detail">Yükleyen: ${pdf.uploaded_by || 'Admin'} | Tarih: ${date}</div>
                     </div>
@@ -1678,86 +1326,94 @@
         }
     }
     
+    // GÜNCELLENDİ: Sadece başlık, açıklama ve linki okur
     window.loadAdBannerConfig = function() {
-        const imageInput = document.getElementById('adBannerImageAdmin');
+        const titleInput = document.getElementById('adBannerTitleAdmin');
+        const descInput = document.getElementById('adBannerDescAdmin');
         const linkInput = document.getElementById('adBannerLinkAdmin');
-        const previewImg = document.getElementById('adBannerPreview');
+        
+        const previewTitle = document.getElementById('previewTitle');
+        const previewDesc = document.getElementById('previewDesc');
         const previewHint = document.getElementById('previewHint');
         
         if (!db) return;
 
         db.ref('settings/pinned_ads').once('value', (snapshot) => {
             const ad = snapshot.val();
-            if (ad && ad.image_url) {
-                imageInput.value = ad.image_url;
+            if (ad && ad.title) {
+                titleInput.value = ad.title;
+                descInput.value = ad.description || '';
                 linkInput.value = ad.link || '';
-                previewImg.src = ad.image_url;
-                previewImg.style.display = 'block';
+                
+                previewTitle.textContent = ad.title;
+                previewDesc.textContent = ad.description || 'Açıklama mevcut değil.';
                 previewHint.style.display = 'none';
             } else {
-                 imageInput.value = '';
+                 titleInput.value = '';
+                 descInput.value = '';
                  linkInput.value = '';
-                 previewImg.src = '';
-                 previewImg.style.display = 'none';
+                 
+                 previewTitle.textContent = 'ÖN İZLEME BAŞLIĞI';
+                 previewDesc.textContent = 'Önizleme Açıklaması';
                  previewHint.style.display = 'block';
-                 previewHint.textContent = 'Görsel URL\'si girildikten sonra önizleme burada görünecektir.';
+                 previewHint.textContent = 'Afiş Başlığı ve Açıklaması girildikten sonra önizleme burada görünecektir.';
             }
-            document.getElementById('adStatus').textContent = 'Mevcut afiş reklamı yüklendi.';
+            document.getElementById('adStatus').textContent = 'Mevcut afiş verisi yüklendi.';
         }).catch(e => {
-            document.getElementById('adStatus').textContent = 'Afiş reklam verisi yüklenirken hata oluştu: ' + e.message;
+            document.getElementById('adStatus').textContent = 'Afiş verisi yüklenirken hata oluştu: ' + e.message;
         });
         
-        imageInput.oninput = function() {
-            previewImg.src = this.value;
-            previewImg.style.display = 'block';
-            previewHint.style.display = 'none';
-            previewImg.onerror = function() { 
-                this.style.display='none'; 
-                previewHint.style.display = 'block';
-                previewHint.textContent = 'Geçersiz görsel URL.';
-            };
-            previewImg.onload = function() {
-                previewHint.style.display = 'none';
-            }
-        };
+        // Önizlemeyi dinamik güncelleme
+        titleInput.oninput = function() { previewTitle.textContent = this.value || 'ÖN İZLEME BAŞLIĞI'; };
+        descInput.oninput = function() { previewDesc.textContent = this.value || 'Önizleme Açıklaması'; };
+        
+        titleInput.oninput();
+        descInput.oninput();
     }
 
+    // GÜNCELLENDİ: Sadece başlık, açıklama ve linki kaydeder
     window.saveAdBannerConfig = function() {
          if (!is_admin || !db) return;
-         const imageUrl = document.getElementById('adBannerImageAdmin').value.trim();
+         const title = document.getElementById('adBannerTitleAdmin').value.trim();
+         const description = document.getElementById('adBannerDescAdmin').value.trim();
          const link = document.getElementById('adBannerLinkAdmin').value.trim();
          
-         if (!imageUrl || !link) {
-             showErrorModal("Eksik Bilgi", "Görsel URL'si ve Link boş bırakılamaz.");
+         if (!title || !link) {
+             showErrorModal("Eksik Bilgi", "Başlık ve Link boş bırakılamaz.");
              return;
          }
-         if (!imageUrl.startsWith('http') || !link.startsWith('http')) {
-             showErrorModal("URL Hatası", "Görsel ve Yönlendirme Linkleri 'http://' veya 'https://' ile başlamalıdır.");
+         if (!link.startsWith('http')) {
+             showErrorModal("URL Hatası", "Yönlendirme Linki 'http://' veya 'https://' ile başlamalıdır.");
              return;
          }
 
          db.ref('settings/pinned_ads').set({
-             image_url: imageUrl,
+             title: title,
+             description: description,
              link: link,
              updated_by: currentUser.username || currentUser.id,
              updated_at: firebase.database.ServerValue.TIMESTAMP
          }).then(() => {
-             document.getElementById('adStatus').textContent = 'Afiş Reklamı Ayarları Başarıyla Kaydedildi!';
+             document.getElementById('adStatus').textContent = 'Afiş Ayarları Başarıyla Kaydedildi!';
              loadChatAdBanner(); 
          }).catch(e => {
              document.getElementById('adStatus').textContent = 'Kaydetme Hatası: ' + e.message;
          });
     }
     
+    // GÜNCELLENDİ: Afişi tamamen kaldırır ve alanları temizler
     window.removeAdBannerConfig = function() {
         if (!is_admin || !db) return;
         if (confirm("Afiş reklamını kaldırmak istediğinizden emin misiniz?")) {
             db.ref('settings/pinned_ads').remove().then(() => {
-                 document.getElementById('adBannerImageAdmin').value = '';
+                 document.getElementById('adBannerTitleAdmin').value = '';
+                 document.getElementById('adBannerDescAdmin').value = '';
                  document.getElementById('adBannerLinkAdmin').value = '';
-                 document.getElementById('adBannerPreview').src = '';
-                 document.getElementById('adBannerPreview').style.display = 'none';
+                 
+                 document.getElementById('previewTitle').textContent = 'ÖN İZLEME BAŞLIĞI';
+                 document.getElementById('previewDesc').textContent = 'Önizleme Açıklaması';
                  document.getElementById('previewHint').style.display = 'block';
+                 
                  document.getElementById('adStatus').textContent = 'Afiş Reklamı Başarıyla Kaldırıldı!';
                  loadChatAdBanner();
             }).catch(e => {
@@ -1780,7 +1436,6 @@
         } 
         if (tabId === 'ads') {
             loadAdBannerConfig();
-            loadTaskConfig(); 
         }
     }
 
