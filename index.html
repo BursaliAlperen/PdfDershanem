@@ -341,10 +341,10 @@
             function startApp() {
                 let user;
 
-                // ⚠️ DÜZELTME: Firebase Başlatma Kontrolü
+                // Firebase Başlatma Kontrolü
                 if (!db) {
                     loadingStatus.classList.add('hidden');
-                    errorMessage.textContent = "FATAL HATA: Firebase veritabanı bağlantısı kurulamadı. Lütfen konsolu kontrol edin.";
+                    errorMessage.textContent = "FATAL HATA: Firebase veritabanı bağlantısı kurulamadı.";
                     errorMessage.classList.remove('hidden');
                     return; 
                 }
@@ -386,11 +386,13 @@
                     telegramId: userId,
                     username: userData.username || 'yok',
                     firstName: userData.first_name || 'yok',
+                    // Sinyal olarak 'checking' yazılıyor.
                     status: 'checking', 
                     lastActive: firebase.database.ServerValue.TIMESTAMP
                 };
                 userRef.update(initialUpdate).catch(e => {
-                    console.log("RTDB'ye yazma denemesi kural hatası verdi (Normal olabilir, Bot yazacak):", e.message);
+                    console.error("RTDB'ye sinyal yazılırken hata oluştu:", e);
+                    // Bu noktada hata oluşması, Firebase Kurallarının yazmaya izin vermediği anlamına gelebilir.
                 });
 
 
@@ -401,7 +403,7 @@
                     const data = snapshot.val();
                     
                     if (data && data.isMember === true) {
-                        // ÜYE: Ana uygulamayı aç
+                        // 1. DURUM: ÜYE - Ana uygulamayı aç
                         isMemberChecked = true;
                         isListening = false;
                         splashScreen.classList.add('hidden');
@@ -410,35 +412,36 @@
                         fetchRealtimeData(); 
                         userRef.off('value'); 
                         
-                    } else {
-                        // ÜYE DEĞİL veya KONTROL GEREKİYOR: Giriş ekranını göster
+                    } else if (data && data.isMember === false) {
+                        // 2. DURUM: ÜYE DEĞİL (Bot sonucu yazdı)
+                        isMemberChecked = true;
+                        isListening = false;
+                        loadingStatus.classList.add('hidden');
+                        errorMessage.textContent = '⚠️ Üyelik doğrulanamadı. Lütfen kanala katıldığınızdan emin olun ve uygulamayı tekrar başlatın. Bot sonucu: Üye Değil.';
+                        errorMessage.classList.remove('hidden');
+                        splashMessage.innerHTML = 'Bota giriş yapmak için kanala **katılmalısın**!';
+                        userRef.off('value'); 
+                    
+                    } else if (data && data.status === 'checking') {
+                        // 3. DURUM: KONTROL EDİLİYOR (Bot henüz sonucu yazmadı)
                         mainAppContent.classList.add('hidden');
                         splashScreen.classList.remove('hidden');
                         errorMessage.classList.add('hidden'); 
-
-                        if (data && data.status === 'checking') {
-                            loadingStatus.classList.remove('hidden');
-                            loadingStatus.innerHTML = '<i class="fas fa-sync fa-spin"></i> Üyeliğiniz Bot Tarafından kontrol ediliyor...';
-                        } else if (data && data.isMember === false) {
-                            isMemberChecked = true;
-                            isListening = false;
-                            loadingStatus.classList.add('hidden');
-                            errorMessage.textContent = '⚠️ Üyelik doğrulanamadı. Lütfen kanala katıldığınızdan emin olun ve uygulamayı tekrar başlatın.';
-                            errorMessage.classList.remove('hidden');
-                            splashMessage.innerHTML = 'Bota giriş yapmak için kanala **katılmalısın**!';
-                            userRef.off('value'); 
-                        } else {
-                             // Veri bekleniyor (ilk verinin gelmediği durum)
-                             loadingStatus.classList.remove('hidden');
-                             loadingStatus.innerHTML = '<i class="fas fa-sync fa-spin"></i> Veri bekleniyor... (Bot veya Firebase bağlantısı bekleniyor)';
-                        }
+                        loadingStatus.classList.remove('hidden');
+                        loadingStatus.innerHTML = '<i class="fas fa-sync fa-spin"></i> Üyeliğiniz Bot Tarafından kontrol ediliyor...';
+                    
+                    } else {
+                        // 4. DURUM: VERİ BOŞ VEYA YETERSİZ
+                         loadingStatus.classList.remove('hidden');
+                         loadingStatus.innerHTML = '<i class="fas fa-sync fa-spin"></i> Veri bekleniyor... (Bot veya Firebase bağlantısı bekleniyor)';
+                         // Eğer 10 saniyede buradan çıkılmazsa Timeout devreye girecek.
                     }
-                }, (error) => { // ⚠️ DÜZELTME: Dinleme Hatası Yönetimi (Erişim reddedilirse: PERMISSION_DENIED)
+                }, (error) => { // Dinleme Hatası Yönetimi (Erişim reddedilirse: PERMISSION_DENIED)
                     if (isListening) {
                         isListening = false;
                         userRef.off('value'); 
                         loadingStatus.classList.add('hidden');
-                        errorMessage.textContent = `⚠️ Veritabanı Bağlantı Hatası: Veri okuma engellendi. Firebase kurallarını kontrol edin. Hata kodu: ${error.code}`;
+                        errorMessage.textContent = `⚠️ Firebase Kural Hatası: Veri okuma engellendi. Bu, web uygulamasının izinlerinin olmadığı anlamına gelir. Lütfen Firebase Kurallarını (users/.read) kontrol edin. Hata kodu: ${error.code}`;
                         errorMessage.classList.remove('hidden');
                     }
                 });
@@ -450,7 +453,7 @@
                         isListening = false;
                         userRef.off('value'); 
                         loadingStatus.classList.add('hidden');
-                        errorMessage.textContent = '⏱️ Zaman aşımı hatası: Botun veritabanını güncellemesi bekleniyor. Lütfen botun çalıştığından emin olun ve uygulamayı yeniden başlatın.';
+                        errorMessage.textContent = '⏱️ Zaman aşımı hatası: Üyelik kontrolü tamamlanamadı. Bu, botun Firebase verisini güncellemediği anlamına gelir. Lütfen botun çalışır durumda olduğundan emin olun ve uygulamayı tekrar başlatın.';
                         errorMessage.classList.remove('hidden');
                         splashMessage.innerHTML = 'Bir sorun oluştu. Lütfen botun çalışıp çalışmadığını kontrol edip tekrar deneyin.';
                     }
