@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>@Pdf_DershanemBot - Web App</title>
+    <title>@Pdf_DershanemBot - Tam Fonksiyonel</title>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script> 
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
@@ -41,16 +42,14 @@
         }
 
         .telegram-app {
-            width: 100%; max-width: 400px; height: 100vh; /* Yüksekliği tam ekran yap */
+            width: 100%; max-width: 400px; height: 100vh;
             background-color: var(--light-bg); 
             box-shadow: var(--shadow-subtle);
             display: flex; flex-direction: column; overflow: hidden;
             position: relative;
         }
         
-        /* ####################################################### */
-        /* ##### GİRİŞ EKRANI STİLLERİ ##### */
-        /* ####################################################### */
+        /* GİRİŞ EKRANI STİLLERİ */
         .splash-screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 100;
             display: flex; flex-direction: column; justify-content: center; align-items: center; 
@@ -70,20 +69,8 @@
         .splash-card h2 { color: var(--text-dark); margin-bottom: 10px; font-weight: 700; font-size: 20px; }
         .splash-card p { color: var(--text-secondary); line-height: 1.5; font-size: 14px; font-weight: 400; margin-bottom: 20px; text-align: left; }
         
-        .terms-container {
-            display: flex;
-            align-items: flex-start;
-            margin: 20px 0;
-            padding: 10px;
-            background-color: #f0f3f6;
-            border-radius: 8px;
-        }
-        
-        .terms-container input[type="checkbox"] {
-            margin-top: 5px; margin-right: 10px; width: 18px; height: 18px; flex-shrink: 0;
-            accent-color: var(--tg-blue); 
-        }
-
+        .terms-container { display: flex; align-items: flex-start; margin: 20px 0; padding: 10px; background-color: #f0f3f6; border-radius: 8px; }
+        .terms-container input[type="checkbox"] { margin-top: 5px; margin-right: 10px; width: 18px; height: 18px; flex-shrink: 0; accent-color: var(--tg-blue); }
         .terms-text { font-size: 13px; color: var(--text-dark); text-align: left; line-height: 1.4; }
         
         .action-button {
@@ -103,117 +90,107 @@
         
         .hidden { display: none !important; }
 
-        /* ####################################################### */
-        /* ##### ANA ARAYÜZ STİLLERİ ##### */
-        /* ####################################################### */
-        .header { 
-            background-color: var(--card-bg); 
-            padding: 15px; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            font-size: 18px; 
-            font-weight: 700; 
-            border-bottom: 1px solid var(--border-color); 
-        }
-
-        .content-container {
-            flex-grow: 1;
-            overflow: hidden;
-            position: relative;
-        }
+        /* ANA UYGULAMA İSKELET STİLLERİ */
+        .header { background-color: var(--card-bg); padding: 15px; display: flex; justify-content: center; align-items: center; font-size: 18px; font-weight: 700; border-bottom: 1px solid var(--border-color); }
+        .content-container { flex-grow: 1; overflow: hidden; position: relative; }
         
         .content-page {
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            overflow-y: auto;
-            padding: 15px;
-            background-color: var(--light-bg);
-            box-sizing: border-box;
-            opacity: 0;
-            transform: translateX(100%);
-            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            width: 100%; height: 100%; position: absolute; top: 0; left: 0; overflow-y: auto; 
+            padding: 15px; background-color: var(--light-bg); box-sizing: border-box; 
+            opacity: 0; transform: translateX(100%); transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
         }
 
-        .content-page.active {
-            opacity: 1;
-            transform: translateX(0);
-            z-index: 5;
-        }
-
-        /* Sponsor Kutusu Stili */
-        .sponsor-box {
-            background-color: #e0f7fa; 
-            border: 1px solid #00bcd4;
-            color: #00838f;
-            padding: 12px;
-            border-radius: var(--border-radius-md);
-            margin-bottom: 15px;
-            font-size: 14px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-        }
-        .sponsor-box i { margin-right: 10px; color: #00bcd4; font-size: 16px; }
+        .content-page.active { opacity: 1; transform: translateX(0); z-index: 5; }
 
         /* Dinamik Liste Stilleri */
-        .list-section-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            margin: 15px 0 10px 0;
-            text-transform: uppercase;
-        }
-        .list-card {
-            background-color: var(--card-bg);
-            margin: 0; 
-            border-radius: var(--border-radius-md);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-        
-        .list-item { 
-            display: flex; 
-            padding: 12px 15px; 
-            align-items: center; 
-            border-bottom: 1px solid var(--border-color); 
-            text-decoration: none;
-            color: inherit;
-        }
+        .sponsor-box { background-color: #e0f7fa; border: 1px solid #00bcd4; color: #00838f; padding: 12px; border-radius: var(--border-radius-md); margin-bottom: 15px; font-size: 14px; font-weight: 600; display: flex; align-items: center; }
+        .sponsor-box i { margin-right: 10px; color: #00bcd4; font-size: 16px; }
+        .list-section-title { font-size: 14px; font-weight: 600; color: var(--text-secondary); margin: 15px 0 10px 0; text-transform: uppercase; }
+        .list-card { background-color: var(--card-bg); margin: 0; border-radius: var(--border-radius-md); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); overflow: hidden; }
+        .list-item { display: flex; padding: 12px 15px; align-items: center; border-bottom: 1px solid var(--border-color); text-decoration: none; color: inherit; }
         .list-item:last-child { border-bottom: none; }
-        
-        .list-icon { 
-            width: 30px; height: 30px; 
-            border-radius: 50%; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            font-size: 15px; 
-            color: var(--card-bg); 
-            flex-shrink: 0; 
-            margin-right: 15px; 
-        }
+        .list-icon { width: 30px; height: 30px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 15px; color: var(--card-bg); flex-shrink: 0; margin-right: 15px; }
         .list-info { flex-grow: 1; }
         .list-name { font-weight: 600; font-size: 15px; }
         .list-detail { font-size: 13px; color: var(--text-secondary); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .list-meta { font-size: 12px; color: var(--text-secondary); flex-shrink: 0; margin-left: 10px; font-weight: 500;}
-
-        /* Navbar */
-        .navbar { 
-            background-color: var(--card-bg); 
-            border-top: 1px solid var(--border-color); 
-            display: flex; 
-            justify-content: space-around; 
-            padding: 10px 0 15px; 
-            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05); 
-            z-index: 10; 
-        }
+        
+        /* Navbar Stilleri */
+        .navbar { background-color: var(--card-bg); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; padding: 10px 0 15px; box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05); z-index: 10; }
         .nav-item { flex: 1; font-size: 11px; color: var(--text-secondary); cursor: pointer; text-align: center; font-weight: 500; }
         .nav-item.active { color: var(--tg-blue); font-weight: 700; }
         .nav-icon { display: block; font-size: 20px; margin-bottom: 2px; }
+
+        /* YENİ EKLENEN SOHBET VE ADMİN STİLLERİ */
+        .chat-interaction-box {
+            background-color: var(--card-bg);
+            padding: 15px;
+            border-radius: var(--border-radius-md);
+            margin-bottom: 15px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .chat-input-group input[type="text"] {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            font-size: 15px;
+            box-sizing: border-box;
+        }
+
+        .chat-input-group button {
+            background-color: var(--tg-blue);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .chat-input-group button:hover { background-color: #0056b3; }
+
+        /* Admin Dosya Yükleme */
+        .file-upload-box {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: var(--border-radius-md);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .upload-button {
+            background-color: var(--tg-green);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            margin-top: 15px;
+            width: 100%;
+            transition: background-color 0.2s;
+        }
+        .upload-button:disabled {
+            background-color: var(--text-secondary);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .file-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        .upload-status {
+            margin-top: 10px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        .upload-status.success { color: var(--tg-green); }
+        .upload-status.error { color: var(--tg-red); }
 
     </style>
 </head>
@@ -276,8 +253,7 @@
                             </div>
                             <div class="list-meta">Sayı</div>
                         </div>
-
-                        <div class="list-item">
+                         <div class="list-item">
                             <div class="list-icon" style="background-color: var(--tg-green);"><i class="fas fa-users"></i></div>
                             <div class="list-info">
                                 <div class="list-name">💬 Ortak Sohbet Grubu</div>
@@ -285,7 +261,6 @@
                             </div>
                             <div class="list-meta"><span id="timeOrtak">--:--</span></div>
                         </div>
-                        
                         <div class="list-item">
                             <div class="list-icon" style="background-color: #FF9500;"><i class="fas fa-clipboard-list"></i></div>
                             <div class="list-info">
@@ -313,27 +288,26 @@
                 </div>
 
                 <div class="content-page" id="page-chats">
-                    <div class="list-section-title">GRUP VE KANAL LİSTELERİ</div>
-                    <div class="list-card">
-                         <div class="list-item">
-                            <div class="list-icon" style="background-color: #00bcd4;"><i class="fas fa-comment"></i></div>
-                            <div class="list-info"><div class="list-name">Ana Sohbet Grubu</div><div class="list-detail">Güncel Konuşmalar</div></div>
-                            <div class="list-meta">Açık</div>
+                    <div class="list-section-title">MESAJ GÖNDERME (ORTAK SOHBET)</div>
+                    <div class="chat-interaction-box">
+                        <label class="file-label">Metin Mesajı Gönder</label>
+                        <div class="chat-input-group">
+                            <input type="text" id="chatText" placeholder="Mesajınızı yazın...">
+                            <button onclick="sendChat('text')"><i class="fas fa-paper-plane"></i></button>
                         </div>
-                        <div class="list-item">
-                            <div class="list-icon" style="background-color: #673ab7;"><i class="fas fa-lock"></i></div>
-                            <div class="list-info"><div class="list-name">Gizli Duyuru Kanalı</div><div class="list-detail">Sadece Yöneticiler Yazabilir</div></div>
-                            <div class="list-meta">Kapalı</div>
+                        
+                        <label class="file-label" style="margin-top: 15px;">Görsel URL (Doğrudan URL Kaydı)</label>
+                        <div class="chat-input-group">
+                            <input type="text" id="chatImage" placeholder="Görsel URL'si (PNG/JPG)">
+                            <button onclick="sendChat('image')"><i class="fas fa-image"></i></button>
                         </div>
+                        <div id="chatStatus" class="upload-status"></div>
                     </div>
-                    <div class="list-section-title">EĞİTİM BAĞLANTILARI</div>
-                    <div class="list-card">
-                         <a href="#" class="list-item" style="cursor: pointer;">
-                            <div class="list-icon" style="background-color: #ff9800;"><i class="fas fa-graduation-cap"></i></div>
-                            <div class="list-info"><div class="list-name">Eğitim Portalı</div><div class="list-detail">Online Derslere Hızlı Erişim</div></div>
-                            <div class="list-meta">Site</div>
-                        </a>
-                    </div>
+                    
+                    <div class="list-section-title">PDF İNDİRME LİSTESİ</div>
+                    <div class="list-card" id="pdfDownloadList">
+                        <div style="padding: 15px; text-align: center; color: var(--text-secondary);">PDF'ler yükleniyor...</div>
+                        </div>
                 </div>
 
                 <div class="content-page" id="page-profile">
@@ -379,7 +353,21 @@
                 </div>
                 
                 <div class="content-page" id="page-admin">
-                    <div class="list-section-title">ADMİN PANELİ</div>
+                    <div class="list-section-title">PDF DOSYA YÜKLEME (GERÇEK İŞLEVSELLİK)</div>
+                    <div class="file-upload-box">
+                        <label class="file-label" for="pdfFile">Yüklenecek PDF Dosyasını Seçin:</label>
+                        <input type="file" id="pdfFile" accept=".pdf" style="width: 100%;">
+                        
+                        <label class="file-label" style="margin-top: 15px;">PDF Adı (Veritabanı Kaydı İçin):</label>
+                        <input type="text" id="pdfName" placeholder="Örn: 11. Sınıf Kimya Notları" style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: var(--border-radius-md); box-sizing: border-box;">
+
+                        <button id="uploadButton" class="upload-button" disabled onclick="uploadPDF()">
+                            <i class="fas fa-cloud-upload-alt"></i> PDF'i Firebase'e Yükle
+                        </button>
+                        <div id="uploadStatus" class="upload-status">Bekleniyor...</div>
+                    </div>
+                    
+                    <div class="list-section-title">DİĞER ADMİN İŞLEMLERİ</div>
                     <div class="list-card">
                         <div class="list-item">
                             <div class="list-icon" style="background-color: #000000;"><i class="fas fa-users-cog"></i></div>
@@ -389,9 +377,6 @@
                             <div class="list-icon" style="background-color: var(--tg-red);"><i class="fas fa-database"></i></div>
                             <div class="list-info"><div class="list-name">Veritabanı Güncelle</div><div class="list-detail">PDF sayısını ve linkleri manuel güncelle.</div></div>
                         </div>
-                    </div>
-                    <div style="padding: 15px; font-size: 14px; color: var(--text-secondary);">
-                        *Bu panel sadece yetkili kullanıcılar için tasarlanmıştır. Gerçek yetkilendirme botunuz tarafından yapılmalıdır.
                     </div>
                 </div>
 
@@ -433,18 +418,21 @@
             measurementId: "G-BZB9FD26GT"
         };
 
-        let db;
+        let db, storage;
+        let currentUser = null; 
+
         try {
             if (!firebase.apps.length) {
                  firebase.initializeApp(firebaseConfig);
             }
             db = firebase.database(); 
+            storage = firebase.storage(); 
         } catch (e) {
             console.error("Firebase başlatılırken hata oluştu:", e);
         }
 
         // #######################################################
-        // ##### 2. GİRİŞ VE ANA MANTIK #####
+        // ##### 2. DOM YÜKLEME VE GİRİŞ MANTIKLARI #####
         // #######################################################
         document.addEventListener('DOMContentLoaded', function() {
             const termsCheckbox = document.getElementById('termsCheckbox');
@@ -454,10 +442,10 @@
             const headerTitle = document.getElementById('headerTitle');
             const navItems = document.querySelectorAll('.nav-item');
             const contentPages = document.querySelectorAll('.content-page');
+            const pdfFileInput = document.getElementById('pdfFile');
+            const uploadButton = document.getElementById('uploadButton');
 
-            let currentUser = null; // Telegram Kullanıcı Bilgisi
-
-            // --- Telegram WebApp ve Tema Ayarları ---
+            // --- Telegram WebApp ve Kullanıcı Bilgisi ---
             if (window.Telegram && Telegram.WebApp) {
                 Telegram.WebApp.ready();
                 if (Telegram.WebApp.themeParams) {
@@ -471,13 +459,8 @@
 
             // --- Giriş Ekranı Mantığı ---
             function toggleLoginButton() {
-                if (termsCheckbox.checked) {
-                    loginButton.classList.add('active');
-                    loginButton.disabled = false;
-                } else {
-                    loginButton.classList.remove('active');
-                    loginButton.disabled = true;
-                }
+                loginButton.disabled = !termsCheckbox.checked;
+                loginButton.classList.toggle('active', termsCheckbox.checked);
             }
 
             termsCheckbox.addEventListener('change', toggleLoginButton);
@@ -485,36 +468,28 @@
 
             loginButton.addEventListener('click', function() {
                 if (termsCheckbox.checked) {
-                    // Giriş başarılı: Splash ekranını kapat, ana içeriği aç
                     splashScreen.classList.add('hidden');
                     mainAppContent.classList.remove('hidden');
                     mainAppContent.style.display = 'flex';
                     
-                    updateProfileInfo(currentUser); // Profil bilgilerini doldur
-                    fetchRealtimeData(); // Verileri çekmeye başla
+                    updateProfileInfo(currentUser); 
+                    fetchRealtimeData();
+                    fetchPDFList(); // PDF listesini de çekmeye başla
                 }
             });
             
-            
             // --- Navigasyon ve Sayfa Geçişi Mantığı ---
             function navigateTo(pageId) {
-                // Nav barları güncelle
                 navItems.forEach(item => {
-                    if (item.getAttribute('data-page') === pageId) {
-                        item.classList.add('active');
+                    const isActive = item.getAttribute('data-page') === pageId;
+                    item.classList.toggle('active', isActive);
+                    if (isActive) {
                         headerTitle.textContent = item.textContent.trim();
-                    } else {
-                        item.classList.remove('active');
                     }
                 });
 
-                // Sayfaları değiştir (slide efekti)
                 contentPages.forEach(page => {
-                    if (page.id === `page-${pageId}`) {
-                        page.classList.add('active');
-                    } else {
-                        page.classList.remove('active');
-                    }
+                    page.classList.toggle('active', page.id === `page-${pageId}`);
                 });
             }
 
@@ -525,51 +500,223 @@
                 });
             });
 
-            // #######################################################
-            // ##### 3. DİNAMİK VERİ VE PROFİL GÜNCELLEME #####
-            // #######################################################
-            
-            function updateProfileInfo(user) {
-                if (user) {
-                    document.getElementById('profile-id').textContent = user.id || 'Yok';
-                    document.getElementById('profile-name').textContent = `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Bilinmiyor';
-                    document.getElementById('profile-username').textContent = user.username ? `@${user.username}` : 'Yok';
-                }
-            }
+            // İlk açılışta Home sayfasını göster
+            navigateTo('home'); 
 
-            function fetchRealtimeData() {
-                if (!db) {
-                    console.error("Firebase veritabanı mevcut değil.");
-                    return; 
-                }
-
-                // 1. PDF Sayısı
-                db.ref('pdf/count').on('value', (snapshot) => {
-                    document.getElementById('pdfCount').textContent = snapshot.val() !== null ? snapshot.val().toLocaleString('tr-TR') : "0";
-                }, (error) => {
-                     console.error("PDF sayısını çekerken hata:", error);
-                     document.getElementById('pdfCount').textContent = "Hata!";
-                });
-                
-                // 2. Chat verilerini çekme (Ortak Sohbet)
-                db.ref('chats/ortak').on('value', snap => {
-                    const data = snap.val();
-                    document.getElementById('lastMsgOrtak').textContent = data && data.lastMessage ? data.lastMessage : 'Yeni mesaj yok.';
-                    document.getElementById('timeOrtak').textContent = data && data.time ? data.time : '---';
-                }, (error) => {
-                     document.getElementById('lastMsgOrtak').textContent = "Hata!";
-                });
-                
-                // 3. Chat verilerini çekme (Test Grubu)
-                db.ref('chats/test').on('value', snap => {
-                    const data = snap.val();
-                    document.getElementById('lastMsgTest').textContent = data && data.lastMessage ? data.lastMessage : 'Yeni mesaj yok.';
-                    document.getElementById('timeTest').textContent = data && data.time ? data.time : '---';
-                }, (error) => {
-                     document.getElementById('lastMsgTest').textContent = "Hata!";
-                });
-            }
+            // --- Admin Dosya Seçimi Kontrolü ---
+            pdfFileInput.addEventListener('change', function() {
+                uploadButton.disabled = !this.files.length || this.files[0].type !== 'application/pdf';
+            });
         });
+        
+        // #######################################################
+        // ##### 3. VERİ ÇEKME VE PROFİL GÜNCELLEME #####
+        // #######################################################
+        
+        function updateProfileInfo(user) {
+            if (user) {
+                document.getElementById('profile-id').textContent = user.id || 'Yok';
+                document.getElementById('profile-name').textContent = `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Bilinmiyor';
+                document.getElementById('profile-username').textContent = user.username ? `@${user.username}` : 'Yok';
+            }
+        }
+
+        function fetchRealtimeData() {
+            if (!db) return; 
+
+            // 1. PDF Sayısı
+            db.ref('pdf/count').on('value', (snapshot) => {
+                document.getElementById('pdfCount').textContent = snapshot.val() !== null ? snapshot.val().toLocaleString('tr-TR') : "0";
+            }, () => { document.getElementById('pdfCount').textContent = "Hata!"; });
+            
+            // 2. Chat verilerini çekme (Ortak Sohbet)
+            db.ref('chats/ortak').on('value', snap => {
+                const data = snap.val();
+                document.getElementById('lastMsgOrtak').textContent = data && data.lastMessage ? data.lastMessage : 'Yeni mesaj yok.';
+                document.getElementById('timeOrtak').textContent = data && data.time ? data.time : '---';
+            }, () => { document.getElementById('lastMsgOrtak').textContent = "Hata!"; });
+            
+            // 3. Chat verilerini çekme (Test Grubu)
+            db.ref('chats/test').on('value', snap => {
+                const data = snap.val();
+                document.getElementById('lastMsgTest').textContent = data && data.lastMessage ? data.lastMessage : 'Yeni mesaj yok.';
+                document.getElementById('timeTest').textContent = data && data.time ? data.time : '---';
+            }, () => { document.getElementById('lastMsgTest').textContent = "Hata!"; });
+        }
+
+        /**
+         * Sohbetler sayfasındaki PDF indirme listesini Firebase'den çeker.
+         */
+        function fetchPDFList() {
+            if (!db) return; 
+
+            const listElement = document.getElementById('pdfDownloadList');
+            listElement.innerHTML = '<div style="padding: 15px; text-align: center; color: var(--text-secondary);">PDF\'ler yükleniyor...</div>';
+
+            db.ref('pdf/files').on('value', (snapshot) => {
+                listElement.innerHTML = '';
+                const files = snapshot.val();
+                
+                if (!files) {
+                    listElement.innerHTML = '<div style="padding: 15px; text-align: center; color: var(--text-secondary);">Henüz yüklenmiş PDF yok.</div>';
+                    return;
+                }
+
+                // En yeni dosyaları üste getirmek için ters çevirme
+                const fileKeys = Object.keys(files).reverse();
+                
+                fileKeys.forEach(key => {
+                    const file = files[key];
+                    const listItem = document.createElement('a');
+                    listItem.href = file.url;
+                    listItem.target = '_blank';
+                    listItem.classList.add('list-item');
+                    listItem.style.textDecoration = 'none';
+
+                    listItem.innerHTML = `
+                        <div class="list-icon" style="background-color: var(--tg-red);"><i class="fas fa-file-pdf"></i></div>
+                        <div class="list-info">
+                            <div class="list-name">${file.name}</div>
+                            <div class="list-detail">Yükleyen: ${file.uploadedBy}</div>
+                        </div>
+                        <div class="list-meta" style="color: var(--tg-blue);"><i class="fas fa-download"></i> İndir</div>
+                    `;
+                    listElement.appendChild(listItem);
+                });
+            }, (error) => {
+                 listElement.innerHTML = `<div style="padding: 15px; text-align: center; color: var(--tg-red);">❌ Hata: PDF listesi çekilemedi. (${error.code})</div>`;
+            });
+        }
+
+
+        // #######################################################
+        // ##### 4. YENİ ETKİLEŞİM FONKSİYONLARI #####
+        // #######################################################
+
+        /**
+         * Sohbetler sayfasından metin veya görsel mesajı Firebase'e kaydeder.
+         * @param {string} type - 'text' veya 'image'
+         */
+        function sendChat(type) {
+            const statusElement = document.getElementById('chatStatus');
+            const textInput = document.getElementById('chatText');
+            const imageInput = document.getElementById('chatImage');
+
+            statusElement.classList.remove('success', 'error');
+            let content, inputElement;
+
+            if (type === 'text') {
+                content = textInput.value.trim();
+                inputElement = textInput;
+            } else if (type === 'image') {
+                content = imageInput.value.trim();
+                inputElement = imageInput;
+            }
+
+            if (!content) {
+                statusElement.textContent = `⚠️ Lütfen bir ${type === 'text' ? 'mesaj' : 'görsel URL\'si'} girin.`;
+                statusElement.classList.add('error');
+                setTimeout(() => { statusElement.textContent = ''; statusElement.classList.remove('error'); }, 4000);
+                return;
+            }
+
+            // Firebase'e mesajı kaydet
+            db.ref('chats/ortak/messages').push({
+                user: (currentUser ? currentUser.first_name : 'Anonim Kullanıcı'),
+                content: content,
+                type: type,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            }).then(() => {
+                statusElement.textContent = `✅ ${type === 'text' ? 'Metin mesajı' : 'Görsel URL\'si'} başarıyla kaydedildi.`;
+                statusElement.classList.add('success');
+                inputElement.value = '';
+            }).catch(error => {
+                statusElement.textContent = `❌ Mesaj kaydedilemedi (Firebase Hatası): ${error.message}`;
+                statusElement.classList.add('error');
+            });
+
+            setTimeout(() => { statusElement.textContent = ''; statusElement.classList.remove('success', 'error'); }, 4000);
+        }
+
+        /**
+         * Admin sayfasından PDF'i Firebase Storage'a yükler ve RTDB'ye kaydeder.
+         */
+        function uploadPDF() {
+            if (!storage) {
+                 document.getElementById('uploadStatus').textContent = "❌ Firebase Storage başlatılamadı!";
+                 document.getElementById('uploadStatus').classList.add('error');
+                 return;
+            }
+
+            const pdfFile = document.getElementById('pdfFile').files[0];
+            const pdfName = document.getElementById('pdfName').value.trim();
+            const uploadStatus = document.getElementById('uploadStatus');
+            const uploadButton = document.getElementById('uploadButton');
+
+            if (!pdfFile || pdfFile.type !== 'application/pdf') {
+                uploadStatus.textContent = "⚠️ Lütfen bir PDF dosyası seçin.";
+                uploadStatus.classList.add('error');
+                return;
+            }
+
+            if (!pdfName) {
+                uploadStatus.textContent = "⚠️ Lütfen PDF için bir ad girin.";
+                uploadStatus.classList.add('error');
+                return;
+            }
+
+            uploadButton.disabled = true;
+            uploadStatus.classList.remove('success', 'error');
+            uploadStatus.textContent = `⏳ ${pdfFile.name} yükleniyor...`;
+
+            // Storage referansı oluşturma
+            const fileName = `${Date.now()}_${pdfFile.name.replace(/[^a-zA-Z0-9.]/g, '_')}`; // Güvenli dosya adı
+            const storageRef = storage.ref(`pdfs/${fileName}`);
+
+            // Yükleme görevi
+            const uploadTask = storageRef.put(pdfFile);
+
+            uploadTask.on('state_changed', 
+                (snapshot) => {
+                    // Yükleme ilerlemesini gösterme
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    uploadStatus.textContent = `⏳ Yükleniyor: ${progress.toFixed(0)}%`;
+                }, 
+                (error) => {
+                    // Hata
+                    console.error("Yükleme hatası:", error);
+                    uploadStatus.textContent = `❌ Yükleme Başarısız: ${error.message}`;
+                    uploadStatus.classList.add('error');
+                    uploadButton.disabled = false;
+                }, 
+                () => {
+                    // Tamamlandı
+                    uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                        
+                        // 1. RTDB'ye kayıt
+                        db.ref('pdf/files').push({
+                            name: pdfName,
+                            url: downloadURL,
+                            uploadedBy: (currentUser ? currentUser.username || currentUser.first_name : 'Admin'),
+                            timestamp: firebase.database.ServerValue.TIMESTAMP
+                        }).then(() => {
+                            // 2. PDF sayısını atomik olarak artırma
+                            db.ref('pdf/count').transaction((currentCount) => {
+                                return (currentCount || 0) + 1;
+                            });
+
+                            uploadStatus.textContent = `✅ PDF başarıyla yüklendi ve RTDB'ye kaydedildi!`;
+                            uploadStatus.classList.add('success');
+                            document.getElementById('pdfFile').value = ''; // Inputları temizle
+                            document.getElementById('pdfName').value = ''; 
+                            uploadButton.disabled = true;
+                        });
+
+                    });
+                }
+            );
+        }
+        
     </script>
 </body>
 </html>
