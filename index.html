@@ -13,12 +13,12 @@
             --tg-blue: #007AFF; 
             --tg-green: #34C759;
             --tg-red: #FF3B30;
-            --light-bg: #F8F9FA; /* Daha açık arka plan */
+            --light-bg: #F8F9FA; 
             --card-bg: #FFFFFF;
-            --text-dark: #1F2937; /* Koyu Gri */
+            --text-dark: #1F2937; 
             --text-secondary: #6B7280; 
             --border-color: #E5E7EB;
-            --shadow-subtle: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Daha belirgin ama yumuşak gölge */
+            --shadow-subtle: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); 
             --border-radius-lg: 16px; 
             --border-radius-md: 10px;
         }
@@ -301,7 +301,7 @@
 
     <script>
         // #######################################################
-        // ##### 1. FIREBASE KONFİGÜRASYONU (ENTEGRE EDİLDİ) #####
+        // ##### 1. FIREBASE KONFİGÜRASYONU #####
         // #######################################################
         const firebaseConfig = {
             apiKey: "AIzaSyArNeaPYGiPg-K7O19Xg4btYhqfnzvyCtw",
@@ -326,7 +326,7 @@
         let currentUserId = null; 
 
         // #######################################################
-        // ##### 2. DOM VE REALTIME DB LOGİĞİ #####
+        // ##### 2. DOM VE REALTIME DB LOGİĞİ (ZAMAN AŞIMI EKLENDİ) #####
         // #######################################################
         document.addEventListener('DOMContentLoaded', function() {
             // DOM Elemanları
@@ -371,14 +371,14 @@
             }
 
             /**
-             * Kullanıcının RTDB'deki üyelik durumunu dinler.
+             * Kullanıcının RTDB'deki üyelik durumunu dinler ve zaman aşımı ekler.
              */
             function startListeningForMembership(userId, userData) {
                 const userRef = db.ref(`users/${userId}`);
+                let isMemberChecked = false; // Kontrolün yapılıp yapılmadığını takip et
+                let isListening = true; // Dinlemeyi kontrol etme flag'i
                 
                 // Botun kontrol etmesi için ilk kaydı oluştur/güncelle (Sinyal)
-                // Bu kısım, RTDB kuralınız `.write: false` ise hata verecek,
-                // ancak botunuz Admin SDK ile bu alana yazacağı için simülasyon olarak duruyor.
                 const initialUpdate = {
                     telegramId: userId,
                     username: userData.username || 'yok',
@@ -387,39 +387,63 @@
                     lastActive: firebase.database.ServerValue.TIMESTAMP
                 };
                 userRef.update(initialUpdate).catch(e => {
-                    console.log("RTDB'ye yazma denemesi kural hatası verdi (Normaldir, Bot Admin SDK ile yazacak):", e.message);
+                    console.log("RTDB'ye yazma denemesi kural hatası verdi:", e.message);
                 });
 
 
                 // Realtime dinleme başlat
                 userRef.on('value', (snapshot) => {
+                    if (!isListening) return; // Eğer zaman aşımı nedeniyle kapatıldıysa geri dön
+
                     const data = snapshot.val();
                     
                     if (data && data.isMember === true) {
                         // ÜYE: Ana uygulamayı aç
+                        isMemberChecked = true;
+                        isListening = false;
                         splashScreen.classList.add('hidden');
                         mainAppContent.classList.remove('hidden');
                         mainAppContent.style.display = 'flex'; 
                         fetchRealtimeData(); 
+                        userRef.off('value'); // Başarılı girişten sonra dinlemeyi kapat
                         
                     } else {
                         // ÜYE DEĞİL veya KONTROL GEREKİYOR: Giriş ekranını göster
                         mainAppContent.classList.add('hidden');
                         splashScreen.classList.remove('hidden');
-                        loadingStatus.classList.remove('hidden');
+                        errorMessage.classList.add('hidden'); // Hata mesajını temizle
 
                         if (data && data.status === 'checking') {
+                            loadingStatus.classList.remove('hidden');
                             loadingStatus.innerHTML = '<i class="fas fa-sync fa-spin"></i> Üyeliğiniz Bot Tarafından kontrol ediliyor...';
                         } else if (data && data.isMember === false) {
+                            isMemberChecked = true;
+                            isListening = false;
                             loadingStatus.classList.add('hidden');
                             errorMessage.textContent = '⚠️ Üyelik doğrulanamadı. Lütfen kanala katıldığınızdan emin olun ve uygulamayı tekrar başlatın.';
                             errorMessage.classList.remove('hidden');
                             splashMessage.innerHTML = 'Bota giriş yapmak için kanala **katılmalısın**!';
+                            userRef.off('value'); // Kontrol sonucu geldiği için dinlemeyi kapat
                         } else {
-                             loadingStatus.innerHTML = '<i class="fas fa-sync fa-spin"></i> Veri bekleniyor...';
+                             // isMember henüz ayarlanmadıysa veya ilk kez veriye bakılıyorsa
+                             loadingStatus.classList.remove('hidden');
+                             loadingStatus.innerHTML = '<i class="fas fa-sync fa-spin"></i> Veri bekleniyor... (Botun veriyi işlemesi bekleniyor)';
                         }
                     }
                 });
+
+                // *** ZAMAN AŞIMI KONTROLÜ (TIMEOUT) ***
+                // 10 saniye içinde bot üyelik durumunu güncellemezse kullanıcıya hata göster.
+                setTimeout(() => {
+                    if (!isMemberChecked && isListening) {
+                        isListening = false;
+                        userRef.off('value'); // Dinlemeyi durdur
+                        loadingStatus.classList.add('hidden');
+                        errorMessage.textContent = '⏱️ Zaman aşımı hatası: Üyelik kontrolü tamamlanamadı. Bu, botun Firebase verisini güncellemediği anlamına gelir. Lütfen botun çalışır durumda olduğundan emin olun ve uygulamayı tekrar başlatın.';
+                        errorMessage.classList.remove('hidden');
+                        splashMessage.innerHTML = 'Bir sorun oluştu. Lütfen botun çalışıp çalışmadığını kontrol edip tekrar deneyin.';
+                    }
+                }, 10000); // 10 saniye bekleme
             }
 
             // Uygulamayı başlat
@@ -429,44 +453,31 @@
             // --- B. Dinamik Uygulama Verileri Çekme Fonksiyonları (RTDB) ---
             
             function fetchRealtimeData() {
-                // Banner Verilerini Çekme (RTDB Path: /config/banners)
-                const bannersRef = db.ref('config/banners');
-                bannersRef.on('value', (snapshot) => {
-                    const data = snapshot.val();
-                    const defaultText = `REKLAM VERMEK İÇİN TIKLA! @${ADMIN_TELEGRAM_USERNAME}`;
-                    const defaultLink = `https://t.me/${ADMIN_TELEGRAM_USERNAME}`;
-                    
-                    // Top Banner
-                    const updateBanner = (element, textElement, link, dbData) => {
-                        if (dbData && dbData.text && dbData.link) {
-                            textElement.textContent = dbData.text;
-                            element.href = dbData.link;
-                            textElement.classList.remove('ad-default-text'); 
-                            textElement.style.color = 'var(--text-dark)';
-                        } else {
-                            textElement.textContent = defaultText;
-                            element.href = defaultLink;
-                            textElement.classList.add('ad-default-text'); 
-                            textElement.style.color = 'var(--tg-blue)';
-                        }
-                    };
-
-                    updateBanner(bannerTop, bannerTopText, defaultLink, data ? data.top : null);
-                    updateBanner(bannerMid, bannerMidText, defaultLink, data ? data.mid : null);
-                });
-                
-                // PDF Sayısını Çekme (RTDB Path: /pdfs)
-                const pdfsRef = db.ref('pdfs');
+                // Bu fonksiyon, sadece ana uygulama açıldığında çalışır.
                 const pdfCountElement = document.getElementById('pdfCount');
-                pdfsRef.on('value', (snapshot) => {
-                    const pdfCount = snapshot.numChildren();
-                    pdfCountElement.textContent = pdfCount > 0 ? `${pdfCount} dosya mevcut` : 'Henüz dosya yok';
+                db.ref('pdf/count').on('value', (snapshot) => {
+                    pdfCountElement.textContent = snapshot.val() !== null ? snapshot.val() : "0";
                 });
                 
-                // Son Mesajları Çekme (Simülasyon - Gerçek veri yapısına göre güncellenmeli)
-                // Şu an sadece yer tutucu zamanı gösteriyor
+                // Diğer veri çekme işlemleri...
+                db.ref('chats/ortak/lastMessage').on('value', snap => {
+                    document.getElementById('lastMsgOrtak').textContent = snap.val() || 'Yeni mesaj yok.';
+                });
+                db.ref('chats/ortak/time').on('value', snap => {
+                    document.getElementById('timeOrtak').textContent = snap.val() || '---';
+                });
+                // ... ve diğer chat verileri...
+                
             }
-
+        });
+    </script>
+    <script>
+        // Diğer Arayüz İşlevselliği
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
         });
     </script>
 </body>
