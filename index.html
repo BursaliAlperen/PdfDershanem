@@ -433,18 +433,18 @@
                              loadingStatus.innerHTML = '<i class="fas fa-sync fa-spin"></i> Veri bekleniyor... (Bot veya Firebase bağlantısı bekleniyor)';
                         }
                     }
-                }, (error) => { // ⚠️ DÜZELTME: Dinleme Hatası Yönetimi (Erişim reddedilirse)
+                }, (error) => { // ⚠️ DÜZELTME: Dinleme Hatası Yönetimi (Erişim reddedilirse: PERMISSION_DENIED)
                     if (isListening) {
                         isListening = false;
+                        userRef.off('value'); 
                         loadingStatus.classList.add('hidden');
                         errorMessage.textContent = `⚠️ Veritabanı Bağlantı Hatası: Veri okuma engellendi. Firebase kurallarını kontrol edin. Hata kodu: ${error.code}`;
                         errorMessage.classList.remove('hidden');
-                        userRef.off('value'); 
                     }
                 });
 
                 // *** ZAMAN AŞIMI KONTROLÜ (TIMEOUT) ***
-                // 10 saniye sonra hala yanıt gelmediyse hata göster.
+                // 10 saniye sonra hala yanıt gelmediyse (Bot güncellemediyse) hata göster.
                 setTimeout(() => {
                     if (!isMemberChecked && isListening) {
                         isListening = false;
