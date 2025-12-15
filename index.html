@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>@Pdf_DershanemBot - Modern Arayüz</title>
+    
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <style>
+        /* MODERN VE TEMİZ TASARIM DEĞİŞKENLERİ */
+        :root {
+            --tg-blue: #007AFF; 
+            --tg-green: #34C759;
+            --tg-red: #FF3B30;
+            --light-bg: #F8F9FA; /* Daha açık arka plan */
+            --card-bg: #FFFFFF;
+            --text-dark: #1F2937; /* Koyu Gri */
+            --text-secondary: #6B7280; 
+            --border-color: #E5E7EB;
+            --shadow-subtle: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Daha belirgin ama yumuşak gölge */
+            --border-radius-lg: 16px; 
+            --border-radius-md: 10px;
+        }
+
+        body {
+            font-family: 'SF Pro Text', system-ui, -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            background-color: var(--light-bg);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-dark);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .telegram-app {
+            width: 100%; max-width: 400px; height: 800px;
+            background-color: var(--light-bg); 
+            box-shadow: var(--shadow-subtle);
+            display: flex; flex-direction: column; overflow: hidden;
+            border-radius: var(--border-radius-lg); 
+            position: relative;
+        }
+        
+        /* ####################################################### */
+        /* ##### GİRİŞ EKRANI STİLLERİ ##### */
+        /* ####################################################### */
+        .splash-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 100;
+            display: flex; flex-direction: column; justify-content: start; align-items: center; 
+            background-color: var(--light-bg);
+            text-align: center;
+            padding-top: 50px;
+        }
+        .splash-card {
+            background-color: var(--card-bg); 
+            border-radius: var(--border-radius-md); 
+            padding: 30px; 
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); 
+            max-width: 350px; width: 90%;
+            margin-bottom: 20px;
+        }
+        .splash-icon i { font-size: 36px; color: var(--tg-blue); margin-bottom: 20px; }
+        .splash-card h2 { 
+            color: var(--text-dark); 
+            margin-bottom: 10px; 
+            font-weight: 700; 
+            font-size: 20px; 
+        }
+        .splash-card p { 
+            color: var(--text-secondary); 
+            line-height: 1.5; 
+            font-size: 15px; 
+            font-weight: 400; 
+            margin-bottom: 20px;
+        }
+        .channel-link-btn {
+            border: none; padding: 12px 25px; border-radius: 8px; 
+            font-weight: 600; cursor: pointer; width: 100%;
+            background-color: var(--tg-green); color: var(--card-bg); 
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+
+        .loading-status { color: var(--tg-blue); margin-top: 20px; font-size: 14px; font-weight: 500; }
+        .error-message { color: var(--tg-red); margin-top: 15px; font-size: 13px; font-weight: 500; padding: 10px; background-color: #FFF0F0; border-radius: 6px; }
+        .hidden { display: none !important; }
+
+        /* ####################################################### */
+        /* ##### ANA ARAYÜZ STİLLERİ ##### */
+        /* ####################################################### */
+        .header { 
+            background-color: var(--card-bg); 
+            padding: 15px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            font-size: 18px; 
+            font-weight: 700; 
+            border-bottom: 1px solid var(--border-color); 
+        }
+        .header-avatar { 
+            background-color: var(--tg-blue); 
+            width: 34px; height: 34px; 
+            border-radius: 50%; 
+            font-size: 15px; 
+            font-weight: 700;
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            color: var(--card-bg); 
+            cursor: pointer; 
+        }
+        .chat-list { 
+            flex-grow: 1; 
+            overflow-y: auto; 
+            padding: 15px 0; 
+        }
+        .list-section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin: 15px 15px 10px;
+            text-transform: uppercase;
+        }
+        .list-card {
+            background-color: var(--card-bg);
+            margin: 0 15px 15px 15px; 
+            border-radius: var(--border-radius-md);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .chat-item { 
+            display: flex; 
+            padding: 12px 15px; 
+            align-items: center; 
+            cursor: pointer; 
+            transition: background-color 0.1s;
+            border-bottom: 1px solid var(--border-color); 
+        }
+        .chat-item:last-child { border-bottom: none; }
+        .chat-item:hover { background-color: #F3F4F6; }
+        
+        .chat-avatar { 
+            width: 44px; height: 44px; 
+            border-radius: 50%; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            font-size: 20px; 
+            color: var(--card-bg); 
+            flex-shrink: 0; 
+            margin-right: 15px; 
+        }
+        .chat-name { font-weight: 600; font-size: 15px; }
+        .last-message { font-size: 13px; color: var(--text-secondary); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .chat-meta { font-size: 12px; color: var(--text-secondary); flex-shrink: 0; margin-left: 10px; font-weight: 500;}
+        
+        /* Navbar */
+        .navbar { 
+            background-color: var(--card-bg); 
+            border-top: 1px solid var(--border-color); 
+            display: flex; 
+            justify-content: space-around; 
+            padding: 10px 0 15px; 
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05); 
+            z-index: 10; 
+        }
+        .nav-item { flex: 1; font-size: 11px; color: var(--text-secondary); cursor: pointer; text-align: center; font-weight: 500; }
+        .nav-item.active { color: var(--tg-blue); font-weight: 700; }
+        .nav-icon { display: block; font-size: 20px; margin-bottom: 2px; }
+        
+        /* Banner Stilleri */
+        .list-banner { 
+            background-color: var(--card-bg); 
+            padding: 12px 15px; 
+            margin: 0 15px 15px 15px;
+            border-radius: var(--border-radius-md); 
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            cursor: pointer; 
+            transition: background-color 0.1s; 
+            display: flex; 
+            align-items: center; 
+            font-size: 14px; 
+            font-weight: 500; 
+            color: var(--text-dark); 
+            text-decoration: none; 
+        }
+        .ad-default-text { color: var(--tg-blue); font-weight: 600; transition: color 0.1s; }
+        .unread-count { background-color: var(--tg-red); color: white; border-radius: 10px; padding: 2px 7px; margin-left: 5px; font-size: 11px; font-weight: 600; }
+
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+
+    <div class="telegram-app" id="app">
+        
+        <div class="splash-screen" id="splashScreen">
+            <div class="splash-card">
+                <div class="splash-icon"><i class="fas fa-info-circle"></i></div>
+                <h2>Giriş Ekranı</h2>
+                <p id="splashMessage">
+                    Bota giriş yapmak için kanala katılmalısın. Bilgilerin otomatik olarak alınıyor.
+                </p>
+
+                <a href="https://t.me/Benim_Hocam_PDF" target="_blank" class="channel-link-btn">
+                    <i class="fas fa-arrow-right"></i> Kanala Katıl
+                </a>
+            </div>
+            
+            <div class="loading-status" id="loadingStatus">
+                <i class="fas fa-sync fa-spin"></i> Bilgileriniz doğrulanıyor...
+            </div>
+
+            <div class="error-message hidden" id="errorMessage">
+                
+            </div>
+        </div>
+        
+        <div id="mainAppContent" class="hidden" style="height: 100%; width: 100%; flex-direction: column;">
+            
+            <div class="header">
+                <i class="fas fa-arrow-left" style="color: var(--tg-blue);"></i>
+                <span class="header-title">Telegram-App</span>
+                <i class="fas fa-bars" style="color: var(--tg-blue);"></i> 
+            </div>
+
+            <div class="chat-list" id="chatList">
+                
+                <a href="https://t.me/AlperenTHE" target="_blank" class="list-banner" id="bannerTop">
+                    <span class="banner-icon"><i class="fas fa-bullhorn"></i></span>
+                    <span id="bannerTopText" class="ad-default-text">REKLAM VERMEK İÇİN TIKLA! @AlperenTHE</span>
+                </a>
+                
+                <div class="list-section-title">PDF VE SOHBETLER</div>
+                
+                <div class="list-card">
+                    <div class="chat-item" id="openPdfModal">
+                        <div class="chat-avatar" style="background-color: var(--tg-red);"><i class="fas fa-book-open"></i></div>
+                        <div class="chat-info"><div class="chat-name">📚 PDF Kütüphanesi</div><div class="last-message">Dosya sayısı: <span id="pdfCount">Yükleniyor...</span></div></div>
+                        <div class="chat-meta">10:00</div>
+                    </div>
+
+                    <div class="chat-item" data-chat-name="Ortak Sohbet Grubu" data-chat-type="writable">
+                        <div class="chat-avatar" style="background-color: var(--tg-green);"><i class="fas fa-users"></i></div>
+                        <div class="chat-info"><div class="chat-name">💬 Ortak Sohbet Grubu</div><div class="last-message" id="lastMsgOrtak">Son mesaj yükleniyor...</div></div>
+                        <div class="chat-meta"><span id="timeOrtak">12:25</span></div>
+                    </div>
+                </div>
+                
+                <a href="https://t.me/AlperenTHE" target="_blank" class="list-banner" id="bannerMid">
+                    <span class="banner-icon"><i class="fas fa-ad"></i></span>
+                    <span id="bannerMidText" class="ad-default-text">REKLAM VERMEK İÇİN TIKLA! @AlperenTHE</span>
+                </a>
+
+                <div class="list-section-title">DİĞER KANALLAR</div>
+                
+                <div class="list-card">
+                    <div class="chat-item" data-chat-name="Test Paylaşım Grubu" data-chat-type="writable">
+                        <div class="chat-avatar" style="background-color: #FF9500;"><i class="fas fa-clipboard-list"></i></div>
+                        <div class="chat-info"><div class="chat-name">📝 Test Paylaşım Grubu</div><div class="last-message" id="lastMsgTest">Son mesaj yükleniyor...</div></div>
+                        <div class="chat-meta"><span id="timeTest">10:18</span></div>
+                    </div>
+
+                    <div class="chat-item" data-chat-name="Duyuru Kanalı" data-chat-type="admin-locked">
+                        <div class="chat-avatar" style="background-color: var(--tg-blue);"><i class="fas fa-bullhorn"></i></div>
+                        <div class="chat-info"><div class="chat-name">📢 Duyuru Kanalı</div><div class="last-message" id="lastMsgDuyuru">Son duyuru yükleniyor...</div></div>
+                        <div class="chat-meta"><span id="timeDuyuru">09:21</span><span class="unread-count">3</span></div>
+                    </div>
+                </div>
+                
+            </div>
+
+            <div class="navbar">
+                <div class="nav-item" id="navHome">
+                    <span class="nav-icon"><i class="fas fa-home"></i></span> Ana Sayfa
+                </div>
+                <div class="nav-item active" id="navChat">
+                    <span class="nav-icon"><i class="fas fa-comment"></i></span> Sohbetler
+                </div>
+                <div class="nav-item" id="navProfileQuick">
+                    <span class="nav-icon"><i class="fas fa-user"></i></span> Profil
+                </div>
+                <div class="nav-item" id="navSearch">
+                    <span class="nav-icon"><i class="fas fa-search"></i></span> Ara
+                </div>
+            </div>
+        </div>
+        
+        <div class="chat-view slide-panel" id="chatView" style="transform: translateX(100%);"></div>
+        <div class="profile-panel slide-panel" id="profilePanel" style="transform: translateX(-100%);"></div>
+
+    </div>
+
+    <script>
+        // #######################################################
+        // ##### 1. FIREBASE KONFİGÜRASYONU (ENTEGRE EDİLDİ) #####
+        // #######################################################
+        const firebaseConfig = {
+            apiKey: "AIzaSyArNeaPYGiPg-K7O19Xg4btYhqfnzvyCtw",
+            authDomain: "pdfdershanem.firebaseapp.com",
+            databaseURL: "https://pdfdershanem-default-rtdb.firebaseio.com",
+            projectId: "pdfdershanem",
+            storageBucket: "pdfdershanem.firebasestorage.app",
+            messagingSenderId: "149337981694",
+            appId: "1:149337981694:web:87ec729568567f43879baf",
+            measurementId: "G-BZB9FD26GT"
+        };
+
+        let app, db;
+        try {
+            app = firebase.initializeApp(firebaseConfig);
+            db = firebase.database(); 
+        } catch (e) {
+            console.error("Firebase başlatılırken hata oluştu:", e);
+        }
+        
+        const ADMIN_TELEGRAM_USERNAME = "AlperenTHE"; 
+        let currentUserId = null; 
+
+        // #######################################################
+        // ##### 2. DOM VE REALTIME DB LOGİĞİ #####
+        // #######################################################
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elemanları
+            const splashScreen = document.getElementById('splashScreen');
+            const mainAppContent = document.getElementById('mainAppContent');
+            const errorMessage = document.getElementById('errorMessage');
+            const loadingStatus = document.getElementById('loadingStatus');
+            const splashMessage = document.getElementById('splashMessage');
+            
+            const bannerTop = document.getElementById('bannerTop');
+            const bannerTopText = document.getElementById('bannerTopText');
+            const bannerMid = document.getElementById('bannerMid');
+            const bannerMidText = document.getElementById('bannerMidText');
+            
+            // --- A. Telegram ID Algılama ve Otomatik Giriş ---
+
+            function startApp() {
+                let user;
+                
+                try {
+                    // Telegram Mini App (WebApp) kullanıcı bilgilerini yakala
+                    if (window.Telegram && Telegram.WebApp && Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.user) {
+                        user = Telegram.WebApp.initDataUnsafe.user;
+                        currentUserId = user.id.toString(); 
+                        splashMessage.textContent = `Hoş geldiniz, ${user.first_name || 'Kullanıcı'}! Giriş için üyeliğiniz kontrol ediliyor.`;
+                        console.log(`Telegram ID yakalandı: ${currentUserId}`);
+                        
+                        // ID yakalandıktan sonra direkt doğrulama sürecini başlat
+                        startListeningForMembership(currentUserId, user);
+                        
+                    } else {
+                        // Eğer bot içinden başlatılmazsa
+                        loadingStatus.classList.add('hidden');
+                        errorMessage.textContent = "Bu uygulama sadece Telegram botu içinden başlatılabilir.";
+                        errorMessage.classList.remove('hidden');
+                    }
+                } catch (e) {
+                    loadingStatus.classList.add('hidden');
+                    errorMessage.textContent = `Hata: ${e.message}`;
+                    errorMessage.classList.remove('hidden');
+                }
+            }
+
+            /**
+             * Kullanıcının RTDB'deki üyelik durumunu dinler.
+             */
+            function startListeningForMembership(userId, userData) {
+                const userRef = db.ref(`users/${userId}`);
+                
+                // Botun kontrol etmesi için ilk kaydı oluştur/güncelle (Sinyal)
+                // Bu kısım, RTDB kuralınız `.write: false` ise hata verecek,
+                // ancak botunuz Admin SDK ile bu alana yazacağı için simülasyon olarak duruyor.
+                const initialUpdate = {
+                    telegramId: userId,
+                    username: userData.username || 'yok',
+                    firstName: userData.first_name || 'yok',
+                    status: 'checking', 
+                    lastActive: firebase.database.ServerValue.TIMESTAMP
+                };
+                userRef.update(initialUpdate).catch(e => {
+                    console.log("RTDB'ye yazma denemesi kural hatası verdi (Normaldir, Bot Admin SDK ile yazacak):", e.message);
+                });
+
+
+                // Realtime dinleme başlat
+                userRef.on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    
+                    if (data && data.isMember === true) {
+                        // ÜYE: Ana uygulamayı aç
+                        splashScreen.classList.add('hidden');
+                        mainAppContent.classList.remove('hidden');
+                        mainAppContent.style.display = 'flex'; 
+                        fetchRealtimeData(); 
+                        
+                    } else {
+                        // ÜYE DEĞİL veya KONTROL GEREKİYOR: Giriş ekranını göster
+                        mainAppContent.classList.add('hidden');
+                        splashScreen.classList.remove('hidden');
+                        loadingStatus.classList.remove('hidden');
+
+                        if (data && data.status === 'checking') {
+                            loadingStatus.innerHTML = '<i class="fas fa-sync fa-spin"></i> Üyeliğiniz Bot Tarafından kontrol ediliyor...';
+                        } else if (data && data.isMember === false) {
+                            loadingStatus.classList.add('hidden');
+                            errorMessage.textContent = '⚠️ Üyelik doğrulanamadı. Lütfen kanala katıldığınızdan emin olun ve uygulamayı tekrar başlatın.';
+                            errorMessage.classList.remove('hidden');
+                            splashMessage.innerHTML = 'Bota giriş yapmak için kanala **katılmalısın**!';
+                        } else {
+                             loadingStatus.innerHTML = '<i class="fas fa-sync fa-spin"></i> Veri bekleniyor...';
+                        }
+                    }
+                });
+            }
+
+            // Uygulamayı başlat
+            startApp();
+
+
+            // --- B. Dinamik Uygulama Verileri Çekme Fonksiyonları (RTDB) ---
+            
+            function fetchRealtimeData() {
+                // Banner Verilerini Çekme (RTDB Path: /config/banners)
+                const bannersRef = db.ref('config/banners');
+                bannersRef.on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    const defaultText = `REKLAM VERMEK İÇİN TIKLA! @${ADMIN_TELEGRAM_USERNAME}`;
+                    const defaultLink = `https://t.me/${ADMIN_TELEGRAM_USERNAME}`;
+                    
+                    // Top Banner
+                    const updateBanner = (element, textElement, link, dbData) => {
+                        if (dbData && dbData.text && dbData.link) {
+                            textElement.textContent = dbData.text;
+                            element.href = dbData.link;
+                            textElement.classList.remove('ad-default-text'); 
+                            textElement.style.color = 'var(--text-dark)';
+                        } else {
+                            textElement.textContent = defaultText;
+                            element.href = defaultLink;
+                            textElement.classList.add('ad-default-text'); 
+                            textElement.style.color = 'var(--tg-blue)';
+                        }
+                    };
+
+                    updateBanner(bannerTop, bannerTopText, defaultLink, data ? data.top : null);
+                    updateBanner(bannerMid, bannerMidText, defaultLink, data ? data.mid : null);
+                });
+                
+                // PDF Sayısını Çekme (RTDB Path: /pdfs)
+                const pdfsRef = db.ref('pdfs');
+                const pdfCountElement = document.getElementById('pdfCount');
+                pdfsRef.on('value', (snapshot) => {
+                    const pdfCount = snapshot.numChildren();
+                    pdfCountElement.textContent = pdfCount > 0 ? `${pdfCount} dosya mevcut` : 'Henüz dosya yok';
+                });
+                
+                // Son Mesajları Çekme (Simülasyon - Gerçek veri yapısına göre güncellenmeli)
+                // Şu an sadece yer tutucu zamanı gösteriyor
+            }
+
+        });
+    </script>
+</body>
+</html>
