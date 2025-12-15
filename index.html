@@ -4,13 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>@Pdf_DershanemBot - Dahili Sohbet Sistemi</title>
-    
+
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script> 
-    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
     <style>
@@ -24,27 +25,71 @@
             --shadow-modern: 0 4px 12px rgba(0, 0, 0, 0.08);
             --border-color: rgba(153, 153, 153, 0.15);
             --card-radius: 14px;
-            --pinned-height: 45px; 
-            --ad-pinned-height: 100px; 
+            --pinned-height: 45px; /* Sabitlenmiş mesaj yüksekliği */
         }
-        html, body { height: 100%; overflow: hidden; margin: 0; padding: 0; }
-        body { 
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif; 
-            background-color: var(--background-color); 
-            color: var(--text-color); 
-            display: flex; 
-            flex-direction: column; 
-            position: fixed; 
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
         }
-        .telegram-app { width: 100%; margin: 0 auto; display: flex; flex-direction: column; flex-grow: 1; position: relative; height: 100%; }
+        .telegram-app {
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            position: relative;
+            height: 100%;
+        }
         .hidden { display: none !important; }
-        .content-container { flex-grow: 1; overflow: hidden; position: relative; width: 100%; padding-bottom: 60px; box-sizing: border-box; } 
-        .content-page { width: 100%; height: 100%; position: absolute; top: 0; left: 0; overflow-y: auto; padding: 10px 0; box-sizing: border-box; display: none; background-color: var(--background-color); }
-        .content-page.active { display: flex; flex-direction: column; z-index: 10; }
+        .content-container {
+            flex-grow: 1;
+            overflow: hidden;
+            position: relative;
+            width: 100%;
+            /* bottom-nav yüksekliği kadar padding bırak */
+            padding-bottom: 60px; 
+            box-sizing: border-box;
+        }
+
+        /* 🔥 YENİ: SAYFA GEÇİŞ ANİMASYONLARI */
+        .content-page {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            overflow-y: auto;
+            padding: 10px 0;
+            box-sizing: border-box;
+            display: none;
+            background-color: var(--background-color);
+            z-index: 10;
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out; /* Animasyon hızı */
+            transform: translateX(100%); /* Başlangıçta sağda, görünmez */
+            opacity: 0;
+        }
+        .content-page.active {
+            display: flex;
+            flex-direction: column;
+            transform: translateX(0); /* Ekrana kaydır */
+            opacity: 1;
+        }
+
+        /* Navigasyon Stilleri (Diğer stiller değişmedi) */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 60px; display: flex; justify-content: space-around; align-items: center; background-color: var(--secondary-color); border-top: 1px solid var(--border-color); box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05); z-index: 50; }
         .nav-item { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 5px 0; color: var(--hint-color); text-decoration: none; font-size: 11px; transition: color 0.2s; cursor: pointer; }
         .nav-item.active { color: var(--primary-color); }
@@ -61,35 +106,80 @@
         .list-meta { font-size: 14px; color: var(--primary-color); flex-shrink: 0; margin-left: auto; }
         .action-button { background-color: var(--primary-color); color: white; border: none; padding: 12px 20px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; width: 100%; box-sizing: border-box; }
         .action-button:disabled { opacity: 0.5; cursor: not-allowed; }
-        
-        /* Sohbet Kutusu ve Mesaj Stilleri */
+
+        /* 🌟 SOHBET KUTUSU VE KLAVYE DÜZELTMELERİ */
         #page-chat-container { display: flex; flex-direction: column; padding: 0; }
-        .chat-messages { flex-grow: 1; overflow-y: auto; padding: 10px 10px; box-sizing: border-box; }
-        .chat-messages-padding { padding-bottom: 60px; padding-top: 0; } 
-        .chat-input-area { 
-            flex-shrink: 0; 
-            width: 100%; 
-            padding: 8px 10px; 
-            display: flex; 
-            align-items: flex-end; 
-            gap: 8px; 
-            background-color: var(--secondary-color); 
-            box-sizing: border-box; 
+        
+        /* Mesajları scrollable yap */
+        .chat-messages { 
+            flex-grow: 1; 
+            overflow-y: auto; 
+            padding: 10px 10px; 
+            box-sizing: border-box;
+        }
+        
+        .chat-input-area {
+            flex-shrink: 0;
+            width: 100%;
+            padding: 8px 10px;
+            display: flex;
+            align-items: flex-end; /* İçerikleri alta hizalar */
+            gap: 8px;
+            background-color: var(--secondary-color);
+            box-sizing: border-box;
+            /* Konumu, bottom-nav'ın hemen üstüne sabitle */
             position: fixed; 
-            bottom: 60px; 
+            bottom: 60px; /* bottom-nav yüksekliği kadar yukarıda */
             left: 0;
             right: 0;
-            z-index: 50; 
+            z-index: 50;
             box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
         }
-        .message-input { flex-grow: 1; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 20px; font-size: 15px; background-color: var(--background-color); color: var(--text-color); resize: none; overflow-y: hidden; min-height: 40px; max-height: 100px; }
+
+        /* Mesaj listesi altına padding bırakılmalı ki, mesajlar input'un altında kalmasın. */
+        .chat-messages-padding {
+            padding-bottom: 60px; /* Input alanı ve altındaki boşluk için yeterli */
+            padding-top: 10px;
+        }
+
+        .message-input { 
+            flex-grow: 1; 
+            padding: 10px 12px; 
+            border: 1px solid var(--border-color); 
+            border-radius: 20px; 
+            font-size: 15px; 
+            background-color: var(--background-color); 
+            color: var(--text-color); 
+            resize: none; 
+            overflow-y: hidden; 
+            min-height: 40px; 
+            max-height: 100px; 
+        }
+
+        /* 🔥 KULLANICI AVATARI */
+        .chat-user-avatar {
+            width: 40px; 
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color); 
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            margin-bottom: 0px; 
+        }
+
         .message-bubble { max-width: 80%; padding: 10px 14px; border-radius: 18px; line-height: 1.4; font-size: 15px; position: relative; box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1); border-top-left-radius: 18px; border-top-right-radius: 18px; cursor: pointer; }
         .message-incoming { background-color: var(--secondary-color); border-bottom-left-radius: 6px; color: var(--text-color); }
         .message-outgoing { background-color: var(--primary-color); color: white; border-bottom-right-radius: 6px; }
 
-        /* Sabitlenmiş Mesaj (Pin) Stili */
+        /* Sabitlenmiş Mesaj Stilleri */
         #pinnedMessageContainer {
             background-color: var(--secondary-color);
+            color: var(--primary-color);
             display: flex;
             align-items: center;
             padding: 10px 15px;
@@ -98,214 +188,206 @@
             border-bottom: 1px solid var(--border-color);
             position: sticky;
             top: 0;
-            z-index: 55; 
+            z-index: 55;
             cursor: pointer;
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            height: var(--pinned-height);
             box-sizing: border-box;
             overflow: hidden;
-            flex-shrink: 0;
-            height: var(--pinned-height); 
-            color: var(--primary-color);
         }
-        
-        /* 🖼️ CHAT AFİŞ REKLAM STİLİ */
-        #chatAdBanner {
-            position: sticky;
-            top: 0;
-            z-index: 55; 
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-            flex-shrink: 0;
-            margin-bottom: 5px; 
-            padding: 5px 10px; 
-            background-color: var(--background-color);
-        }
-        
-        .ad-content {
-            position: relative;
-            background-color: var(--secondary-color);
-            border-radius: var(--card-radius);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            padding: 15px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        
-        .ad-image-container {
-            width: 100%;
-            height: 100px; 
-            overflow: hidden;
-            border-radius: 10px;
-            margin-bottom: 10px;
-        }
-
-        .ad-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover; 
-            display: block;
-        }
-        
-        .ad-button {
-            background-color: #34C759;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 10px;
-            transition: background-color 0.2s;
-        }
-        .ad-button:hover {
-             background-color: #2fb94f;
-        }
-
-        /* İndirme Görev Modal Stili */
-        .task-modal-content {
-            background-color: var(--secondary-color); 
-            padding: 20px; 
-            border-radius: var(--card-radius); 
-            box-shadow: var(--shadow-modern);
-            max-width: 90%;
-            width: 350px;
-            box-sizing: border-box;
-        }
-        .task-button {
-            display: flex;
-            align-items: center;
-            padding: 12px 15px;
-            margin-bottom: 10px;
-            border-radius: 10px;
-            border: 2px solid var(--primary-color);
-            background-color: #f7f7f7;
-            cursor: pointer;
-            transition: background-color 0.1s;
-        }
-        .task-button:hover { background-color: #e5e5e5; }
-        .task-button:disabled { opacity: 0.6; cursor: not-allowed; border-color: var(--hint-color); }
-        .task-button .material-symbols-rounded { margin-right: 15px; font-size: 24px; color: var(--primary-color); }
-        .task-info { text-align: left; }
-        .task-info .name { font-weight: 700; font-size: 16px; color: var(--text-color); }
-        .task-info .detail { font-size: 13px; color: var(--hint-color); }
-
-        /* Admin Analiz Kartı Stilleri */
-        .analysis-card {
-            background-color: var(--secondary-color);
-            margin: 0 0 18px 0;
-            padding: 15px;
-            border-radius: var(--card-radius);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-        }
-        .analysis-item {
-            text-align: center;
-            padding: 10px;
-            border-radius: 8px;
-            background-color: var(--background-color);
-        }
-        .analysis-value {
+        #pinnedMessageContainer .material-symbols-rounded {
             font-size: 20px;
-            font-weight: 700;
-            color: var(--primary-color);
-        }
-        .analysis-label {
-            font-size: 12px;
+            margin-right: 8px;
             color: var(--hint-color);
-            margin-top: 2px;
+        }
+        #pinnedMessageText {
+            flex-grow: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text-color);
+        }
+        #unpinButton {
+            color: #FF3B30;
+            font-size: 20px;
+            margin-left: 10px;
+            cursor: pointer;
         }
         
+        /* 🔥 PDF İndirme Onay Modalı Stilleri */
+        .download-task-list {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0 25px 0;
+            text-align: left;
+        }
+
+        .download-task-list li {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            font-size: 1em;
+            color: var(--text-color);
+        }
+        
+        .download-task-list input[type="checkbox"] {
+            width: 18px; 
+            height: 18px; 
+            margin-right: 10px; 
+            accent-color: var(--primary-color); 
+            flex-shrink: 0;
+        }
+        
+        #download-confirm-btn {
+            background-color: #ccc;
+            color: #666;
+            cursor: not-allowed;
+            transition: all 0.3s;
+        }
+
+        #download-confirm-btn.active {
+            background-color: #28a745; /* Yeşil */
+            color: white;
+            cursor: pointer;
+        }
+
+
+        /* 🔥 ANIMASYON KEYFRAMES */
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOutLeft {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(-100%); opacity: 0; }
+        }
+        @keyframes slideInLeft {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOutRight {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+        @keyframes bounce {
+            from { transform: translateY(0px); }
+            to { transform: translateY(-5px); }
+        }
     </style>
 </head>
 <body>
-<div class="splash-screen" id="splashScreen" style="height: 100%; display: flex; justify-content: center; align-items: center; background-color: var(--background-color);">
+<div class="splash-screen" id="splashScreen" style="height: 100%; display: flex; justify-content: center; align-items: center; background-color: var(--background-color); z-index: 90;">
     <div style="background: var(--secondary-color); padding: 30px; border-radius: 20px; text-align: center; max-width: 300px; width: 90%; box-shadow: var(--shadow-modern);">
-        <span class="material-symbols-rounded" style="font-size: 48px; color: var(--primary-color); margin-bottom: 15px; animation: bounce 1s infinite alternate;">book</span>
-        <h2 style="margin-top: 0; font-size: 22px; font-weight: 700;">PDF Dershanem</h2>
-        <p style="font-size: 15px; color: var(--hint-color);">Botu kullanmaya başlamak için onaylayın.</p>
-        <div style="display: flex; align-items: center; margin-bottom: 25px; margin-top: 15px;">
-            <input type="checkbox" id="termsCheckbox" style="width: 18px; height: 18px; margin-right: 10px; accent-color: var(--primary-color);">
-            <label for="termsCheckbox" style="font-size: 14px; margin-top: 0; font-weight: 400;">Hizmet Şartlarını okudum ve kabul ediyorum. (<a href="#" id="readTermsLink" style="color: var(--primary-color);">Oku</a>)</label>
+        <span class="material-symbols-rounded" style="font-size: 48px; color: var(--primary-color); margin-bottom: 15px; animation: bounce 1s infinite alternate;">lock_open</span>
+        <h2 style="margin-top: 0; font-size: 22px; font-weight: 700;">PDF Dershanem Botuna Hoş Geldiniz</h2>
+        <p style="font-size: 15px; color: var(--hint-color);">Uygulamayı kullanmaya başlamadan önce, Hizmet Şartlarını onaylamanız gerekmektedir.</p>
+        <div style="display: flex; align-items: flex-start; margin-bottom: 25px; margin-top: 15px;">
+            <input type="checkbox" id="termsCheckbox" style="width: 18px; height: 18px; margin-right: 10px; accent-color: var(--primary-color); flex-shrink: 0; margin-top: 2px;">
+            <label for="termsCheckbox" style="font-size: 14px; margin-top: 0; font-weight: 400; text-align: left;">
+                Hizmet Şartlarını okudum ve kabul ediyorum.
+                <a href="javascript:void(0);" id="readTermsLink" style="color: var(--primary-color); font-weight: 600;" onclick="document.getElementById('termsModal').classList.remove('hidden')">Şartları Oku</a>
+            </label>
         </div>
         <button id="loginButton" class="action-button" disabled>Bota Giriş Yap</button>
-        <button id="sponsorJoinButtonSplash" class="action-button" onclick="window.open(SPONSORED_CHANNEL, '_blank')" style="margin-top: 10px; background-color: #5d9ddf;">
-            <span class="material-symbols-rounded" style="font-size: 18px; vertical-align: middle;">group_add</span> Sponsor Kanala Katıl
-        </button>
         <p id="loadingStatus" style="font-size: 13px; color: #FF3B30; margin-top: 15px; display: none;">Veriler yükleniyor...</p>
     </div>
 </div>
 
 <div class="modal-overlay hidden" id="termsModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 100;">
-     <div class="modal-content" style="max-width: 90%; padding: 20px; background-color: var(--secondary-color); border-radius: var(--card-radius); box-shadow: var(--shadow-modern);">
-        <h3>Hizmet Şartları ve Gizlilik Politikası</h3>
+     <div class="modal-content" style="max-width: 90%; max-height: 80%; overflow-y: auto; padding: 20px; background-color: var(--secondary-color); border-radius: var(--card-radius); box-shadow: var(--shadow-modern);">
+        <h3 style="color: var(--primary-color); margin-top: 0;">Hizmet Şartları ve Gizlilik Politikası</h3>
         <p style="font-size: 14px; color: var(--text-color);">**1. Veri Toplama:** Bu bot, yalnızca Telegram ID'nizi, adınızı, soyadınızı ve kullanıcı adınızı kaydeder. Sohbet içerikleri, hizmetin devamlılığı için Firebase Realtime Database'de depolanır.</p>
          <p style="font-size: 14px; color: var(--text-color);">**2. Kullanım Kısıtlamaları:** Argo, hakaret, yasa dışı veya telif hakkıyla korunan içeriklerin paylaşılması kesinlikle yasaktır. Bu tür davranışlar, yöneticiler tarafından kalıcı yasaklama ile sonuçlanacaktır.</p>
         <p style="font-size: 14px; color: var(--text-color);">**3. Sorumluluk:** Paylaşılan PDF ve mesaj içeriklerinden tamamen kullanıcı sorumludur. Yöneticiler, önceden haber vermeksizin içeriği düzenleme veya silme hakkını saklı tutar.</p>
         <p style="font-size: 14px; color: var(--text-color);">**4. İletişim:** Sorun veya şikayetleriniz için lütfen Admin/Yönetici ile iletişime geçiniz.</p>
+        <button id="acceptTermsModal" class="action-button" style="margin-top: 15px;">Okudum ve Kabul Ediyorum</button>
         <button id="closeTermsModal" class="action-button" style="margin-top: 10px; background-color: var(--tg-theme-hint-color);">Kapat ve Reddet</button>
-        <button id="acceptTermsModal" class="action-button" style="margin-top: 10px;">Okudum ve Kabul Ediyorum</button>
     </div>
 </div>
 
-<div class="modal-overlay hidden" id="taskModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 100;">
-    <div class="task-modal-content">
-        <h3 style="color: var(--primary-color); margin-top: 0; text-align: center;"><span class="material-symbols-rounded" style="font-size: 24px; vertical-align: middle;">task_alt</span> İndirme Görevlerini Tamamlayın</h3>
-        <p style="font-size: 14px; color: var(--text-color); text-align: center; margin-bottom: 20px;">PDF'i indirmek için aşağıdaki zorunlu görevleri tamamlayın.</p>
+<div class="modal-overlay hidden" id="pdfDownloadConfirmModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 100;">
+     <div class="modal-content" style="max-width: 350px; padding: 25px; background-color: var(--secondary-color); border-radius: var(--card-radius); box-shadow: var(--shadow-modern); text-align: center;">
+        <h3 style="color: var(--primary-color); margin-top: 0;"><span class="material-symbols-rounded" style="font-size: 24px; vertical-align: middle;">lock</span> İndirme Onayı Gerekiyor</h3>
+        <p id="pdfConfirmTitle" style="font-size: 16px; color: var(--text-color); font-weight: 600;">"[PDF Adı]" dosyasını indirmek üzeresiniz.</p>
+        <p style="font-size: 14px; color: var(--hint-color); margin-top: -5px;">Devam etmek için aşağıdaki şartları tamamlayın:</p>
 
-        <div id="taskAdButton" class="task-button" style="display: none;">
-            <span class="material-symbols-rounded">play_circle</span>
-            <div class="task-info">
-                <div class="name">REKLAM LİNKLERİNİ ZİYARET ET</div>
-                <div class="detail" id="adsRequiredText"></div>
-            </div>
-        </div>
-
-        <div id="taskJoinButton" class="task-button" style="display: none;">
-            <span class="material-symbols-rounded">group_add</span>
-            <div class="task-info">
-                <div class="name">SPONSOR KANALLARA KATIL</div>
-                <div class="detail" id="joinsRequiredText"></div>
-            </div>
-        </div>
+        <ul class="download-task-list">
+            <li>
+                <input type="checkbox" id="task-recaptcha" onchange="checkDownloadTasks()">
+                <label for="task-recaptcha">Ben Robot Değilim (Kontrolü Geç)</label>
+            </li>
+            <li>
+                <input type="checkbox" id="task-channel-join" onchange="checkDownloadTasks()">
+                <label for="task-channel-join">Sponsorlu Kanala katıldım (Gerekli Onay)</label>
+            </li>
+        </ul>
         
-        <button onclick="document.getElementById('taskModal').classList.add('hidden')" class="action-button" style="margin-top: 10px; background-color: var(--tg-theme-hint-color);">İptal</button>
-        <div id="taskStatus" style="font-size: 13px; color: #FF3B30; margin-top: 15px; text-align: center; display: none;"></div>
+        <a id="sponsoredChannelLink" href="javascript:void(0);" target="_blank" class="action-button" style="padding: 8px 15px; font-size: 14px; margin-bottom: 15px; display: none;">
+             <span class="material-symbols-rounded" style="font-size: 18px; vertical-align: middle;">star</span> Sponsorlu Kanala Git
+        </a>
+
+        <button id="download-confirm-btn" class="action-button" disabled>
+            Tüm Görevleri Tamamlayın
+        </button>
+        
+        <button onclick="document.getElementById('pdfDownloadConfirmModal').classList.add('hidden')" class="action-button" style="margin-top: 10px; background-color: var(--tg-theme-hint-color);">İptal</button>
     </div>
 </div>
 
+<div class="modal-overlay hidden" id="pdfDownloadInfoModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 100;">
+     <div class="modal-content" style="max-width: 350px; padding: 20px; background-color: var(--secondary-color); border-radius: var(--card-radius); box-shadow: var(--shadow-modern);">
+        <h3 style="color: var(--primary-color); margin-top: 0;"><span class="material-symbols-rounded" style="font-size: 24px; vertical-align: middle;">download_for_offline</span> PDF İndirme</h3>
+        <p style="font-size: 15px; color: var(--text-color);">
+            Botumuzdaki PDF'ler, kullanıcılara **linkli buton** ile sunulmaktadır. İndirme bağlantısına tıklayarak doğrudan tarayıcınız üzerinden indirme işlemini başlatabilirsiniz.
+            <br><br>
+            ⚠️ **Önemli Bilgi:** Dosya indirmeden önce bir veya daha fazla **sponsorlu** kanala katılmanız gerekmektedir. Bu şartlar yakında aktif edilecektir.
+        </p>
+        <button onclick="window.open(SPONSORED_CHANNEL, '_blank')" class="action-button" style="margin-top: 15px;">
+             <span class="material-symbols-rounded" style="font-size: 18px; vertical-align: middle;">star</span> Sponsorlu Kanala Katıl
+        </button>
+        <button onclick="document.getElementById('pdfDownloadInfoModal').classList.add('hidden')" class="action-button" style="margin-top: 10px; background-color: var(--tg-theme-hint-color);">Kapat</button>
+    </div>
+</div>
 
 <div class="telegram-app" id="app">
-    
+
     <div id="mainAppContent" class="hidden content-container">
-        
-        <div class="content-page active" id="page-home">
-            
+
+        <div class="content-page active" id="page-home" data-page-index="0">
+
             <div class="list-card" onclick="window.open(SPONSORED_CHANNEL, '_blank')" style="cursor: pointer; background-color: #5d9ddf; margin-top: 5px; margin-bottom: 18px;">
                 <div class="list-item" style="border-bottom: none; padding: 10px 15px;">
                     <div class="list-icon" style="background-color: #ffffff30; width: 40px; height: 40px; border-radius: 50%;">
-                        <span class="material-symbols-rounded" style="color: white; font-size: 24px;">group_add</span>
+                        <span class="material-symbols-rounded" style="color: white; font-size: 24px;">star</span>
                     </div>
                     <div class="list-info">
-                        <div class="list-name" style="color: white; font-weight: 700;">SPONSOR KANAL</div>
-                        <div class="list-detail" style="color: #dddddd;">Krallar PDF - Tıklayın ve Hemen Katılın!</div>
+                        <div class="list-name" style="color: white; font-weight: 700;">SPONSORLU KANAL</div>
+                        <div class="list-detail" style="color: #dddddd;">Benim Hocam PDF - Tıklayın ve Katılın!</div>
                     </div>
                     <div class="list-meta"><span class="material-symbols-rounded" style="color: white;">chevron_right</span></div>
                 </div>
             </div>
-            
-            <div class="list-section-title">PDF KÜTÜPHANESİ</div>
+
+            <div class="list-card hidden" id="bannerAd1" style="margin-bottom: 18px; text-align: center; padding: 10px;">
+                <p style="margin: 0; font-size: 13px; color: var(--hint-color);">Sponsorlu Banner 1 Yükleniyor...</p>
+            </div>
+
+            <div class="list-section-title">PDF KÜTÜPHANESİ VE ÖZET</div>
             <div class="list-card">
                 <div class="list-item" onclick="changeTab('pdf-list')">
                     <div class="list-icon" style="background-color: #FF3B30;"><span class="material-symbols-rounded">collections_bookmark</span></div>
                     <div class="list-info"><div class="list-name">Tüm PDF Dosyaları</div><div class="list-detail">Toplam Dosya: <span id="pdfCount">Yükleniyor...</span></div></div>
                     <div class="list-meta" style="color: var(--primary-color);"><span class="material-symbols-rounded">chevron_right</span></div>
                 </div>
+                <div class="list-item" onclick="document.getElementById('pdfDownloadInfoModal').classList.remove('hidden')">
+                    <div class="list-icon" style="background-color: #007AFF;"><span class="material-symbols-rounded">download_for_offline</span></div>
+                    <div class="list-info"><div class="list-name">PDF İndirme Bilgisi</div><div class="list-detail">Nasıl indirilir? Sponsorluk Şartları.</div></div>
+                    <div class="list-meta" style="color: var(--primary-color);"><span class="material-symbols-rounded">chevron_right</span></div>
+                </div>
+            </div>
+
+            <div class="list-card hidden" id="bannerAd2" style="margin-bottom: 18px; text-align: center; padding: 10px;">
+                <p style="margin: 0; font-size: 13px; color: var(--hint-color);">Sponsorlu Banner 2 Yükleniyor...</p>
             </div>
 
             <div class="list-section-title">SOHBET VE İLETİŞİM</div>
@@ -325,11 +407,15 @@
             <div class="list-card hidden" id="adminControlCard">
                 <div class="list-item" onclick="openAdminModal()">
                     <div class="list-icon" style="background-color: #FF9500;"><span class="material-symbols-rounded">shield</span></div>
-                    <div class="list-info"><div class="list-name">Admin Yönetimi Paneli</div><div class="list-detail">Kullanıcı, PDF ve Reklam Ayarları.</div></div>
+                    <div class="list-info"><div class="list-name">Admin Yönetimi Paneli</div><div class="list-detail">Kullanıcı, PDF ve Sponsorluk Ayarları.</div></div>
                     <div class="list-meta" style="color: var(--primary-color);">Aç</div>
                 </div>
             </div>
-            
+
+            <div class="list-card hidden" id="bannerAd3" style="margin-bottom: 18px; text-align: center; padding: 10px;">
+                <p style="margin: 0; font-size: 13px; color: var(--hint-color);">Sponsorlu Banner 3 Yükleniyor...</p>
+            </div>
+
             <div class="list-section-title">HESAP</div>
             <div class="list-card">
                 <div class="list-item" onclick="changeTab('profile')">
@@ -338,31 +424,19 @@
                     <div class="list-meta" style="color: var(--primary-color);"><span class="material-symbols-rounded">chevron_right</span></div>
                 </div>
             </div>
-            
-            
+
+
         </div>
 
-        <div class="content-page" id="page-pdf-list">
+        <div class="content-page" id="page-pdf-list" data-page-index="1">
             <div class="list-section-title">İNDİRİLEBİLİR PDF LİSTESİ</div>
             <div class="list-card" id="pdfDownloadList">
                 <div style="padding: 15px; text-align: center; color: var(--hint-color);">PDF'ler yükleniyor...</div>
             </div>
         </div>
-        
-        <div class="content-page" id="page-chat-container"> 
-             
-             <div id="chatAdBanner" style="display: none;">
-                <div class="ad-content">
-                    <div class="ad-image-container">
-                        <img id="adBannerImage" class="ad-image" src="" alt="Sponsorlu Afiş Reklamı" onerror="handleAdImageError(this)">
-                    </div>
-                    <h4 id="adBannerTitle" style="margin: 0; font-size: 16px; color: var(--text-color);">YENİ NOTLAR, TEKRARLAR VE FASİKÜLLER</h4>
-                    <p id="adBannerDesc" style="font-size: 13px; color: var(--hint-color); margin: 5px 0 0 0;">Krallar PDF - Tüm Sınav Hazırlığı Kaynakları</p>
-                    <button id="adBannerButton" class="ad-button" onclick="handleAdBannerClick()">HEMEN GÖR! →</button>
-                    <div style="font-size: 10px; color: var(--hint-color); margin-top: 5px; opacity: 0.7;">Bu bir reklamdır.</div>
-                </div>
-             </div>
-             
+
+        <div class="content-page" id="page-chat-container" data-page-index="2">
+
              <div id="pinnedMessageContainer" style="display: none;" onclick="scrollToPinnedMessage()">
                  <span class="material-symbols-rounded">push_pin</span>
                  <span id="pinnedMessageText">Yükleniyor...</span>
@@ -372,13 +446,13 @@
              <div class="chat-messages chat-messages-padding" id="chatMessagesContainer">
                  <div style="padding: 15px; text-align: center; color: var(--hint-color);">Sohbet verileri yükleniyor...</div>
              </div>
-             
+
              <div class="chat-input-area" id="chatInputArea" style="display: none;">
-                <textarea 
-                    id="messageInput" 
-                    class="message-input" 
-                    placeholder="Mesaj yazın..." 
-                    oninput="autoExpandTextarea(this)" 
+                <div id="inputAvatar" class="chat-user-avatar">?</div> <textarea
+                    id="messageInput"
+                    class="message-input"
+                    placeholder="Mesaj yazın..."
+                    oninput="autoExpandTextarea(this)"
                     onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }"
                 ></textarea>
                 <button id="sendMessageButton" onclick="sendMessage()" style="width: 40px; height: 40px; padding: 0; margin: 0; border-radius: 50%; background-color: var(--primary-color); flex-shrink: 0;">
@@ -386,8 +460,8 @@
                 </button>
             </div>
         </div>
-        
-        <div class="content-page" id="page-profile">
+
+        <div class="content-page" id="page-profile" data-page-index="3">
             <div class="list-section-title" style="margin-top: 20px;">KULLANICI BİLGİLERİ</div>
             <div class="list-card">
                 <div style="padding: 20px; text-align: center; border-bottom: 1px solid var(--border-color);">
@@ -402,25 +476,25 @@
                 <div class="list-item"><div class="list-icon" style="background-color: #3f51b5;"><span class="material-symbols-rounded">alternate_email</span></div>
                     <div class="list-info"><div class="list-name">Kullanıcı Adı</div><div class="list-detail" id="profile-username">Yükleniyor...</div></div></div>
             </div>
-            
+
             <div class="list-card hidden" id="adminControlCardProfile">
                 <div class="list-item" onclick="openAdminModal()">
                     <div class="list-icon" style="background-color: #FF9500;"><span class="material-symbols-rounded">shield</span></div>
-                    <div class="list-info"><div class="list-name">Admin Yönetimi Paneli</div><div class="list-detail">Kullanıcı, PDF ve Reklam Ayarları.</div></div>
+                    <div class="list-info"><div class="list-name">Admin Yönetimi Paneli</div><div class="list-detail">Kullanıcı, PDF ve Sponsorluk Ayarları.</div></div>
                     <div class="list-meta" style="color: var(--primary-color);">Aç</div>
                 </div>
             </div>
         </div>
 
     </div>
-    
+
     <div id="page-admin-instance" class="hidden" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto; background-color: var(--background-color); z-index: 60;">
-        <div style="background-color: var(--secondary-bg-color); box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <div style="background-color: var(--secondary-bg-color); box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 61;">
             <h2 style="padding: 15px; margin: 0; display: flex; justify-content: space-between; align-items: center; color: var(--text-color);">
                 Admin Yönetimi
                 <button class="action-button" onclick="closeAdminModal()" style="width: auto; padding: 5px 10px; font-size: 14px; background-color: var(--tg-theme-hint-color);">Geri Dön</button>
             </h2>
-            <div class="bottom-nav" style="position: relative; height: auto; border-top: none;">
+            <div class="bottom-nav" style="position: relative; height: auto; border-top: none; box-shadow: none;">
                 <div class="nav-item active" data-admin-tab="pdf" onclick="changeAdminTab('pdf')">
                     <span class="material-symbols-rounded">picture_as_pdf</span>
                     <span>PDF'ler</span>
@@ -430,31 +504,22 @@
                     <span>Kullanıcılar</span>
                 </div>
                 <div class="nav-item" data-admin-tab="ads" onclick="changeAdminTab('ads')">
-                    <span class="material-symbols-rounded">campaign</span>
-                    <span>Reklamlar & Görevler</span>
+                    <span class="material-symbols-rounded">star</span>
+                    <span>Sponsorluk</span>
                 </div>
             </div>
         </div>
-        
+
         <div style="padding: 15px;">
-            
+
             <div id="admin-tab-pdf" class="admin-tab active">
-                <div class="list-section-title">PDF KAYDI EKLE (DİNAMİK GÖREVLER)</div>
+                <div class="list-section-title">PDF YÜKLE</div>
                 <div class="list-card" style="padding: 15px;">
-                    <input type="text" id="pdfTitle" placeholder="1. PDF Başlığını Girin (Örn: TYT Matematik)" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: var(--background-color); color: var(--text-color);">
-                    <input type="url" id="pdfUrl" placeholder="2. PDF İndirme URL'sini Yapıştırın (Görevi Tamamlayınca Açılır)" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: var(--background-color); color: var(--text-color);">
-                    
-                    <label for="joinLinksCount" style="font-size: 14px; font-weight: 600; display: block; margin-bottom: 5px;">3. Kanala Katılma Görevi (Kaç Link/Kanal Eklenecek?)</label>
-                    <input type="number" id="joinLinksCount" min="0" max="10" value="0" oninput="updateDynamicLinkInputs('join', this.value)" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: var(--background-color); color: var(--text-color);">
-                    <div id="joinLinksContainer"></div>
-                    
-                    <label for="adLinksCount" style="font-size: 14px; font-weight: 600; display: block; margin-top: 15px; margin-bottom: 5px;">4. Reklam Görüntüleme Görevi (Kaç Reklam/Link Eklenecek?)</label>
-                    <input type="number" id="adLinksCount" min="0" max="50" value="0" oninput="updateDynamicLinkInputs('ad', this.value)" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: var(--background-color); color: var(--text-color);">
-                    <div id="adLinksContainer"></div>
-                    
-                    <button class="action-button" id="uploadPdfButton" onclick="uploadPDF()" style="margin-top: 20px;">PDF Kaydını Ekle</button>
+                    <input type="text" id="pdfTitle" placeholder="Başlık (Dosya adı otomatik yazılacaktır)" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: var(--background-color); color: var(--hint-color);" disabled>
+                    <input type="file" id="pdfFile" accept=".pdf" style="width: 100%; margin-bottom: 15px;" onchange="updatePdfTitle(this)">
+                    <button class="action-button" id="uploadPdfButton" onclick="uploadPDF()">PDF Yükle</button>
                 </div>
-                
+
                 <div class="list-section-title">MEVCUT PDF LİSTESİ</div>
                 <div class="list-card" id="adminPdfList">
                     <div style="padding: 15px; text-align: center; color: var(--hint-color);">Mevcut PDF'ler yükleniyor...</div>
@@ -462,27 +527,6 @@
             </div>
 
             <div id="admin-tab-users" class="admin-tab hidden">
-                <div class="list-section-title">DETAYLI ANALİZ</div>
-                 <div class="analysis-card">
-                     <div class="analysis-item">
-                         <div class="analysis-value" id="totalUsersCount">0</div>
-                         <div class="analysis-label">Toplam Kullanıcı</div>
-                     </div>
-                     <div class="analysis-item">
-                         <div class="analysis-value" id="todayActiveUsers">0</div>
-                         <div class="analysis-label">Bugün Aktif Kullanıcı</div>
-                     </div>
-                     <div class="analysis-item" style="grid-column: span 2;">
-                         <div class="analysis-value" id="totalPdfCountAnalysis">0</div>
-                         <div class="analysis-label">Toplam Kayıtlı PDF</div>
-                     </div>
-                 </div>
-                <div class="list-section-title">SOHBET YÖNETİMİ</div>
-                <div class="list-card" style="padding: 15px;">
-                    <p style="font-size: 14px; color: var(--hint-color); margin-bottom: 10px;">Ortak sohbet kanalındaki TÜM mesajları kalıcı olarak siler.</p>
-                    <button class="action-button" style="background-color: #FF3B30;" onclick="clearChatMessages('ortak')">Ortak Sohbeti Temizle</button>
-                </div>
-
                 <div class="list-section-title">KAYITLI KULLANICI LİSTESİ</div>
                 <div class="list-card" id="adminUserList">
                     <div style="padding: 15px; text-align: center; color: var(--hint-color);">Kullanıcılar yükleniyor...</div>
@@ -490,55 +534,24 @@
             </div>
 
             <div id="admin-tab-ads" class="admin-tab hidden">
-                
-                <div class="list-section-title">PDF İNDİRME GÖREV AYARLARI</div>
+                <div class="list-section-title">SPONSORLUK BÖLGELERİ YÖNETİMİ</div>
                 <div class="list-card" style="padding: 15px;">
-                     <label for="adsPerDownload" style="font-size: 14px; font-weight: 600; display: block; margin-bottom: 5px;">Reklam Görüntüleme Zorunluluğu (Kaç Reklam Linki İstenmeli?)</label>
-                     <input type="number" id="adsPerDownload" min="0" max="100" placeholder="Örn: 1 (Her indirme için 1 reklam), 0 (Devre Dışı)" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: var(--background-color); color: var(--text-color);">
-                     <p style="font-size: 12px; color: var(--hint-color);">Bu değer, Adminin PDF eklerken kaç adet "Reklam Linki" girmesi gerektiğini belirtir.</p>
-                     
-                     <label for="requiredJoins" style="font-size: 14px; font-weight: 600; display: block; margin-top: 15px; margin-bottom: 5px;">Kanala Katılma Zorunluluğu (Kaç Kanal Linki İstenmeli?)</label>
-                     <input type="number" id="requiredJoins" min="0" max="10" placeholder="Örn: 1 (Görevin olması için 1), 0 (Devre Dışı)" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: var(--background-color); color: var(--text-color);">
-                     <p style="font-size: 12px; color: var(--hint-color);">Bu değer, Adminin PDF eklerken kaç adet "Kanala Katılma Linki" girmesi gerektiğini belirtir. (0 = Pasif)</p>
-                     
-                     <button class="action-button" id="saveTasksButton" onclick="saveTaskConfig()" style="margin-top: 15px;">Görev Ayarlarını Kaydet</button>
-                     <p id="taskConfigStatus" style="font-size: 13px; color: var(--hint-color); text-align: center; margin-top: 10px;"></p>
-                </div>
-                <div class="list-section-title">SOHBET AFİŞ REKLAMI (GÖRSEL BANNER)</div>
-                <div class="list-card" style="padding: 15px;">
-                    <p style="font-size: 14px; color: var(--hint-color);">Sohbet ekranının en üstünde sabit duracak görsel afişi yönetin.</p>
-                    
-                    <label for="adBannerImageAdmin" style="font-size: 14px; font-weight: 600; display: block; margin-top: 10px;">Afiş Görsel URL'si (https://...)</label>
-                    <input type="url" id="adBannerImageAdmin" placeholder="Görsel linkini yapıştırın..." style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: var(--background-color); color: var(--text-color);">
-                    
-                    <label for="adBannerLinkAdmin" style="font-size: 14px; font-weight: 600; display: block; margin-top: 10px;">Yönlendirme Linki (HEMEN GÖR! butonu için)</label>
-                    <input type="url" id="adBannerLinkAdmin" placeholder="Tıklanınca gidilecek link..." style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: var(--background-color); color: var(--text-color);">
-                    
-                    <button class="action-button" id="saveAdBannerButton" onclick="saveAdBannerConfig()">Afiş Reklamı Kaydet/Güncelle</button>
+                    <p style="font-size: 14px; color: var(--hint-color);">Sponsorluk metinlerini ve durumunu buradan yönetin. (Firebase verisiyle senkronize)</p>
+
+                    <label for="ad1Text" style="font-size: 14px; font-weight: 600; display: block; margin-top: 10px;">Banner 1 Metni (Ana Sayfa 1)</label>
+                    <input type="text" id="ad1Text" placeholder="Sponsorluk metni buraya..." style="width: 100%; padding: 10px; margin-bottom: 5px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: var(--background-color); color: var(--text-color);">
+
+                    <label for="ad1Link" style="font-size: 14px; font-weight: 600; display: block; margin-top: 10px;">Banner 1 Linki (https://...)</label>
+                    <input type="url" id="ad1Link" placeholder="Sponsorluk linki buraya..." style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: var(--background-color); color: var(--text-color);">
+
+                    <button class="action-button" id="saveAdsButton" onclick="saveAdsConfig()">Sponsorlukları Kaydet/Güncelle</button>
                     <p id="adStatus" style="font-size: 13px; color: var(--hint-color); text-align: center; margin-top: 10px;"></p>
                 </div>
-                
-                <div class="list-card" style="padding: 15px; margin-top: 18px;">
-                    <button class="action-button" style="background-color: #FF3B30;" onclick="removeAdBannerConfig()">Afiş Reklamını Kaldır</button>
-                </div>
-                
-                <div class="list-section-title">ÖN İZLEME</div>
-                 <div class="list-card" style="padding: 10px;">
-                     <div class="ad-content" style="padding: 10px; background-color: var(--background-color);">
-                        <div class="ad-image-container" style="height: 60px;">
-                            <img id="adBannerPreview" class="ad-image" src="" alt="Afiş Ön İzleme" style="width: 100%; height: 100%; border-radius: 8px; display: none;" onerror="this.style.display='none';" onload="this.style.display='block';">
-                        </div>
-                        <h4 style="margin: 0; font-size: 14px;">ÖN İZLEME BAŞLIĞI</h4>
-                        <p style="font-size: 12px; color: var(--hint-color); margin: 3px 0 0 0;">Önizleme Açıklaması</p>
-                        <button class="ad-button" style="padding: 6px 10px; font-size: 12px; margin-top: 8px;">HEMEN GÖR! →</button>
-                    </div>
-                    <p id="previewHint" style="font-size: 13px; color: var(--hint-color); text-align: center; margin-top: 5px;">Görsel URL'si girildikten sonra önizleme burada görünecektir.</p>
-                 </div>
             </div>
 
         </div>
     </div>
-    
+
     <div class="modal-overlay hidden" id="errorModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 100;">
         <div class="modal-content" style="max-width: 350px; padding: 20px; background-color: var(--secondary-color); border-radius: var(--card-radius); box-shadow: var(--shadow-modern);">
             <h3 id="errorModalTitle" style="color: #FF3B30;"><span class="material-symbols-rounded" style="font-size: 24px; vertical-align: middle;">warning</span> Hata!</h3>
@@ -559,19 +572,19 @@
     </div>
 
     <div class="bottom-nav">
-        <div class="nav-item active" data-tab="home" onclick="changeTab('home')">
+        <div class="nav-item active" data-tab="home" data-index="0" onclick="changeTab('home')">
             <span class="material-symbols-rounded">home</span>
             <span>Ana Sayfa</span>
         </div>
-        <div class="nav-item" data-tab="pdf-list" onclick="changeTab('pdf-list')">
+        <div class="nav-item" data-tab="pdf-list" data-index="1" onclick="changeTab('pdf-list')">
             <span class="material-symbols-rounded">picture_as_pdf</span>
             <span>PDF'ler</span>
         </div>
-        <div class="nav-item" data-tab="chat-container" onclick="openChat('ortak', '💬 Ortak Sohbet Grubu', false)">
+        <div class="nav-item" data-tab="chat-container" data-index="2" onclick="openChat('ortak', '💬 Ortak Sohbet Grubu', false)">
             <span class="material-symbols-rounded">forum</span>
             <span>Sohbet</span>
         </div>
-        <div class="nav-item" data-tab="profile" onclick="changeTab('profile')">
+        <div class="nav-item" data-tab="profile" data-index="3" onclick="changeTab('profile')">
             <span class="material-symbols-rounded">person</span>
             <span>Profil</span>
         </div>
@@ -583,302 +596,126 @@
     // #######################################################
     // ##### JAVASCRIPT LOGIC #####
     // #######################################################
-    
+
     // 🛑 YAPILANDIRMA: SİZİN TARAFINIZDAN VERİLEN GÜNCEL BİLGİLER 🛑
     const firebaseConfig = {
-      apiKey: "AIzaSyArNeaPYGiPg-K7O19Xg4btYhqfnzvyCtw", 
+      apiKey: "AIzaSyArNeaPYGiPg-K7O19Xg4btYhqfnzvyCtw",
       authDomain: "pdfdershanem.firebaseapp.com",
-      databaseURL: "https://pdfdershanem-default-rtdb.firebaseio.com", 
+      databaseURL: "https://pdfdershanem-default-rtdb.firebaseio.com",
       projectId: "pdfdershanem",
-      storageBucket: "pdfdershanem.firebasestorage.app", 
+      storageBucket: "pdfdershanem.appspot.com", // storageBucket alanını düzelttim.
       messagingSenderId: "149337981694",
       appId: "1:149337981694:web:87ec729568567f43879baf",
       measurementId: "G-BZB9FD26GT"
     };
-    
+
     // 🛑 YÖNETİCİ ID'LERİ DİZİSİ 🛑
     const ADMIN_IDS = [
-        7904032877, 
-        8392479231, 
+        7904032877, // Admin 1
+        8392479231, // Admin 2
     ];
-    
+
     // 🛑 SABİT SPONSORLU KANAL LİNKİ 🛑
-    const SPONSORED_CHANNEL = "https://t.me/KrallarPDF"; 
+    const SPONSORED_CHANNEL = "https://t.me/Benim_Hocam_PDF";
 
-    let db;
-    let currentUser = null; 
+    let db, storage;
+    let currentUser = null;
     let is_admin = false;
-    
-    let currentChatId = 'ortak'; 
-    let currentChatIsReadonly = true; 
+    let userAdCount = 0;
+    const ADS_REQUIRED = 2;
+
+    let currentChatId = 'ortak';
+    let currentChatIsReadonly = true;
     let currentPinnedMessageKey = null;
+    let currentPageIndex = 0; // Geçerli sayfa indeksi
     
-    let pendingDownload = { key: null, name: null, url: null, required_links: { join: [], ad: [] } }; // GÜNCELLENDİ
-    let taskConfig = { ads_per_download: 0, required_joins: 0 }; 
-    
-    function initializeApp() {
-        const loadingStatus = document.getElementById('loadingStatus');
+    // 🔥 GÜNCELLENMİŞ PDF İNDİRME DEĞİŞKENLERİ
+    let currentPdfUrl = '';
+    let currentPdfName = '';
 
-        try {
-            if (!firebase.apps.length) {
-                 firebase.initializeApp(firebaseConfig);
-            }
-            db = firebase.database(); 
-        } catch (e) {
-            console.error("Firebase Başlatma Hatası:", e);
-            loadingStatus.textContent = "Hata: Firebase bağlantısı kurulamadı. " + e.message;
-            loadingStatus.style.display = 'block';
-            return;
+    // Firebase'i başlatma
+    try {
+        if (!firebase.apps.length) {
+             firebase.initializeApp(firebaseConfig);
         }
-
-        if (window.Telegram && Telegram.WebApp) {
-             try {
-                Telegram.WebApp.ready();
-                if (Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.user) {
-                    currentUser = Telegram.WebApp.initDataUnsafe.user;
-                    is_admin = ADMIN_IDS.includes(currentUser.id); 
-                } else {
-                     currentUser = { id: 999999999, first_name: 'Misafir', last_name: 'Kullanıcı', username: 'misafir' };
-                     is_admin = false;
-                }
-                Telegram.WebApp.expand();
-            } catch (e) {
-                loadingStatus.textContent = "Hata: Telegram WebApp başlatılamadı. " + e.message;
-                loadingStatus.style.display = 'block';
-                if (!currentUser) currentUser = { id: 7904032877, first_name: 'Test', last_name: 'Admin', username: 'testadmin' };
-            }
-        } else {
-             currentUser = { id: 7904032877, first_name: 'Test', last_name: 'Admin', username: 'testadmin' };
-             is_admin = ADMIN_IDS.includes(currentUser.id);
-        }
-
-        updateProfileInfo(currentUser); 
-        
-        if (is_admin) {
-            document.getElementById('adminControlCard').classList.remove('hidden');
-            document.getElementById('adminControlCardProfile').classList.remove('hidden');
-        }
-        
-        // Yeni dinamik form alanlarını sıfırla/başlat
-        updateDynamicLinkInputs('join', 0);
-        updateDynamicLinkInputs('ad', 0);
-
-        loadTaskConfig(); 
+        db = firebase.database();
+        storage = firebase.storage();
+    } catch (e) {
+        console.error("Firebase Başlatma Hatası:", e);
+        document.getElementById('loadingStatus').textContent = "Hata: Firebase bağlantısı kurulamadı. " + e.message;
+        document.getElementById('loadingStatus').style.display = 'block';
     }
-    
+
     // #############################
     // ##### GENEL AMAÇLI FONKSİYONLAR #####
     // #############################
-    
-    function showErrorModal(title, message) { 
+
+    function showErrorModal(title, message) {
         const errorModal = document.getElementById('errorModal');
         if (window.Telegram && Telegram.WebApp) Telegram.WebApp.HapticFeedback.notificationOccurred('error');
         document.getElementById('errorModalTitle').innerHTML = `<span class="material-symbols-rounded" style="font-size: 24px; vertical-align: middle;">warning</span> ${title}`;
         document.getElementById('errorModalMessage').textContent = message;
         errorModal.classList.remove('hidden');
     }
-    
-    function saveUserToDatabase(user) { 
+
+    function saveUserToDatabase(user) {
         const userRef = db.ref('users/' + user.id);
         return userRef.once('value').then(snapshot => {
+            let userData = snapshot.val();
+            userAdCount = (userData && typeof userData.ad_count === 'number') ? userData.ad_count : 0;
             const updates = {
-                id: user.id, 
-                first_name: user.first_name || '', 
+                id: user.id,
+                first_name: user.first_name || '',
                 last_name: user.last_name || '',
-                username: user.username || 'yok', 
+                username: user.username || 'yok',
                 last_login: firebase.database.ServerValue.TIMESTAMP,
+                ad_count: userAdCount
             };
-            return userRef.update(updates).then(() => { return true; }); 
-        }).catch(err => { 
-            throw new Error("Kullanıcı kaydı/güncellenmesi başarısız oldu. Hata: " + err.message); 
+            return userRef.update(updates).then(() => { return true; });
+        }).catch(err => {
+            throw new Error("Kullanıcı kaydı/güncellenmesi başarısız oldu. Hata: " + err.message);
         });
     }
 
-    window.updateProfileInfo = function(user) {
-         if (!user || !user.id) return;
-         
-         const fullName = `${user.first_name || 'Bilinmiyor'} ${user.last_name || ''}`.trim();
-
-         document.getElementById('profile-id').textContent = user.id;
-         document.getElementById('profile-name').textContent = fullName;
-         document.getElementById('profile-username').textContent = user.username ? `@${user.username}` : 'Ayarlanmamış';
-         document.getElementById('profile-full-name').textContent = fullName || 'Misafir Kullanıcı';
-         document.getElementById('profile-status').textContent = is_admin ? '🛡️ Yönetici' : 'Kayıtlı Kullanıcı';
-    }
-    
     // #############################
-    // ##### İNDİRME GÖREV LOJİĞİ (GÜNCELLENDİ) #####
+    // 🔥 NAVİGASYON VE ANİMASYON FONKSİYONLARI 🔥
     // #############################
-    
-    window.loadTaskConfig = function() {
-        if (!db) return;
-        db.ref('settings/tasks').on('value', (snapshot) => {
-             const config = snapshot.val();
-             if (config) {
-                 taskConfig.ads_per_download = parseInt(config.ads_per_download) || 0;
-                 taskConfig.required_joins = parseInt(config.required_joins) || 0;
-             }
-             if (document.getElementById('adsPerDownload')) {
-                 document.getElementById('adsPerDownload').value = taskConfig.ads_per_download;
-                 document.getElementById('requiredJoins').value = taskConfig.required_joins;
-             }
-        }, (error) => {
-             console.error("Görev ayarları yüklenemedi:", error);
-        });
-    }
 
-    // GÜNCELLENDİ: PDF indirme modalını açar, PDF'e tanımlı linkleri çeker
-    window.handlePDFDownload = function(key, name, url) {
-        if (!currentUser) return;
-        
-        if (is_admin) {
-             finalizeDownload(name, url, key); 
-             return;
-        }
-
-        const taskModal = document.getElementById('taskModal');
-        const taskAdButton = document.getElementById('taskAdButton');
-        const taskJoinButton = document.getElementById('taskJoinButton');
-        const taskStatus = document.getElementById('taskStatus');
-        
-        taskStatus.style.display = 'none';
-
-        db.ref('pdfs/' + key).once('value').then(snapshot => {
-            const pdf = snapshot.val();
-            if (!pdf) {
-                 showErrorModal("Hata", "PDF kaydı bulunamadı.");
-                 return;
-            }
-            
-            pendingDownload = { key, name: pdf.title, url: pdf.url, required_links: pdf.required_links || { join: [], ad: [] } };
-            
-            const joinLinks = pendingDownload.required_links.join || [];
-            const adLinks = pendingDownload.required_links.ad || [];
-            
-            // Kanala Katılma Görevi Ayarları
-            const isJoinTaskActive = joinLinks.length > 0 && taskConfig.required_joins > 0;
-            if (isJoinTaskActive) {
-                document.getElementById('joinsRequiredText').textContent = `${joinLinks.length} adet sponsora katılarak indirme hakkı kazanın.`;
-                taskJoinButton.style.display = 'flex';
-                taskJoinButton.setAttribute('onclick', `startDownloadTask('join_channel', ${joinLinks.length})`);
-            } else {
-                taskJoinButton.style.display = 'none';
-            }
-
-            // Reklam Görüntüleme Görevi Ayarları
-            const isAdTaskActive = adLinks.length > 0 && taskConfig.ads_per_download > 0;
-            if (isAdTaskActive) {
-                document.getElementById('adsRequiredText').textContent = `${adLinks.length} adet reklam linkine tıklayarak indirme hakkı kazanın.`;
-                taskAdButton.style.display = 'flex';
-                taskAdButton.setAttribute('onclick', `startDownloadTask('watch_ads', ${adLinks.length})`);
-            } else {
-                taskAdButton.style.display = 'none';
-            }
-            
-            if (!isJoinTaskActive && !isAdTaskActive) {
-                 finalizeDownload(pendingDownload.name, pendingDownload.url, pendingDownload.key);
-                 return;
-            }
-
-            taskModal.classList.remove('hidden');
-
-        }).catch(error => {
-             showErrorModal("Veri Hatası", "PDF görev bilgileri yüklenemedi: " + error.message);
-        });
-    }
-    
-    // GÜNCELLENDİ: Görevleri sırayla açtırır
-    window.startDownloadTask = function(taskType, requiredCount) {
-        const statusElement = document.getElementById('taskStatus');
-        const taskLinks = taskType === 'join_channel' ? pendingDownload.required_links.join : pendingDownload.required_links.ad;
-        
-        if (taskLinks.length !== requiredCount) {
-             statusElement.textContent = "Hata: Görev linki sayısı ve ayarlar eşleşmiyor. Admin ile iletişime geçin.";
-             statusElement.style.display = 'block';
-             return;
-        }
-
-        statusElement.style.display = 'block';
-        if (window.Telegram && Telegram.WebApp) Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-
-        if (taskType === 'join_channel' && requiredCount > 0) {
-            
-            let completedJoins = 0;
-            statusElement.innerHTML = `Kanala Katılma Görevi: Lütfen sırayla **${requiredCount} linki** ziyaret edin ve katılın.`;
-            
-            taskLinks.forEach((link, index) => {
-                 setTimeout(() => {
-                      window.open(link, '_blank');
-                      statusElement.innerHTML = `<span style="color: #FF9500;">(${index + 1}/${requiredCount})</span> Ziyaret ediliyor... Lütfen katılın ve geri gelin.`;
-                      completedJoins++;
-                      
-                      if (completedJoins === requiredCount) {
-                           setTimeout(() => {
-                                statusElement.textContent = "Kanala katılım görevi tamamlandı! İndirme başlatılıyor...";
-                                document.getElementById('taskModal').classList.add('hidden');
-                                finalizeDownload(pendingDownload.name, pendingDownload.url, pendingDownload.key); 
-                           }, 2000);
-                      }
-                 }, index * 500); 
-            });
-            
-        } else if (taskType === 'watch_ads' && requiredCount > 0) {
-             
-            let completedAds = 0;
-            statusElement.innerHTML = `Reklam Görüntüleme Görevi: Lütfen sırayla **${requiredCount} linki** ziyaret edin ve 3 saniye bekleyin.`;
-
-            taskLinks.forEach((link, index) => {
-                 setTimeout(() => {
-                      window.open(link, '_blank');
-                      statusElement.innerHTML = `<span style="color: #FF9500;">(${index + 1}/${requiredCount})</span> Reklam görüntüleniyor... (3 saniye bekleyin)`;
-                      
-                      setTimeout(() => {
-                          completedAds++;
-                          if (completedAds === requiredCount) {
-                                statusElement.textContent = "Reklam görüntüleme görevi tamamlandı! İndirme başlatılıyor...";
-                                document.getElementById('taskModal').classList.add('hidden');
-                                finalizeDownload(pendingDownload.name, pendingDownload.url, pendingDownload.key); 
-                          }
-                      }, 3000); 
-
-                 }, index * 3500); 
-            });
-            
-        } else {
-             statusElement.textContent = "Hata: Görev başlatılamadı.";
-        }
-    }
-    
-    window.finalizeDownload = function(name, url, key) {
-         if (!url) return;
-         
-         db.ref('pdfs/' + key).child('downloads').transaction((current) => {
-             return (current || 0) + 1;
-         });
-         
-         window.open(url, '_blank');
-         
-         if (window.Telegram && Telegram.WebApp) {
-             Telegram.WebApp.showAlert(`İndirme başlatıldı: ${name}`);
-             Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-         }
-         
-         pendingDownload = { key: null, name: null, url: null, required_links: { join: [], ad: [] } }; 
-    }
-
-    // #############################
-    // ##### NAVİGASYON VE ARAYÜZ FONKSİYONLARI #####
-    // #############################
-    
-    window.changeTab = function(tabId) { 
-        document.querySelectorAll('.content-page').forEach(page => page.classList.remove('active'));
-        const targetPage = document.getElementById(`page-${tabId}`);
-        if (targetPage) { targetPage.classList.add('active'); }
-
-        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    window.changeTab = function(tabId) {
+        const newPage = document.getElementById(`page-${tabId}`);
+        const activePage = document.querySelector('.content-page.active');
         const activeNavItem = document.querySelector(`.nav-item[data-tab="${tabId}"]`);
+        const newPageIndex = activeNavItem ? parseInt(activeNavItem.getAttribute('data-index')) : 0;
+
+
+        if (newPage === activePage) return; // Zaten aktifse çık
+        if (!newPage) return;
+
+        // Geçiş Yönü Belirleme
+        const direction = newPageIndex > currentPageIndex ? 'right' : 'left';
+
+        // Önceki sayfayı animasyonla kaldır
+        if (activePage) {
+            activePage.style.animation = direction === 'right' ? 'slideOutLeft 0.3s forwards' : 'slideOutRight 0.3s forwards';
+            // Animasyon bitiminde gizle
+            setTimeout(() => {
+                activePage.classList.remove('active');
+                activePage.style.animation = ''; // Stili temizle
+            }, 300);
+        }
+
+        // Yeni sayfayı animasyonla getir
+        newPage.classList.add('active');
+        newPage.style.animation = direction === 'right' ? 'slideInRight 0.3s forwards' : 'slideInLeft 0.3s forwards';
+
+        // Navigasyon butonlarını güncelle
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
         if (activeNavItem) { activeNavItem.classList.add('active'); }
-        
+
+        // Güncel indeksi kaydet
+        currentPageIndex = newPageIndex;
+
+        // Diğer işlemler
         if (window.Telegram && Telegram.WebApp && tabId !== 'chat-container') {
              try {
                  Telegram.WebApp.setHeaderColor('bg_color');
@@ -886,37 +723,167 @@
              } catch(e) { console.warn("changeTab setTitle hatası yakalandı."); }
          }
 
-        if (tabId === 'pdf-list' || tabId === 'home') fetchPDFList(); 
-        if (tabId === 'profile' && currentUser) updateProfileInfo(currentUser); 
-        
-        if (window.Telegram && Telegram.WebApp.MainButton) Telegram.WebApp.MainButton.hide(); 
-        
+        if (tabId === 'pdf-list' || tabId === 'home') fetchPDFList();
+        if (tabId === 'home') fetchAds();
+        if (tabId === 'profile') updateProfileInfo(currentUser);
+
+        if (window.Telegram && Telegram.WebApp.MainButton) Telegram.WebApp.MainButton.hide();
+
+        // Chat Input'u sadece chat sayfasında göster
         const chatInput = document.getElementById('chatInputArea');
         if (chatInput) {
             chatInput.style.display = tabId === 'chat-container' ? 'flex' : 'none';
         }
 
         if (tabId !== 'chat-container') {
-            if (db) db.ref('chats/' + currentChatId).off();
-            if (db) db.ref('pinned_messages/' + currentChatId).off();
-            if (db) db.ref('settings/pinned_ads').off(); 
-            document.getElementById('chatAdBanner').style.display = 'none'; 
+            db.ref('chats/' + currentChatId).off();
+            db.ref('pinned_messages/' + currentChatId).off();
         }
     }
-    
+
+
+    // #############################
+    // 🔥 GÜNCELLENEN PDF İNDİRME ONAY MEKANİZMASI 🔥
+    // #############################
+
+    // PDF İndirme İşlemini Başlatma (Modal'ı Açan Yeni Fonksiyon)
+    window.handlePDFDownload = function(key, name, url) {
+
+        // State değişkenlerini ayarla
+        currentPdfUrl = url;
+        currentPdfName = name;
+
+        // Modal'ı açmadan önce içeriğini temizle/hazırla
+        const confirmModal = document.getElementById('pdfDownloadConfirmModal');
+        const confirmBtn = document.getElementById('download-confirm-btn');
+        const recapCheckbox = document.getElementById('task-recaptcha');
+        const channelCheckbox = document.getElementById('task-channel-join');
+        const linkElement = document.getElementById('sponsoredChannelLink');
+
+        // Modal'daki bilgileri güncelle
+        document.getElementById('pdfConfirmTitle').textContent = `"${name}" dosyasını indirmek üzeresiniz.`;
+        linkElement.href = SPONSORED_CHANNEL;
+        linkElement.style.display = 'block';
+
+        // Checkbox'ları sıfırla ve butonu devre dışı bırak
+        recapCheckbox.checked = false;
+        channelCheckbox.checked = false;
+        confirmBtn.disabled = true;
+        confirmBtn.classList.remove('active');
+        confirmBtn.textContent = "Tüm Görevleri Tamamlayın";
+
+
+        // Modalı göster
+        confirmModal.classList.remove('hidden');
+
+        if (window.Telegram && Telegram.WebApp) Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+    }
+
+    // Görevleri Kontrol Eden ve Butonu Aktifleştiren Fonksiyon
+    // Kullanıcı bir kutucuğu işaretlediğinde çalışır
+    window.checkDownloadTasks = function() {
+        const recapChecked = document.getElementById('task-recaptcha').checked;
+        const channelChecked = document.getElementById('task-channel-join').checked;
+        const confirmBtn = document.getElementById('download-confirm-btn');
+
+        // Tüm görevler tamamlanmışsa butonu aktifleştir
+        if (recapChecked && channelChecked) {
+            confirmBtn.disabled = false;
+            confirmBtn.classList.add('active');
+            confirmBtn.textContent = "PDF'i Şimdi İndir";
+        } else {
+            confirmBtn.disabled = true;
+            confirmBtn.classList.remove('active');
+            confirmBtn.textContent = "Tüm Görevleri Tamamlayın";
+        }
+    }
+
+    // Modal İçindeki İndirme Butonuna Tıklama Olayı (Final İndirme)
+    document.getElementById('download-confirm-btn').addEventListener('click', function() {
+        const recapChecked = document.getElementById('task-recaptcha').checked;
+        const channelChecked = document.getElementById('task-channel-join').checked;
+
+        // Kontrol: Eğer butona tıklandıysa ama görevler eksikse
+        if (!recapChecked || !channelChecked) {
+             // İstenen hata mesajı
+             document.getElementById('pdfDownloadConfirmModal').classList.add('hidden'); // Modalı kapat
+             showErrorModal(
+                 "Görev Hatası", 
+                 "Görevleri Eksik Veya Bayatlı Yaptınız. Lütfen tüm şartları yerine getirdiğinizden emin olun."
+             );
+             return;
+        }
+        
+        // Eğer tüm şartlar yerine getirildiyse:
+        
+        // Modal'ı kapat
+        document.getElementById('pdfDownloadConfirmModal').classList.add('hidden');
+
+        // Gerçek İndirme İşlemi
+        if (currentPdfUrl) {
+            window.open(currentPdfUrl, '_blank');
+            if (window.Telegram && Telegram.WebApp) Telegram.WebApp.showAlert(`İndirme başlatıldı: ${currentPdfName}`);
+        } else {
+             showErrorModal("İndirme Hatası", "PDF URL'si bulunamadı. Lütfen tekrar deneyin.");
+        }
+
+        // Modal'ı sıfırla
+        document.getElementById('task-recaptcha').checked = false;
+        document.getElementById('task-channel-join').checked = false;
+    });
+
+
+    // #############################
+    // 🔥 DİĞER FONKSİYONLAR 🔥
+    // #############################
+
+    // Reklamları Firebase'den Çekme ve Arayüze Uygulama (SPONSORLUK)
+    window.fetchAds = function() {
+        db.ref('settings/ads').once('value', (snapshot) => {
+            const ads = snapshot.val();
+            const banner1 = document.getElementById('bannerAd1');
+
+            if (ads && ads.ad1 && ads.ad1.text && ads.ad1.link) {
+                banner1.classList.remove('hidden');
+                banner1.innerHTML = `
+                    <a href="${ads.ad1.link}" target="_blank" style="text-decoration: none; color: var(--text-color); display: block; padding: 5px;">
+                        <span class="material-symbols-rounded" style="font-size: 16px; vertical-align: middle; color: var(--primary-color);">star</span>
+                        <span style="font-size: 14px; font-weight: 700; vertical-align: middle; color: var(--primary-color);">SPONSORLU:</span>
+                        <span style="font-size: 14px; font-weight: 500; vertical-align: middle;">${ads.ad1.text}</span>
+                    </a>
+                `;
+            } else {
+                 banner1.classList.add('hidden');
+            }
+        });
+    }
+
+    // Modal Butonları
+    document.getElementById('acceptTermsModal').addEventListener('click', function() {
+        document.getElementById('termsCheckbox').checked = true;
+        document.getElementById('loginButton').disabled = false;
+        document.getElementById('termsModal').classList.add('hidden');
+    });
+
+    document.getElementById('closeTermsModal').addEventListener('click', function() {
+        document.getElementById('termsCheckbox').checked = false;
+        document.getElementById('loginButton').disabled = true;
+        document.getElementById('termsModal').classList.add('hidden');
+    });
+
+
+    // PDF Listesini Çekme ve Ana Sayfadaki Sayıyı Güncelleme
     window.fetchPDFList = function() {
         const listContainer = document.getElementById('pdfDownloadList');
         const countElement = document.getElementById('pdfCount');
-        
+
         if(listContainer) listContainer.innerHTML = '<div style="padding: 15px; text-align: center; color: var(--hint-color);">PDF\'ler yükleniyor...</div>';
         if(countElement) countElement.textContent = 'Yükleniyor...';
 
-        if (!db) return;
-
         db.ref('pdfs').once('value', (snapshot) => {
             const pdfs = snapshot.val();
-            listContainer.innerHTML = ''; 
-            
+            listContainer.innerHTML = '';
+
             if (!pdfs) {
                 if(countElement) countElement.textContent = '0';
                 listContainer.innerHTML = '<div style="padding: 15px; text-align: center; color: var(--hint-color);">Henüz yüklenmiş PDF bulunmamaktadır.</div>';
@@ -931,37 +898,22 @@
 
             keys.forEach(key => {
                 const pdf = pdfs[key];
-                
-                const onclickAction = `handlePDFDownload('${key}', '${pdf.title.replace(/'/g, "\\'").replace(/"/g, '\\"')}', '${pdf.url}')`;
-                
-                const requiredLinks = pdf.required_links || { join: [], ad: [] };
-                const isTaskRequired = (requiredLinks.join.length > 0 && taskConfig.required_joins > 0) || (requiredLinks.ad.length > 0 && taskConfig.ads_per_download > 0);
-                
-                let taskText = 'Direk İndirilebilir';
-                if (isTaskRequired) {
-                    let taskDetail = [];
-                    if (requiredLinks.join.length > 0) taskDetail.push(`${requiredLinks.join.length} Kanal`);
-                    if (requiredLinks.ad.length > 0) taskDetail.push(`${requiredLinks.ad.length} Reklam`);
-                    taskText = `Görevli İndirme (${taskDetail.join(' + ')})`;
-                }
-                
-                const detailText = `${taskText} | Yükleyen: ${pdf.uploaded_by || 'Admin'}`;
-
-                listItem = document.createElement('div');
+                const listItem = document.createElement('div');
                 listItem.classList.add('list-item');
-                listItem.setAttribute('onclick', onclickAction);
-                
+                // handlePDFDownload artık Modal'ı açar ve global değişkenleri ayarlar
+                listItem.setAttribute('onclick', `handlePDFDownload('${key}', '${pdf.title.replace(/'/g, "\\'").replace(/"/g, '\\"')}', '${pdf.url}')`);
+
                 listItem.innerHTML = `
                     <div class="list-icon" style="background-color: #007AFF;"><span class="material-symbols-rounded">file_download</span></div>
                     <div class="list-info">
                         <div class="list-name">${pdf.title}</div>
-                        <div class="list-detail">${detailText}</div>
+                        <div class="list-detail">${pdf.size} | Yükleyen: ${pdf.uploaded_by || 'Admin'}</div>
                     </div>
-                    <div class="list-meta"><span class="material-symbols-rounded">${isTaskRequired ? 'task_alt' : 'download'}</span></div>
+                    <div class="list-meta"><span class="material-symbols-rounded">chevron_right</span></div>
                 `;
                 listCard.appendChild(listItem);
             });
-            listContainer.appendChild(listCard); 
+            listContainer.appendChild(listCard);
 
         }, (error) => {
             console.error("PDF Listesi yüklenemedi:", error);
@@ -970,134 +922,73 @@
         });
     }
 
+    // Profil Bilgilerini Güncelleme
+    window.updateProfileInfo = function(user) {
+        if (!user || !user.id) return;
 
-    // #############################
-    // ##### SOHBET LOJİĞİ VE AFİŞ REKLAM YÖNETİMİ #####
-    // #############################
+        const adminCardHome = document.getElementById('adminControlCard');
+        const adminCardProfile = document.getElementById('adminControlCardProfile');
 
-    window.openChat = function(chatId, chatTitle, isReadonly) {
-        changeTab('chat-container');
-        
-        currentChatId = chatId;
-        currentChatIsReadonly = (chatId === 'duyuru' && !is_admin) || (chatId !== 'duyuru' && isReadonly); 
-
-        const inputArea = document.getElementById('chatInputArea');
-        if (chatId === 'duyuru') {
-            inputArea.style.display = is_admin ? 'flex' : 'none';
-        } else { 
-            inputArea.style.display = 'flex';
+        if (ADMIN_IDS.includes(user.id)) {
+            adminCardHome.classList.remove('hidden');
+            adminCardProfile.classList.remove('hidden');
+            document.getElementById('profile-status').textContent = 'Yönetici (Admin)';
+            document.getElementById('profile-status').style.color = '#FF9500';
+        } else {
+            adminCardHome.classList.add('hidden');
+            adminCardProfile.classList.add('hidden');
+            document.getElementById('profile-status').textContent = 'Standart Kullanıcı';
+            document.getElementById('profile-status').style.color = '#34C759';
         }
 
-        if (window.Telegram && Telegram.WebApp) {
-            try {
-                Telegram.WebApp.setHeaderColor('secondary_bg_color'); 
-                Telegram.WebApp.setTitle(chatTitle);
-            } catch(e) { console.warn("setTitle/setHeaderColor hatası yakalandı: " + e.message); }
-        }
+        document.getElementById('profile-id').textContent = user.id;
+        document.getElementById('profile-name').textContent = `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Bilgi Yok';
+        document.getElementById('profile-username').textContent = user.username ? `@${user.username}` : 'Ayarlanmadı';
+        document.getElementById('profile-full-name').textContent = user.first_name || 'Kullanıcı';
 
-        if (db) {
-            loadChatAdBanner(); 
-            listenToPinnedMessage(currentChatId); 
-            listenToChat(currentChatId, 'chatMessagesContainer');
+        // Input Avatarını Baş Harfle Güncelle
+        const inputAvatar = document.getElementById('inputAvatar');
+        if (inputAvatar) {
+            const initial = user.first_name ? user.first_name.charAt(0).toUpperCase() : '?';
+            inputAvatar.textContent = initial;
         }
-        
-        setTimeout(() => {
-            const messagesContainer = document.getElementById('chatMessagesContainer');
-            if(messagesContainer) messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }, 100);
     }
-    
-    window.loadChatAdBanner = function() {
-        const bannerContainer = document.getElementById('chatAdBanner');
-        const bannerImage = document.getElementById('adBannerImage');
-        const adButton = document.getElementById('adBannerButton');
-        
-        if (!db) return;
 
-        db.ref('settings/pinned_ads').off();
-        
-        db.ref('settings/pinned_ads').on('value', (snapshot) => {
-            const ad = snapshot.val();
-            
-            if (ad && ad.image_url && ad.link) {
-                bannerImage.src = ad.image_url;
-                adButton.setAttribute('data-link', ad.link);
-                bannerContainer.style.display = 'block';
-            } else {
-                bannerContainer.style.display = 'none';
-                bannerImage.src = '';
-            }
+    // Mesaj sabitleme modalını açar (Sadece Adminler)
+    window.openPinModal = function(messageKey, messageText, senderInfo) {
+        if (!is_admin) return;
 
-            updateChatPadding();
+        document.getElementById('pinModalMessageText').textContent = messageText;
+        document.getElementById('pinModalSenderInfo').textContent = `Gönderen: ${senderInfo}`;
+        document.getElementById('pinMessageButton').setAttribute('data-message-key', messageKey);
+        document.getElementById('pinModal').classList.remove('hidden');
+    }
+
+    // Mesajı Sabitleme İşlemi
+    document.getElementById('pinMessageButton').addEventListener('click', function() {
+        const messageKey = this.getAttribute('data-message-key');
+        const messageText = document.getElementById('pinModalMessageText').textContent;
+        const senderInfo = document.getElementById('pinModalSenderInfo').textContent;
+
+        if (!messageKey) return;
+
+        db.ref('pinned_messages/' + currentChatId).set({
+            message_key: messageKey,
+            text: messageText,
+            sender: senderInfo,
+            pinned_by: currentUser.username || currentUser.id,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        }).then(() => {
+            document.getElementById('pinModal').classList.add('hidden');
+            if (window.Telegram && Telegram.WebApp) Telegram.WebApp.showAlert("Mesaj başarıyla sabitlendi.");
+        }).catch(error => {
+            showErrorModal("Sabitleme Hatası", "Mesaj sabitlenemedi: " + error.message);
         });
-    }
-    
-    window.handleAdBannerClick = function() {
-        const link = document.getElementById('adBannerButton').getAttribute('data-link');
-        if (link) {
-             window.open(link, '_blank');
-             if (window.Telegram && Telegram.WebApp) Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-        }
-    }
-    
-    window.handleAdImageError = function(img) {
-        img.style.display='none'; 
-        document.getElementById('chatAdBanner').style.display='none'; 
-        updateChatPadding();
-    }
+    });
 
-
-    function updateChatPadding() {
-         const bannerContainer = document.getElementById('chatAdBanner');
-         const pinnedContainer = document.getElementById('pinnedMessageContainer');
-         const messagesContainer = document.getElementById('chatMessagesContainer');
-         
-         if (!messagesContainer) return;
-
-         let totalOffset = 10; 
-         
-         if (bannerContainer.style.display !== 'none' && document.getElementById('page-chat-container').classList.contains('active')) {
-             const adContent = bannerContainer.querySelector('.ad-content');
-             if (adContent) {
-                  totalOffset += adContent.offsetHeight + 10; 
-             } else {
-                  totalOffset += parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ad-pinned-height'));
-             }
-         }
-         if (pinnedContainer.style.display !== 'none') {
-             totalOffset += parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pinned-height'));
-         }
-         
-         messagesContainer.style.paddingTop = `${totalOffset}px`;
-         messagesContainer.style.paddingBottom = `60px`; 
-    }
-
-
-    function listenToPinnedMessage(chatId) {
-        const pinnedContainer = document.getElementById('pinnedMessageContainer');
-        const pinnedText = document.getElementById('pinnedMessageText');
-        const unpinBtn = document.getElementById('unpinButton');
-
-        if (!db) return;
-
-        db.ref('pinned_messages/' + chatId).on('value', (snapshot) => {
-            const pinned = snapshot.val();
-            
-            if (pinned && pinned.message_key) {
-                currentPinnedMessageKey = pinned.message_key;
-                pinnedText.textContent = pinned.text.substring(0, 50) + (pinned.text.length > 50 ? '...' : ''); 
-                pinnedContainer.style.display = 'flex';
-                unpinBtn.classList.toggle('hidden', !is_admin);
-            } else {
-                currentPinnedMessageKey = null;
-                pinnedContainer.style.display = 'none';
-            }
-            updateChatPadding();
-        });
-    }
-
+    // Sabitlenmiş Mesajı Kaldırma
     window.unpinMessage = function() {
-         if (!is_admin || !db) return;
+        if (!is_admin) return;
          if (confirm("Sabitlenmiş mesajı kaldırmak istediğinizden emin misiniz?")) {
             db.ref('pinned_messages/' + currentChatId).remove().then(() => {
                 if (window.Telegram && Telegram.WebApp) Telegram.WebApp.showAlert("Sabitlenmiş mesaj kaldırıldı.");
@@ -1106,319 +997,254 @@
             });
          }
     }
-    
+
+    // Sabitlenmiş Mesaja Kaydırma
+    window.scrollToPinnedMessage = function() {
+        const messageKey = currentPinnedMessageKey;
+        if (!messageKey) return;
+
+        const targetMessage = document.querySelector(`.message-bubble[data-message-key="${messageKey}"]`);
+        if (targetMessage) {
+            const container = document.getElementById('chatMessagesContainer');
+            const offset = container.scrollTop + targetMessage.getBoundingClientRect().top - targetMessage.offsetHeight - 5;
+
+            container.scrollTo({ top: offset, behavior: 'smooth' });
+
+             // Mesajı kısa süreliğine vurgulama
+            targetMessage.style.transition = 'box-shadow 0.5s';
+            targetMessage.style.boxShadow = '0 0 10px 5px var(--primary-color)';
+            if (window.Telegram && Telegram.WebApp) Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+
+            setTimeout(() => {
+                targetMessage.style.boxShadow = '0 1px 1px rgba(0, 0, 0, 0.1)';
+            }, 1500);
+        } else {
+             if (window.Telegram && Telegram.WebApp) Telegram.WebApp.showAlert("Sabitlenmiş mesaj bulunamadı.");
+        }
+    }
+
+
+    window.openChat = function(chatId, chatTitle, isReadonly) {
+        changeTab('chat-container');
+
+        currentChatId = chatId;
+        currentChatIsReadonly = (chatId === 'duyuru' && !is_admin) || (chatId !== 'duyuru' && isReadonly);
+
+        const inputArea = document.getElementById('chatInputArea');
+        if (chatId === 'duyuru') {
+            inputArea.style.display = is_admin ? 'flex' : 'none';
+        } else {
+            inputArea.style.display = 'flex';
+        }
+
+        if (window.Telegram && Telegram.WebApp) {
+            try {
+                Telegram.WebApp.setHeaderColor('secondary_bg_color');
+                Telegram.WebApp.setTitle(chatTitle);
+            } catch(e) { console.warn("setTitle/setHeaderColor hatası yakalandı: " + e.message); }
+        }
+
+        listenToPinnedMessage(currentChatId);
+        listenToChat(currentChatId, 'chatMessagesContainer');
+
+        setTimeout(() => {
+            const messagesContainer = document.getElementById('chatMessagesContainer');
+            if(messagesContainer) messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }, 350); // Animasyon süresi sonrası kaydır
+    }
+
     window.sendMessage = function() {
         const inputField = document.getElementById('messageInput');
         const messageText = inputField.value.trim();
-        
-        if (messageText === '' || !db) return; 
-        
+
+        if (messageText === '') return;
+
         if (currentChatId === 'duyuru' && !is_admin) {
              showErrorModal("Yazma İzni Yok", "Bu kanal sadece Admin duyuruları içindir.");
              return;
         }
 
         const senderName = (currentChatId === 'duyuru' && is_admin) ? 'Yönetici' : (currentUser.first_name || 'Kullanıcı');
-        
+
         const newMessageRef = db.ref('chats/' + currentChatId).push();
-        
+
         newMessageRef.set({
             sender_id: currentUser.id,
             sender_name: senderName,
             text: messageText,
-            timestamp: firebase.database.ServerValue.TIMESTAMP 
+            timestamp: firebase.database.ServerValue.TIMESTAMP
         }).then(() => {
             inputField.value = '';
-            inputField.style.height = '40px'; 
+            inputField.style.height = '40px';
             if (window.Telegram && Telegram.WebApp) Telegram.WebApp.HapticFeedback.impactOccurred('light');
         }).catch(error => {
             showErrorModal("Mesaj Gönderme Hatası", "Mesaj gönderilemedi: " + error.message);
         });
     }
-    
-    window.openPinModal = function(messageKey, text, senderName, senderId) {
-        if (!is_admin) return;
-        
-        const pinModal = document.getElementById('pinModal');
-        document.getElementById('pinModalMessageText').textContent = text;
-        document.getElementById('pinModalSenderInfo').textContent = `Gönderen: ${senderName} (ID: ${senderId})`;
-        
-        const pinButton = document.getElementById('pinMessageButton');
-        pinButton.setAttribute('data-message-key', messageKey);
-        
-        if (messageKey === currentPinnedMessageKey) {
-             pinButton.textContent = 'Zaten sabitlenmiş. Kaldır?';
-             pinButton.onclick = () => { unpinMessage(); pinModal.classList.add('hidden'); };
-             pinButton.style.backgroundColor = '#FF3B30';
-        } else {
-             pinButton.textContent = 'Mesajı Sabitle';
-             pinButton.onclick = () => { pinMessage(messageKey, text, senderId); pinModal.classList.add('hidden'); };
-             pinButton.style.backgroundColor = 'var(--primary-color)';
-        }
 
-        pinModal.classList.remove('hidden');
-    }
+    // Sabitlenmiş mesaj dinleyicisi
+    function listenToPinnedMessage(chatId) {
+        const pinnedContainer = document.getElementById('pinnedMessageContainer');
+        const pinnedText = document.getElementById('pinnedMessageText');
+        const unpinBtn = document.getElementById('unpinButton');
 
-    function pinMessage(messageKey, text, senderId) {
-        if (!is_admin || !db) return;
-        
-        db.ref('pinned_messages/' + currentChatId).set({
-            message_key: messageKey,
-            text: text,
-            sender_id: senderId,
-            pinned_at: firebase.database.ServerValue.TIMESTAMP
-        }).then(() => {
-            if (window.Telegram && Telegram.WebApp) Telegram.WebApp.showAlert("Mesaj başarıyla sabitlendi.");
-        }).catch(error => {
-            showErrorModal("Sabitleme Hatası", "Mesaj sabitlenemedi: " + error.message);
-        });
-    }
+        db.ref('pinned_messages/' + chatId).on('value', (snapshot) => {
+            const pinned = snapshot.val();
 
-    window.scrollToPinnedMessage = function() {
-        if (!currentPinnedMessageKey || !db) return;
-        
-        db.ref('chats/' + currentChatId + '/' + currentPinnedMessageKey).once('value', (snapshot) => {
-            const message = snapshot.val();
-            if (message) {
-                const messageElement = document.getElementById('msg-' + currentPinnedMessageKey);
-                if (messageElement) {
-                     messageElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                     
-                     // Mesajı kısa bir süre highlight et
-                     messageElement.style.backgroundColor = '#FFEB3B44';
-                     setTimeout(() => {
-                         messageElement.style.backgroundColor = '';
-                     }, 1500);
-                } else {
-                     if (window.Telegram && Telegram.WebApp) Telegram.WebApp.showAlert("Sabitlenmiş mesaj bulunamadı.");
-                }
+            if (pinned && pinned.message_key) {
+                currentPinnedMessageKey = pinned.message_key;
+                pinnedText.textContent = pinned.text.substring(0, 50) + (pinned.text.length > 50 ? '...' : '');
+                pinnedContainer.style.display = 'flex';
+
+                // Adminlere kaldırma butonu göster
+                unpinBtn.classList.toggle('hidden', !is_admin);
+
+                // Mesaj alanını sabitlenmiş mesajın altına kaydır
+                document.getElementById('chatMessagesContainer').style.paddingTop = `calc(10px + var(--pinned-height))`;
+            } else {
+                currentPinnedMessageKey = null;
+                pinnedContainer.style.display = 'none';
+                 document.getElementById('chatMessagesContainer').style.paddingTop = `10px`;
             }
         });
     }
 
+    // Sohbet mesaj dinleyicisi
     function listenToChat(chatId, containerId) {
-        const container = document.getElementById(containerId);
-        if (!container || !db) return;
+        const messagesContainer = document.getElementById(containerId);
+        if (!messagesContainer) return;
 
-        container.innerHTML = `<div id="loadingChat" style="padding: 15px; text-align: center; color: var(--hint-color);">Sohbet verileri yükleniyor...</div>`;
+        db.ref('chats/' + chatId).off();
 
-        db.ref('chats/' + chatId).limitToLast(50).on('value', (snapshot) => {
+        db.ref('chats/' + chatId).limitToLast(100).on('value', (snapshot) => {
+            messagesContainer.innerHTML = '';
             const messages = snapshot.val();
-            container.innerHTML = ''; 
-            let shouldScroll = container.scrollHeight - container.scrollTop < container.offsetHeight + 100; 
 
             if (!messages) {
-                 container.innerHTML = '<div style="padding: 15px; text-align: center; color: var(--hint-color);">Henüz mesaj yok. İlk mesajı siz gönderin!</div>';
-                 return;
+                messagesContainer.innerHTML = '<div style="padding: 15px; text-align: center; color: var(--hint-color);">Henüz mesaj yok. İlk mesajı siz yazın!</div>';
+                return;
             }
-            
-            const fragment = document.createDocumentFragment();
 
-            Object.keys(messages).forEach(key => {
+            const keys = Object.keys(messages).sort();
+
+            keys.forEach(key => {
                 const message = messages[key];
-                const isOutgoing = message.sender_id === currentUser.id;
-                
+                if (!message || !message.text) return;
+
+                const isOutgoing = message.sender_id == currentUser.id;
+
+                const messageEl = document.createElement('div');
+                messageEl.style.display = 'flex';
+                messageEl.style.justifyContent = isOutgoing ? 'flex-end' : 'flex-start';
+                messageEl.style.marginBottom = '8px';
+
+                let userTag = '';
+                if (!isOutgoing && message.sender_name === 'Yönetici') {
+                     userTag = `<div style="font-size: 11px; color: #FF9500; margin-bottom: 2px; font-weight: 600;">Yönetici</div>`;
+                } else if (!isOutgoing) {
+                    const senderName = message.sender_name || 'Bilinmeyen';
+                    userTag = `<div style="font-size: 11px; color: #007AFF; margin-bottom: 2px; font-weight: 600;">${senderName}</div>`;
+                }
+
                 const bubble = document.createElement('div');
                 bubble.classList.add('message-bubble');
-                bubble.id = `msg-${key}`;
                 bubble.classList.add(isOutgoing ? 'message-outgoing' : 'message-incoming');
-                bubble.style.marginLeft = isOutgoing ? 'auto' : '10px';
-                bubble.style.marginRight = isOutgoing ? '10px' : 'auto';
-                bubble.style.marginBottom = '8px';
-                
+                bubble.setAttribute('data-message-key', key);
+                bubble.innerHTML = message.text.replace(/\n/g, '<br>');
+
+                 // Mesaja tıklama (Admin ise sabitleme menüsü aç)
                 if (is_admin) {
-                     bubble.setAttribute('onclick', `openPinModal('${key}', '${message.text.replace(/'/g, "\\'").replace(/"/g, '\\"')}', '${message.sender_name}', '${message.sender_id}')`);
+                    bubble.onclick = function() {
+                        const senderName = (message.sender_id == currentUser.id) ? 'Siz' : (message.sender_name || 'Bilinmeyen');
+                        openPinModal(key, message.text, senderName);
+                    };
                 }
 
-                if (!isOutgoing && chatId !== 'duyuru') {
-                    const senderNameEl = document.createElement('div');
-                    senderNameEl.textContent = message.sender_name;
-                    senderNameEl.style.fontSize = '12px';
-                    senderNameEl.style.fontWeight = '700';
-                    senderNameEl.style.color = isOutgoing ? 'white' : 'var(--primary-color)';
-                    senderNameEl.style.marginBottom = '4px';
-                    bubble.appendChild(senderNameEl);
-                }
-                
-                const textEl = document.createElement('div');
-                textEl.textContent = message.text;
-                bubble.appendChild(textEl);
-                
-                const timeEl = document.createElement('div');
-                const time = message.timestamp ? new Date(message.timestamp).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) : '...';
-                timeEl.textContent = time;
-                timeEl.style.fontSize = '10px';
-                timeEl.style.textAlign = 'right';
-                timeEl.style.marginTop = '5px';
-                timeEl.style.opacity = '0.7';
-                bubble.appendChild(timeEl);
+                const wrapper = document.createElement('div');
+                wrapper.style.maxWidth = '80%';
+                wrapper.innerHTML = userTag;
+                wrapper.appendChild(bubble);
 
-                fragment.appendChild(bubble);
+                messageEl.appendChild(wrapper);
+                messagesContainer.appendChild(messageEl);
             });
 
-            container.appendChild(fragment);
+            // Yeni mesaj gelince otomatik kaydırma
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-            if (shouldScroll) {
-                 container.scrollTop = container.scrollHeight;
-            }
         }, (error) => {
-            container.innerHTML = `<div style="padding: 15px; text-align: center; color: #FF3B30;">Sohbet yüklenirken bir hata oluştu: ${error.message}</div>`;
+            console.error("Sohbet verisi yüklenirken hata oluştu:", error);
+            messagesContainer.innerHTML = `<div style="padding: 15px; text-align: center; color: #FF3B30;">Hata: Sohbet verileri yüklenemedi. İzinleri (Rules) kontrol edin. (${error.message})</div>`;
         });
     }
-    
-    window.clearChatMessages = function(chatId) {
-         if (!is_admin || !db) return;
-         if (confirm(`"${chatId}" sohbet kanalındaki TÜM MESAJLARI KALICI OLARAK SİLMEK istediğinizden emin misiniz? Bu işlem geri alınamaz!`)) {
-              db.ref('chats/' + chatId).off();
-              
-              db.ref('chats/' + chatId).remove().then(() => {
-                   if (window.Telegram && Telegram.WebApp) Telegram.WebApp.showAlert(`Sohbet kanalı (${chatId}) başarıyla temizlendi.`);
-                   db.ref('pinned_messages/' + chatId).remove();
-                   if (currentChatId === chatId) {
-                        listenToChat(chatId, 'chatMessagesContainer');
-                   }
-              }).catch(error => {
-                   showErrorModal("Temizleme Hatası", `Sohbet (${chatId}) temizlenemedi: ` + error.message);
-              });
-         }
-    }
 
-
-    // #############################
-    // ##### ADMIN PANEL LOJİĞİ (GÜNCELLENDİ) #####
-    // #############################
-    
-    // YENİ: Dinamik olarak link giriş alanlarını oluşturur
-    window.updateDynamicLinkInputs = function(type, count) {
-        const containerId = type === 'join' ? 'joinLinksContainer' : 'adLinksContainer';
-        const placeholderText = type === 'join' ? 'Kanala Katılma Linki (1/X)' : 'Reklam Görüntüleme Linki (1/X)';
-        const container = document.getElementById(containerId);
-        container.innerHTML = '';
-        
-        const num = parseInt(count);
-        if (isNaN(num) || num <= 0) return;
-
-        for (let i = 1; i <= num; i++) {
-            const input = document.createElement('input');
-            input.type = 'url';
-            input.id = `${type}Link${i}`;
-            input.placeholder = `${i}. ${placeholderText}`;
-            input.classList.add('dynamic-link-input');
-            input.style.cssText = `width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: var(--background-color); color: var(--text-color);`;
-            container.appendChild(input);
+    // PDF Yükleme: Dosya adını başlık yapar
+    window.updatePdfTitle = function(input) {
+        const titleInput = document.getElementById('pdfTitle');
+        if (input.files.length > 0) {
+            titleInput.value = input.files[0].name.replace(/\.pdf$/i, '').trim();
+        } else {
+            titleInput.value = '';
         }
     }
 
-    // GÜNCELLENDİ: Dinamik linkleri toplayıp kaydeder
+    // PDF Yükleme Fonksiyonu
     window.uploadPDF = function() {
-        if (!is_admin || !db) { showErrorModal("Yetkisiz Erişim", "Sadece yöneticiler dosya yükleyebilir."); return; }
-        
-        const title = document.getElementById('pdfTitle').value.trim();
-        const pdfUrl = document.getElementById('pdfUrl').value.trim();
-        const joinCount = parseInt(document.getElementById('joinLinksCount').value) || 0;
-        const adCount = parseInt(document.getElementById('adLinksCount').value) || 0;
-        
-        if (!title || !pdfUrl) { showErrorModal("Eksik Bilgi", "Lütfen Başlık ve Ana PDF URL'sini eksiksiz girin."); return; }
-        if (!pdfUrl.startsWith('http')) { showErrorModal("URL Hatası", "Lütfen geçerli bir ana PDF URL'si girin."); return; }
-        
-        const requiredLinks = { join: [], ad: [] };
+        if (!is_admin) { showErrorModal("Yetkisiz Erişim", "Sadece yöneticiler dosya yükleyebilir."); return; }
+        const fileInput = document.getElementById('pdfFile');
+        const file = fileInput.files[0];
+        const title = document.getElementById('pdfTitle').value.trim() || (file ? file.name : 'Başlıksız PDF');
 
-        // 1. Kanala Katılma Linklerini Topla ve Kontrol Et
-        for (let i = 1; i <= joinCount; i++) {
-            const linkInput = document.getElementById(`joinLink${i}`);
-            if (!linkInput || !linkInput.value.trim().startsWith('http')) {
-                showErrorModal("Eksik/Hatalı Link", `${i}. Kanala Katılma Linki hatalı veya eksik. Lütfen tüm ${joinCount} adet linki doğru girin.`);
-                return;
+        if (!file || !title) { showErrorModal("Eksik Bilgi", "Lütfen bir PDF dosyası seçin."); return; }
+
+        document.getElementById('uploadPdfButton').textContent = 'Yükleniyor...';
+        document.getElementById('uploadPdfButton').disabled = true;
+
+        const storageRef = storage.ref(`pdfs/${Date.now()}_${file.name}`);
+        const uploadTask = storageRef.put(file);
+
+        uploadTask.on('state_changed',
+            (snapshot) => {
+                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                document.getElementById('uploadPdfButton').textContent = `Yükleniyor: ${Math.round(progress)}%`;
+            },
+            (error) => {
+                showErrorModal("Yükleme Hatası", "Dosya yüklenemedi: " + error.message);
+                document.getElementById('uploadPdfButton').textContent = 'PDF Yükle';
+                document.getElementById('uploadPdfButton').disabled = false;
+            },
+            () => {
+                uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                    const newPdfRef = db.ref('pdfs').push();
+                    newPdfRef.set({
+                        title: title,
+                        url: downloadURL,
+                        size: (file.size / (1024 * 1024)).toFixed(2) + ' MB',
+                        timestamp: firebase.database.ServerValue.TIMESTAMP,
+                        uploaded_by: currentUser.username || currentUser.id
+                    }).then(() => {
+                        showErrorModal("Başarılı", `PDF "${title}" başarıyla yüklendi.`);
+                        document.getElementById('pdfTitle').value = ''; fileInput.value = '';
+                        document.getElementById('uploadPdfButton').textContent = 'PDF Yükle';
+                        document.getElementById('uploadPdfButton').disabled = false;
+                        fetchAdminPdfList();
+                    });
+                });
             }
-            requiredLinks.join.push(linkInput.value.trim());
-        }
-
-        // 2. Reklam Görüntüleme Linklerini Topla ve Kontrol Et
-        for (let i = 1; i <= adCount; i++) {
-            const linkInput = document.getElementById(`adLink${i}`);
-            if (!linkInput || !linkInput.value.trim().startsWith('http')) {
-                showErrorModal("Eksik/Hatalı Link", `${i}. Reklam Görüntüleme Linki hatalı veya eksik. Lütfen tüm ${adCount} adet linki doğru girin.`);
-                return;
-            }
-            requiredLinks.ad.push(linkInput.value.trim());
-        }
-        
-        // Görev ayarlarını kontrol et (opsiyonel uyarı)
-        if (joinCount > 0 && taskConfig.required_joins === 0) {
-            if (!confirm("UYARI: Kanala Katılma linkleri eklediniz, ancak 'Görev Ayarları'nda zorunluluk 0. Devam etmek istiyor musunuz?")) return;
-        }
-        if (adCount > 0 && taskConfig.ads_per_download === 0) {
-             if (!confirm("UYARI: Reklam Görüntüleme linkleri eklediniz, ancak 'Görev Ayarları'nda zorunluluk 0. Devam etmek istiyor musunuz?")) return;
-        }
-
-        const uploadButton = document.getElementById('uploadPdfButton');
-        uploadButton.textContent = 'Kaydediliyor...';
-        uploadButton.disabled = true;
-        
-        const newPdfRef = db.ref('pdfs').push();
-        newPdfRef.set({
-            title: title,
-            url: pdfUrl, 
-            required_links: requiredLinks, 
-            timestamp: firebase.database.ServerValue.TIMESTAMP,
-            uploaded_by: currentUser.username || currentUser.id,
-            downloads: 0 
-        }).then(() => {
-            showErrorModal("Başarılı", `PDF "${title}" kaydı başarıyla eklendi.`);
-            // Formu sıfırla
-            document.getElementById('pdfTitle').value = ''; 
-            document.getElementById('pdfUrl').value = '';
-            document.getElementById('joinLinksCount').value = 0;
-            document.getElementById('adLinksCount').value = 0;
-            updateDynamicLinkInputs('join', 0); 
-            updateDynamicLinkInputs('ad', 0);
-            
-            uploadButton.textContent = 'PDF Kaydını Ekle';
-            uploadButton.disabled = false;
-            fetchAdminPdfList(); 
-            fetchPDFList(); 
-        }).catch(error => {
-            showErrorModal("Kaydetme Hatası", "PDF kaydı Firebase'e yazılamadı: " + error.message);
-            uploadButton.textContent = 'PDF Kaydını Ekle';
-            uploadButton.disabled = false;
-        });
-    }
-    
-    window.saveTaskConfig = function() {
-        if (!is_admin || !db) return;
-        
-        const ads = parseInt(document.getElementById('adsPerDownload').value) || 0;
-        const joins = parseInt(document.getElementById('requiredJoins').value) || 0;
-        
-        if (ads < 0 || joins < 0) {
-             showErrorModal("Geçersiz Değer", "Reklam ve Katılma zorunlulukları 0 veya pozitif bir sayı olmalıdır.");
-             return;
-        }
-
-        db.ref('settings/tasks').set({
-             ads_per_download: ads,
-             required_joins: joins,
-             updated_by: currentUser.username || currentUser.id,
-             updated_at: firebase.database.ServerValue.TIMESTAMP
-        }).then(() => {
-             document.getElementById('taskConfigStatus').textContent = `Görev Ayarları Başarıyla Kaydedildi! (Reklam Link Sayısı: ${ads}, Kanal Link Sayısı: ${joins})`;
-             loadTaskConfig(); 
-        }).catch(e => {
-             document.getElementById('taskConfigStatus').textContent = 'Kaydetme Hatası: ' + e.message;
-        });
+        );
     }
 
+    // Mevcut PDF'leri Admin Panelinde listeleme (Silme Lojiği Dahil)
     window.fetchAdminPdfList = function() {
         const listContainer = document.getElementById('adminPdfList');
         listContainer.innerHTML = '<div style="padding: 15px; text-align: center; color: var(--hint-color);">Yükleniyor...</div>';
-        if (!db) return;
 
         db.ref('pdfs').once('value', (snapshot) => {
             const pdfs = snapshot.val();
             listContainer.innerHTML = '';
-            
+
             if (!pdfs) {
-                listContainer.innerHTML = '<div style="padding: 15px; text-align: center; color: var(--hint-color);">Henüz yüklenmiş PDF kaydı bulunmamaktadır.</div>';
+                listContainer.innerHTML = '<div style="padding: 15px; text-align: center; color: var(--hint-color);">Henüz yüklenmiş PDF bulunmamaktadır.</div>';
                 return;
             }
 
@@ -1429,31 +1255,21 @@
             keys.forEach(key => {
                 const pdf = pdfs[key];
                 const date = new Date(pdf.timestamp).toLocaleDateString('tr-TR');
-                const downloadCount = pdf.downloads || 0;
-                
-                const requiredLinks = pdf.required_links || { join: [], ad: [] };
-                let taskSummary = [];
-                if (requiredLinks.join.length > 0) taskSummary.push(`Katılma: ${requiredLinks.join.length}`);
-                if (requiredLinks.ad.length > 0) taskSummary.push(`Reklam: ${requiredLinks.ad.length}`);
 
                 const listItem = document.createElement('div');
                 listItem.classList.add('list-item');
                 listItem.style.flexWrap = 'wrap';
                 listItem.style.flexDirection = 'column';
                 listItem.style.alignItems = 'flex-start';
-                
+
                 listItem.innerHTML = `
                     <div style="flex-basis: 100%; margin-bottom: 5px;">
                         <div class="list-name">${pdf.title}</div>
-                        <div class="list-detail">
-                            <span style="color: ${downloadCount > 0 ? '#34C759' : '#FF9500'}; font-weight: 600;">İndirme Sayısı: ${downloadCount}</span> 
-                            | Görevler: ${taskSummary.join(' / ') || 'Yok'}
-                        </div>
-                        <div class="list-detail">Yükleyen: ${pdf.uploaded_by || 'Admin'} | Tarih: ${date}</div>
+                        <div class="list-detail">Boyut: ${pdf.size} | Yükleyen: ${pdf.uploaded_by} | Tarih: ${date}</div>
                     </div>
                     <div style="flex-basis: 100%; display: flex; gap: 8px; margin-top: 5px; width: 100%;">
-                        <button class="action-button" style="padding: 6px 10px; font-size: 13px; flex-grow: 1;" onclick="window.open('${pdf.url}', '_blank')">Ana Link</button>
-                        <button class="action-button" style="padding: 6px 10px; font-size: 13px; flex-grow: 1; background-color: #FF3B30;" onclick="deletePDF('${key}', '${pdf.url}')">Kaydı Sil</button>
+                        <button class="action-button" style="padding: 6px 10px; font-size: 13px; flex-grow: 1;" onclick="window.open('${pdf.url}', '_blank')">Görüntüle</button>
+                        <button class="action-button" style="padding: 6px 10px; font-size: 13px; flex-grow: 1; background-color: #FF3B30;" onclick="deletePDF('${key}', '${pdf.url}')">Sil</button>
                     </div>
                 `;
                 listCard.appendChild(listItem);
@@ -1464,61 +1280,41 @@
         });
     }
 
+    // PDF Silme Fonksiyonu
     window.deletePDF = function(pdfKey, pdfUrl) {
-         if (!is_admin || !db) return;
-         if (confirm("Bu PDF kaydını kalıcı olarak silmek istediğinizden emin misiniz?")) {
-            db.ref('pdfs/' + pdfKey).remove().then(() => {
-                showErrorModal("Başarılı", "PDF kaydı başarıyla silindi.");
-                fetchAdminPdfList(); 
-                fetchPDFList(); 
+         if (!is_admin) return;
+
+        if (confirm("Bu PDF'i kalıcı olarak silmek istediğinizden emin misiniz?")) {
+            const storageRef = storage.refFromURL(pdfUrl);
+            storageRef.delete().then(() => {
+                db.ref('pdfs/' + pdfKey).remove().then(() => {
+                    showErrorModal("Başarılı", "PDF başarıyla silindi.");
+                    fetchAdminPdfList();
+                    fetchPDFList();
+                });
             }).catch((error) => {
-                 showErrorModal("Silme Hatası", "DB kaydı silinemedi: " + error.message);
+                if (error.code === 'storage/object-not-found') {
+                    db.ref('pdfs/' + pdfKey).remove().then(() => {
+                        showErrorModal("Başarılı (Kısmi)", "Storage'da bulunamadı, ancak DB kaydı silindi.");
+                        fetchAdminPdfList();
+                        fetchPDFList();
+                    });
+                } else {
+                    showErrorModal("Silme Hatası", "Dosya silinemedi: " + error.message);
+                }
             });
         }
     }
-    
-    window.fetchAdminAnalytics = function() {
-        if (!db) return;
-        
-        db.ref('pdfs').once('value').then(snapshot => {
-             const count = snapshot.numChildren();
-             document.getElementById('totalPdfCountAnalysis').textContent = count;
-        }).catch(e => console.error("PDF sayacı hatası:", e));
-        
-        db.ref('users').once('value').then(snapshot => {
-            const users = snapshot.val();
-            if (!users) {
-                 document.getElementById('totalUsersCount').textContent = '0';
-                 document.getElementById('todayActiveUsers').textContent = '0';
-                 return;
-            }
-            
-            const totalUsers = Object.keys(users).length;
-            document.getElementById('totalUsersCount').textContent = totalUsers;
-            
-            const twentyFourHoursAgo = Date.now() - 86400000; 
-            let activeToday = 0;
-            
-            Object.values(users).forEach(user => {
-                 if (user.last_login && user.last_login >= twentyFourHoursAgo) {
-                      activeToday++;
-                 }
-            });
-            document.getElementById('todayActiveUsers').textContent = activeToday;
 
-        }).catch(e => console.error("Kullanıcı analizi hatası:", e));
-    }
-
+    // Kullanıcıları Listeleme (Yeni)
     window.fetchUserList = function() {
         const listContainer = document.getElementById('adminUserList');
         listContainer.innerHTML = '<div style="padding: 15px; text-align: center; color: var(--hint-color);">Kullanıcılar yükleniyor...</div>';
-        
-        if (!db) return;
 
         db.ref('users').once('value', (snapshot) => {
             const users = snapshot.val();
             listContainer.innerHTML = '';
-            
+
             if (!users) {
                 listContainer.innerHTML = '<div style="padding: 15px; text-align: center; color: var(--hint-color);">Kayıtlı kullanıcı bulunmamaktadır.</div>';
                 return;
@@ -1531,10 +1327,10 @@
             keys.forEach(key => {
                 const user = users[key];
                 const isAdminStatus = ADMIN_IDS.includes(parseInt(key)) ? 'YÖNETİCİ' : 'Kullanıcı';
-                
+
                 const listItem = document.createElement('div');
                 listItem.classList.add('list-item');
-                
+
                 listItem.innerHTML = `
                     <div class="list-icon" style="background-color: ${isAdminStatus === 'YÖNETİCİ' ? '#FF9500' : '#34C759'};"><span class="material-symbols-rounded">${isAdminStatus === 'YÖNETİCİ' ? 'star' : 'person'}</span></div>
                     <div class="list-info">
@@ -1553,8 +1349,9 @@
         });
     }
 
+    // Kullanıcı Banlama (Basit Lojik)
     window.banUser = function(userId) {
-        if (!is_admin || !db) return;
+        if (!is_admin) return;
         if (confirm(`Kullanıcı ID ${userId} banlanacaktır. Devam etmek istiyor musunuz? (Bu, sadece 'users' tablosunda 'banned: true' flag'i ekler.)`)) {
             db.ref('users/' + userId).update({ banned: true, banned_by: currentUser.id, banned_at: firebase.database.ServerValue.TIMESTAMP })
             .then(() => {
@@ -1566,93 +1363,43 @@
             });
         }
     }
-    
-    window.loadAdBannerConfig = function() {
-        const imageInput = document.getElementById('adBannerImageAdmin');
-        const linkInput = document.getElementById('adBannerLinkAdmin');
-        const previewImg = document.getElementById('adBannerPreview');
-        const previewHint = document.getElementById('previewHint');
-        
-        if (!db) return;
 
-        db.ref('settings/pinned_ads').once('value', (snapshot) => {
-            const ad = snapshot.val();
-            if (ad && ad.image_url) {
-                imageInput.value = ad.image_url;
-                linkInput.value = ad.link || '';
-                previewImg.src = ad.image_url;
-                previewImg.style.display = 'block';
-                previewHint.style.display = 'none';
-            } else {
-                 imageInput.value = '';
-                 linkInput.value = '';
-                 previewImg.src = '';
-                 previewImg.style.display = 'none';
-                 previewHint.style.display = 'block';
-                 previewHint.textContent = 'Görsel URL\'si girildikten sonra önizleme burada görünecektir.';
+    // Reklam Yönetimi: Verileri Yükle (SPONSORLUK)
+    window.loadAdsConfig = function() {
+        db.ref('settings/ads').once('value', (snapshot) => {
+            const ads = snapshot.val();
+            if (ads && ads.ad1) {
+                document.getElementById('ad1Text').value = ads.ad1.text || '';
+                document.getElementById('ad1Link').value = ads.ad1.link || '';
             }
-            document.getElementById('adStatus').textContent = 'Mevcut afiş reklamı yüklendi.';
+            document.getElementById('adStatus').textContent = 'Mevcut sponsorluklar yüklendi.';
         }).catch(e => {
-            document.getElementById('adStatus').textContent = 'Afiş reklam verisi yüklenirken hata oluştu: ' + e.message;
+            document.getElementById('adStatus').textContent = 'Sponsorluk verisi yüklenirken hata oluştu: ' + e.message;
         });
-        
-        imageInput.oninput = function() {
-            previewImg.src = this.value;
-            previewImg.style.display = 'block';
-            previewHint.style.display = 'none';
-            previewImg.onerror = function() { 
-                this.style.display='none'; 
-                previewHint.style.display = 'block';
-                previewHint.textContent = 'Geçersiz görsel URL.';
-            };
-            previewImg.onload = function() {
-                previewHint.style.display = 'none';
-            }
-        };
     }
 
-    window.saveAdBannerConfig = function() {
-         if (!is_admin || !db) return;
-         const imageUrl = document.getElementById('adBannerImageAdmin').value.trim();
-         const link = document.getElementById('adBannerLinkAdmin').value.trim();
-         
-         if (!imageUrl || !link) {
-             showErrorModal("Eksik Bilgi", "Görsel URL'si ve Link boş bırakılamaz.");
-             return;
-         }
-         if (!imageUrl.startsWith('http') || !link.startsWith('http')) {
-             showErrorModal("URL Hatası", "Görsel ve Yönlendirme Linkleri 'http://' veya 'https://' ile başlamalıdır.");
+    // Reklam Yönetimi: Kaydet (SPONSORLUK)
+    window.saveAdsConfig = function() {
+         if (!is_admin) return;
+         const text = document.getElementById('ad1Text').value.trim();
+         const link = document.getElementById('ad1Link').value.trim();
+
+         if (!text || !link) {
+             showErrorModal("Eksik Bilgi", "Sponsorluk metni ve linki boş bırakılamaz.");
              return;
          }
 
-         db.ref('settings/pinned_ads').set({
-             image_url: imageUrl,
+         db.ref('settings/ads/ad1').set({
+             text: text,
              link: link,
              updated_by: currentUser.username || currentUser.id,
              updated_at: firebase.database.ServerValue.TIMESTAMP
          }).then(() => {
-             document.getElementById('adStatus').textContent = 'Afiş Reklamı Ayarları Başarıyla Kaydedildi!';
-             loadChatAdBanner(); 
+             document.getElementById('adStatus').textContent = 'Sponsorluk Ayarları Başarıyla Kaydedildi!';
+             fetchAds();
          }).catch(e => {
              document.getElementById('adStatus').textContent = 'Kaydetme Hatası: ' + e.message;
          });
-    }
-    
-    window.removeAdBannerConfig = function() {
-        if (!is_admin || !db) return;
-        if (confirm("Afiş reklamını kaldırmak istediğinizden emin misiniz?")) {
-            db.ref('settings/pinned_ads').remove().then(() => {
-                 document.getElementById('adBannerImageAdmin').value = '';
-                 document.getElementById('adBannerLinkAdmin').value = '';
-                 document.getElementById('adBannerPreview').src = '';
-                 document.getElementById('adBannerPreview').style.display = 'none';
-                 document.getElementById('previewHint').style.display = 'block';
-                 document.getElementById('adStatus').textContent = 'Afiş Reklamı Başarıyla Kaldırıldı!';
-                 loadChatAdBanner();
-            }).catch(e => {
-                 document.getElementById('adStatus').textContent = 'Kaldırma Hatası: ' + e.message;
-            });
-        }
     }
 
     window.changeAdminTab = function(tabId) {
@@ -1663,21 +1410,17 @@
         document.querySelector(`[data-admin-tab="${tabId}"]`).classList.add('active');
 
         if (tabId === 'pdf') fetchAdminPdfList();
-        if (tabId === 'users') {
-            fetchAdminAnalytics(); 
-            fetchUserList();
-        } 
-        if (tabId === 'ads') {
-            loadAdBannerConfig();
-            loadTaskConfig(); 
-        }
+        if (tabId === 'users') fetchUserList();
+        if (tabId === 'ads') loadAdsConfig();
     }
 
+     // Textarea'nın içeriğe göre otomatik büyümesi
     window.autoExpandTextarea = function(textarea) {
         textarea.style.height = 'auto';
         textarea.style.height = (textarea.scrollHeight) + 'px';
     }
 
+    // Admin Modalı Açma/Kapama
     window.openAdminModal = function() {
         if (!is_admin) {
              showErrorModal("Yetkisiz Erişim", "Admin Paneli'ne sadece yöneticiler erişebilir.");
@@ -1685,7 +1428,7 @@
         }
         document.getElementById('page-admin-instance').classList.remove('hidden');
         document.getElementById('mainAppContent').classList.add('hidden');
-        changeAdminTab('pdf'); 
+        changeAdminTab('pdf'); // Varsayılan sekme
         if (window.Telegram && Telegram.WebApp) {
              Telegram.WebApp.setHeaderColor('secondary_bg_color');
              Telegram.WebApp.setTitle('Admin Paneli');
@@ -1695,83 +1438,82 @@
     window.closeAdminModal = function() {
         document.getElementById('page-admin-instance').classList.add('hidden');
         document.getElementById('mainAppContent').classList.remove('hidden');
-        changeTab('home'); 
+        changeTab('home'); // Ana sayfaya geri dön
     }
 
 
     // #############################
     // ##### BAŞLANGIÇ LOJİĞİ (CRITICAL) #####
     // #############################
-    
-    document.addEventListener('DOMContentLoaded', function() {
-        initializeApp();
 
+    document.addEventListener('DOMContentLoaded', function() {
         const termsCheckbox = document.getElementById('termsCheckbox');
         const loginButton = document.getElementById('loginButton');
         const loadingStatus = document.getElementById('loadingStatus');
-        
-        if (currentUser && currentUser.id !== 999999999) {
+
+        // Telegram WebApp ve Kullanıcı Bilgilerini Al
+        if (window.Telegram && Telegram.WebApp) {
+             try {
+                Telegram.WebApp.ready();
+                if (Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.user) {
+                    currentUser = Telegram.WebApp.initDataUnsafe.user;
+                    is_admin = ADMIN_IDS.includes(currentUser.id);
+                } else {
+                     currentUser = { id: 999999999, first_name: 'Misafir', last_name: 'Kullanıcı', username: 'misafir' };
+                }
+                Telegram.WebApp.expand();
+            } catch (e) {
+                loadingStatus.textContent = "Hata: Telegram WebApp başlatılamadı. " + e.message;
+                loadingStatus.style.display = 'block';
+                return;
+            }
         } else {
+             // Test Kullanıcısı (Admin ID ile)
+             currentUser = { id: 7904032877, first_name: 'Test', last_name: 'Admin', username: 'testadmin' };
+             is_admin = ADMIN_IDS.includes(currentUser.id);
         }
 
+        // Giriş Butonu Olayları
         termsCheckbox.addEventListener('change', () => { loginButton.disabled = !termsCheckbox.checked; });
-        
+
         loginButton.addEventListener('click', function() {
-            if (termsCheckbox.checked && currentUser && db) {
+            if (termsCheckbox.checked && currentUser) {
                 loginButton.disabled = true;
                 loginButton.textContent = 'Veriler yükleniyor...';
                 loadingStatus.textContent = 'İlk veri senkronizasyonu bekleniyor...';
                 loadingStatus.style.display = 'block';
 
                 saveUserToDatabase(currentUser).then(() => {
+                    // BAŞARILI KISIM
+                    fetchAds();
                     document.getElementById('splashScreen').style.display = 'none';
                     document.getElementById('mainAppContent').classList.remove('hidden');
-                    document.getElementById('mainAppContent').style.display = 'flex'; 
+                    document.getElementById('mainAppContent').style.display = 'flex';
                     loadingStatus.style.display = 'none';
-                    
-                    updateProfileInfo(currentUser); 
-                    changeTab('home'); 
-                    
+
+                    updateProfileInfo(currentUser);
+                    changeTab('home');
+
                     if (window.Telegram && Telegram.WebApp) Telegram.WebApp.HapticFeedback.notificationOccurred('success');
                 }).catch(err => {
+                    // Hata durumunda bile uygulamayı başlatıyoruz
                     console.error("Firebase'e yazma hatası yakalandı:", err);
-                    
+
+                    fetchAds();
                     document.getElementById('splashScreen').style.display = 'none';
                     document.getElementById('mainAppContent').classList.remove('hidden');
-                    document.getElementById('mainAppContent').style.display = 'flex'; 
+                    document.getElementById('mainAppContent').style.display = 'flex';
                     loadingStatus.style.display = 'none';
-                    
-                    updateProfileInfo(currentUser); 
-                    changeTab('home'); 
-                    
+
+                    updateProfileInfo(currentUser);
+                    changeTab('home');
+
                     if (window.Telegram && Telegram.WebApp) {
-                        Telegram.WebApp.showAlert(`Uyarı: Veri kaydı sırasında bir sorun oluştu, ancak uygulama başlatıldı. Hata: ${err.message}`);
+                        Telegram.WebApp.showAlert("Uyarı: Veri kaydı sırasında küçük bir sorun oluştu, ancak uygulama devam ediyor.");
                     }
                 });
-            } else if (!db) {
-                 showErrorModal("Bağlantı Hatası", "Firebase bağlantısı kurulamadığı için giriş yapılamıyor.");
-                 loginButton.disabled = false;
-                 loginButton.textContent = 'Bota Giriş Yap';
             }
         });
-        
-        document.getElementById('closeTermsModal').addEventListener('click', function() {
-            document.getElementById('termsModal').classList.add('hidden');
-            termsCheckbox.checked = false;
-            loginButton.disabled = true;
-        });
-
-        document.getElementById('acceptTermsModal').addEventListener('click', function() {
-            document.getElementById('termsModal').classList.add('hidden');
-            termsCheckbox.checked = true;
-            loginButton.disabled = false;
-        });
-        
-        document.getElementById('readTermsLink').addEventListener('click', function(e) {
-            e.preventDefault();
-            document.getElementById('termsModal').classList.remove('hidden');
-        });
-
     });
 
 </script>
