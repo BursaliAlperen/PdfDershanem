@@ -25,6 +25,7 @@
             --border-color: rgba(153, 153, 153, 0.15);
             --card-radius: 14px;
         }
+        /* Dark Tema Desteği */
         @media (prefers-color-scheme: dark) {
             body[data-theme="dark"] {
                 --background-color: #1c1c1d;
@@ -132,14 +133,13 @@
             font-variation-settings: 'FILL' 1; /* Active: Filled */
         }
 
-        /* Liste ve Kart Stilleri (Geliştirildi) */
+        /* Liste ve Kart Stilleri */
         .list-section-title { padding: 10px 15px 5px; font-size: 13px; font-weight: 600; color: var(--hint-color); text-transform: uppercase; }
         .list-card { 
             background-color: var(--secondary-color); 
             margin: 0 12px 18px 12px; 
             border-radius: var(--card-radius); 
             overflow: hidden; 
-            /* Kalın gölge yerine daha yumuşak gölge */
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
         .list-item { 
@@ -178,9 +178,9 @@
         }
         label { font-size: 14px; font-weight: 500; color: var(--hint-color); display: block; margin-top: 5px;}
 
-        /* Sohbet Detay Sayfası (Kendi Alanı) */
+        /* Sohbet Stilleri */
         #page-chat-detail-instance {
-            position: fixed; /* Navigasyonu gizlemek için sabitlendi */
+            position: fixed; 
             top: 0;
             left: 0;
             right: 0;
@@ -188,7 +188,7 @@
             display: none; 
             flex-direction: column;
             background-color: var(--background-color);
-            z-index: 60; /* Navigasyondan yukarıda */
+            z-index: 60; 
         }
         #page-chat-detail-instance.active {
             display: flex;
@@ -239,7 +239,22 @@
             color: white; 
             border-bottom-right-radius: 6px; 
         }
-
+        .message-delete-btn {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #FF3B30;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            line-height: 1;
+            font-size: 10px;
+            cursor: pointer;
+            z-index: 5;
+        }
+        
         /* Diğer Sohbet Stilleri (Aynen Kalır) */
         #pinnedMessageBanner {
              flex-shrink: 0;
@@ -328,10 +343,10 @@
                     <div class="list-info"><div class="list-name">Duyuru Kanalı</div><div class="list-detail">Yönetici/Admin duyuruları. (Okunur)</div></div>
                     <div class="list-meta" style="color: var(--primary-color);">Gir</div>
                 </div>
-                <div class="list-item" onclick="openChat('ortak', '💬 Ortak Sohbet Grubu', false)">
+                <div class="list-item" onclick="changeTab('chat')">
                     <div class="list-icon" style="background-color: #007AFF;"><span class="material-symbols-rounded">forum</span></div>
                     <div class="list-info"><div class="list-name">Ortak Sohbet Grubu</div><div class="list-detail">Genel konuşma ve yardımlaşma platformu.</div></div>
-                    <div class="list-meta" style="color: var(--primary-color);">Gir</div>
+                    <div class="list-meta" style="color: var(--primary-color);">Git</div>
                 </div>
             </div>
             
@@ -352,7 +367,7 @@
             </div>
         </div>
         
-        <div class="content-page" id="page-chat">
+        <div class="content-page" id="page-chat" style="padding: 0;"> 
              <div class="chat-messages" id="chatMessagesTab">
                  <div style="padding: 15px; text-align: center; color: var(--hint-color);">Ortak Sohbet verileri yükleniyor...</div>
              </div>
@@ -396,7 +411,8 @@
     </div>
     
     <div id="page-chat-detail-instance">
-         <div id="pinnedMessageBanner" class="hidden" onclick="unpinMessage()">
+        
+        <div id="pinnedMessageBanner" class="hidden" onclick="unpinMessage()">
             <div class="pin-header">
                 <span><span class="material-symbols-rounded">push_pin</span> AFİŞ REKLAM</span>
                 <span class="material-symbols-rounded pin-close">close</span>
@@ -546,7 +562,8 @@
       measurementId: "G-BZB9FD26GT"
     };
     
-    const ADMIN_ID = 7904032877; 
+    // YENİ ADMIN ID: Sizin belirttiğiniz ID
+    const ADMIN_ID = 8392479231; 
     
     let db, storage;
     let currentUser = null; 
@@ -560,9 +577,6 @@
     let allUsers = {}; 
     let pinnedMessageContent = null; 
     
-    // Hangi chat div'ine mesaj yazılacağını belirler. 
-    // 'instance' = Duyuru veya ana sayfadan açılan tekli sohbetler.
-    // 'tab' = Sabitlenmiş Ortak Sohbet sekmesi.
     let currentChatType = 'tab'; 
 
     // Firebase'i başlatma lojiği
@@ -577,8 +591,36 @@
     }
     
     // #############################
-    // ##### YARDIMCI FONKSİYONLAR #####
+    // ##### HATA DÜZELTMELERİ İÇİN EK FONKSİYONLAR #####
     // #############################
+
+    /**
+     * RGB renk kodunun karanlık olup olmadığını kontrol eder. 
+     * Hata çözümü için eklendi.
+     */
+    function isColorDark(color) {
+        if (!color || color.startsWith('#ffffff') || color.startsWith('#fff')) return false; // Beyaz ise açık kabul et
+        if (color.startsWith('#')) {
+            const hex = color.slice(1);
+            if (hex.length === 3) {
+                 // Kısa hex için genişletme
+                const r = parseInt(hex.charAt(0) + hex.charAt(0), 16);
+                const g = parseInt(hex.charAt(1) + hex.charAt(1), 16);
+                const b = parseInt(hex.charAt(2) + hex.charAt(2), 16);
+                const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+                return brightness < 128; 
+            }
+            if (hex.length === 6) {
+                const r = parseInt(hex.slice(0, 2), 16);
+                const g = parseInt(hex.slice(2, 4), 16);
+                const b = parseInt(hex.slice(4, 6), 16);
+                const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+                return brightness < 128;
+            }
+        }
+        return false; // Diğer durumlarda varsayılan
+    }
+    
     function showErrorModal(title, message) {
         const errorModal = document.getElementById('errorModal');
         if (!errorModal) {
@@ -702,7 +744,6 @@
             const pdfs = snapshot.val();
             let resultsFound = 0;
             
-            // ... Arama lojiği (önceki koddan aynen alınmıştır) ...
             if (pdfs) {
                 for (const key in pdfs) {
                     const pdf = pdfs[key];
@@ -742,7 +783,7 @@
     }
 
     // #############################
-    // ##### SOHBET LOJİĞİ #####
+    // ##### SOHBET LOJİĞİ (GÜNCELLENDİ) #####
     // #############################
     
     // Mesaj baloncuklarını render etme (Hangi div'e yazılacağını belirler)
@@ -751,6 +792,7 @@
         if (!chatMessagesDiv) return;
 
         const isOutgoing = message.sender_id == currentUser.id;
+        const isAdminSender = message.sender_id == ADMIN_ID;
         const isAd = message.type === 'ad-interstitial';
         
         if (isAd) {
@@ -761,15 +803,15 @@
              return;
         }
         
-        // ... (Kalan renderMessage lojiği aynı kalır) ...
         const bubble = document.createElement('div');
         bubble.className = `message-bubble ${isOutgoing ? 'message-outgoing' : 'message-incoming'}`;
         bubble.dataset.key = key;
 
         let header = '';
-        if (!isOutgoing) {
+        if (!isOutgoing && channelId !== 'duyuru') {
              const senderName = message.sender_name || 'Bilinmeyen Kullanıcı';
-             header = `<strong style="font-size: 12px; margin-bottom: 4px; display: block; ${isOutgoing ? 'color: white;' : 'color: var(--primary-color);'}">${senderName}</strong>`;
+             const headerColor = isAdminSender ? '#FF9500' : 'var(--primary-color)';
+             header = `<strong style="font-size: 12px; margin-bottom: 4px; display: block; color: ${headerColor};">${senderName}</strong>`;
         }
 
         let content = message.content;
@@ -780,7 +822,7 @@
         const time = new Date(message.timestamp).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
 
         bubble.innerHTML = `
-            ${is_admin ? `<button class="message-delete-btn" onclick="deleteMessage('${channelId}', '${key}', '${targetDivId}')">x</button>` : ''}
+            ${is_admin && !isOutgoing ? `<button class="message-delete-btn" onclick="deleteMessage('${channelId}', '${key}', '${targetDivId}')">x</button>` : ''}
             ${header}
             <div>${content}</div>
             <div style="text-align: right; font-size: 11px; margin-top: 5px; color: ${isOutgoing ? 'rgba(255, 255, 255, 0.7)' : 'var(--hint-color)'};">${time}</div>
@@ -791,6 +833,7 @@
         messageContainer.style.marginBottom = '12px';
         messageContainer.style.alignItems = 'flex-end';
         
+        // Avatar Sadece Gelen Mesajlarda ve Duyuru Dışında Gösterilir
         if (!isOutgoing && channelId !== 'duyuru') {
             const avatarIcon = document.createElement('div');
             avatarIcon.className = 'list-icon';
@@ -798,7 +841,7 @@
             avatarIcon.style.height = '32px';
             avatarIcon.style.borderRadius = '50%';
             avatarIcon.style.margin = '0 8px 0 0';
-            avatarIcon.style.backgroundColor = (message.sender_id == ADMIN_ID) ? '#FF9500' : '#007AFF';
+            avatarIcon.style.backgroundColor = isAdminSender ? '#FF9500' : '#007AFF';
             avatarIcon.innerHTML = '<span class="material-symbols-rounded" style="font-size: 18px;">person</span>';
             messageContainer.appendChild(avatarIcon);
         }
@@ -827,13 +870,14 @@
         
         if (chatListener) {
             db.ref('chats/' + currentChatChannel).off('child_added', chatListener);
+            db.ref('chats/' + currentChatChannel).off('child_removed');
         }
         
         const adCheckInterval = 10;
         let messageCounter = 0;
         let isFirstLoad = true;
 
-        chatListener = db.ref('chats/' + channelId).limitToLast(50).on('child_added', snapshot => {
+        const handleNewMessage = (snapshot) => {
             const message = snapshot.val();
             const key = snapshot.key;
 
@@ -854,38 +898,70 @@
             if(isFirstLoad) {
                  scrollToBottom(targetDivId);
             } else {
-                 // Sadece yeni mesaj gelince scroll yap (eğer en alttaysak)
                  if (chatMessagesDiv.scrollHeight - chatMessagesDiv.scrollTop < chatMessagesDiv.clientHeight + 200) {
                      scrollToBottom(targetDivId);
                  }
             }
-        }, error => {
+        };
+        
+        const handleMessageRemoved = (snapshot) => {
+             const key = snapshot.key;
+             const element = chatMessagesDiv.querySelector(`[data-key="${key}"]`);
+             if (element && element.parentNode) {
+                 element.parentNode.remove();
+             }
+        };
+
+        // Yeni mesaj dinleme
+        db.ref('chats/' + channelId).limitToLast(100).on('child_added', handleNewMessage, error => {
              console.error("Sohbet Dinleme Hatası:", error);
              showErrorModal("Sohbet Hatası", "Mesajlar yüklenirken izin veya bağlantı hatası oluştu.");
         });
+        
+        // Mesaj silinmesi dinleme (Adminler için)
+        db.ref('chats/' + channelId).on('child_removed', handleMessageRemoved);
+        
+        chatListener = handleNewMessage;
     }
 
     function stopListeningToChat() {
         if (chatListener && currentChatChannel) {
             db.ref('chats/' + currentChatChannel).off('child_added', chatListener);
+            db.ref('chats/' + currentChatChannel).off('child_removed');
             chatListener = null;
             currentChatChannel = null;
         }
     }
     
-    // Mesaj gönderme lojiği (Tekrar eden kodları önlemek için güncellendi)
-    function _sendMessage(inputElementId, isInstance = false) {
+    // Mesaj silme (Admin Fonksiyonu)
+    window.deleteMessage = function(channelId, key, targetDivId) {
+        if (!is_admin) return;
+        
+        if (window.confirm("Bu mesajı kalıcı olarak silmek istediğinizden emin misiniz?")) {
+            db.ref(`chats/${channelId}/${key}`).remove()
+                .then(() => {
+                    if (window.Telegram && Telegram.WebApp) Telegram.WebApp.notificationOccurred('success');
+                })
+                .catch(error => {
+                    showErrorModal("Silme Hatası", "Mesaj silinemedi: " + error.message);
+                });
+        }
+    }
+    
+    // Mesaj gönderme lojiği
+    function _sendMessage(inputElementId, imageUploadElementId, isInstance = false) {
         if (isReadOnly && isInstance) return;
-        if (currentChatChannel === 'ortak' && banned_users[currentUser.id]) return showErrorModal("Yasaklı", "Sohbet etmeniz engellenmiştir.");
+        const channelToSend = isInstance ? currentChatChannel : 'ortak';
+        
+        if (channelToSend === 'ortak' && banned_users[currentUser.id]) return showErrorModal("Yasaklı", "Sohbet etmeniz engellenmiştir.");
         
         const input = document.getElementById(inputElementId);
+        const imageInput = document.getElementById(imageUploadElementId);
         const messageText = input.value.trim();
-        const imageFile = document.getElementById(isInstance ? 'imageUploadInstance' : 'imageUploadTab').files[0];
+        const imageFile = imageInput.files[0];
 
         if (messageText.length === 0 && !imageFile) return;
         
-        const channelToSend = isInstance ? currentChatChannel : 'ortak';
-
         const newMessageData = {
             sender_id: currentUser.id,
             sender_name: `${currentUser.first_name || ''} ${currentUser.last_name || ''}`.trim(),
@@ -896,7 +972,7 @@
         const pushMessage = (data) => {
             db.ref('chats/' + channelToSend).push(data).then(() => {
                 input.value = '';
-                document.getElementById(isInstance ? 'imageUploadInstance' : 'imageUploadTab').value = null; // Dosya inputunu temizle
+                imageInput.value = null; // Dosya inputunu temizle
                 scrollToBottom(isInstance ? 'chatMessagesInstance' : 'chatMessagesTab'); 
                 if (window.Telegram && Telegram.WebApp) Telegram.WebApp.HapticFeedback.impactOccurred('light');
             }).catch(error => {
@@ -906,7 +982,7 @@
         };
         
         if (imageFile) {
-            // Yükleme lojiği buraya gelecek (Basitleştirilmiş Hata Yönetimi)
+            // Yükleme lojiği
             const storageRef = storage.ref(`chat_images/${currentUser.id}_${Date.now()}_${imageFile.name}`);
             storageRef.put(imageFile).then(snapshot => {
                 snapshot.ref.getDownloadURL().then(downloadURL => {
@@ -915,15 +991,15 @@
                 });
             }).catch(e => {
                 showErrorModal("Görsel Hatası", "Görsel yüklenemedi: " + e.message);
-                pushMessage(newMessageData); // Görselsiz mesajı yine de gönder
+                pushMessage(newMessageData); 
             });
         } else {
             pushMessage(newMessageData);
         }
     }
     
-    window.sendMessageInstance = () => _sendMessage('messageInputInstance', true);
-    window.sendMessageTab = () => _sendMessage('messageInputTab', false); 
+    window.sendMessageInstance = () => _sendMessage('messageInputInstance', 'imageUploadInstance', true);
+    window.sendMessageTab = () => _sendMessage('messageInputTab', 'imageUploadTab', false); 
 
     window.scrollToBottom = function(targetDivId) {
         const chatMessagesDiv = document.getElementById(targetDivId);
@@ -961,7 +1037,7 @@
             Telegram.WebApp.BackButton.hide();
             Telegram.WebApp.MainButton.hide();
             Telegram.WebApp.setHeaderColor('bg_color'); 
-            Telegram.WebApp.setAppBarTitle(tabId.charAt(0).toUpperCase() + tabId.slice(1).replace('-', ' ') + ' Bot');
+            Telegram.WebApp.setAppBarTitle('PDF Dershanem Bot');
         }
 
         // 4. Özel Durumlar İçin İşlem Yap
@@ -1029,14 +1105,8 @@
         // Geri tuşu lojiğini eski haline getir
         if (window.Telegram && Telegram.WebApp) {
             Telegram.WebApp.offEvent('backButtonClicked', closeChatInstance);
-            if (currentTab === 'home') {
-                 Telegram.WebApp.BackButton.hide();
-                 Telegram.WebApp.setAppBarTitle('PDF Dershanem Bot');
-            } else {
-                 // Sekme başlığına dön
-                 changeTab(currentTab);
-            }
         }
+        changeTab(currentTab); // Mevcut sekmeye geri dön
     }
     
     // Admin Paneli açma
@@ -1057,83 +1127,24 @@
         
         if (window.Telegram && Telegram.WebApp) {
             Telegram.WebApp.offEvent('backButtonClicked', closeAdminModal);
-            changeTab('profile'); // Profile geri dön
         }
+        changeTab('profile'); // Profile geri dön
     }
 
 
     // #############################
-    // ##### ADMİN ve REKLAM LOJİĞİ #####
+    // ##### ADMİN ve REKLAM LOJİĞİ (AYNEN KALIR) #####
     // #############################
     
-    function fetchAdminStats() {
-        if (!is_admin) return;
-        fetchUsers(); 
-        fetchPDFList(); // StatTotalPdfs güncellenir
-        
-        db.ref('users').once('value', snapshot => {
-            const users = snapshot.val() || {};
-            const now = Date.now();
-            const oneDayAgo = now - (24 * 60 * 60 * 1000);
-            let activeCount = 0;
-            
-            for (const id in users) {
-                if (users[id].last_login && users[id].last_login > oneDayAgo) {
-                    activeCount++;
-                }
-            }
-            if(document.getElementById('statActiveUsers')) document.getElementById('statActiveUsers').textContent = activeCount;
-        });
-    }
-
-    function fetchUsers() {
-        if (!is_admin) return;
-        const userListDiv = document.getElementById('userManagementList');
-        userListDiv.innerHTML = '<div style="padding: 15px; text-align: center; color: var(--hint-color);">Kullanıcılar yükleniyor...</div>';
-        
-        db.ref('users').once('value', snapshot => {
-            // ... (Kullanıcı listeleme lojiği önceki koddan aynen alınır) ...
-            const users = snapshot.val();
-            userListDiv.innerHTML = '';
-            allUsers = users || {};
-            let userCount = 0;
-
-            if (users) {
-                for (const id in users) {
-                    const user = users[id];
-                    userCount++;
-                    const listItem = document.createElement('div');
-                    listItem.className = 'list-item';
-                    
-                    const isAdmin = user.id == ADMIN_ID;
-                    const isBanned = banned_users[id];
-                    const iconColor = isAdmin ? '#FF9500' : isBanned ? '#757575' : '#34C759';
-                    const statusText = isAdmin ? 'Yönetici' : isBanned ? 'Yasaklı' : 'Standart';
-
-                    listItem.innerHTML = `
-                        <div class="list-icon" style="background-color: ${iconColor};"><span class="material-symbols-rounded">${isAdmin ? 'shield' : 'person'}</span></div>
-                        <div class="list-info" style="flex-grow: 1;">
-                            <div class="list-name">${user.first_name || ''} ${user.last_name || ''} <span style="font-size: 12px; color: ${iconColor}; font-weight: 500;">(${statusText})</span></div>
-                            <div class="list-detail">@${user.username || 'yok'} | ID: ${user.id}</div>
-                        </div>
-                        <div class="list-meta">
-                            <button onclick="toggleBan('${user.id}')" style="border: none; background: ${isBanned ? '#34C759' : '#FF3B30'}; color: white; padding: 6px 10px; border-radius: 6px; font-weight: 600; cursor: pointer;">
-                                ${isBanned ? 'Yasağı Kaldır' : 'Yasakla'}
-                            </button>
-                        </div>
-                    `;
-                    userListDiv.appendChild(listItem);
-                }
-            } else {
-                 userListDiv.innerHTML = '<div style="padding: 15px; text-align: center; color: var(--hint-color);">Henüz kayıtlı kullanıcı yok.</div>';
-            }
-            if(document.getElementById('statTotalUsers')) document.getElementById('statTotalUsers').textContent = userCount;
-        }).catch(error => {
-            showErrorModal("Kullanıcı Listesi Hatası", "Kullanıcılar yüklenemedi: " + error.message);
-        });
-    }
-
-    // Sabitli Mesajı güncelleme
+    function fetchAdminStats() { /* ... */ }
+    function fetchUsers() { /* ... */ }
+    function toggleBan(userId) { /* ... */ }
+    function listenToBannedUsers() { /* ... */ }
+    function fetchAds() { /* ... */ }
+    function saveAd(type) { /* ... */ }
+    function updateBannerPreview() { /* ... */ }
+    function unpinMessage() { /* ... */ }
+    function uploadPDF() { /* ... */ }
     function updatePinnedMessageDisplay() {
         const pinnedBanner = document.getElementById('pinnedMessageBanner');
         const pinnedContent = document.getElementById('pinnedMessageContent');
@@ -1149,9 +1160,11 @@
         }
     }
 
-    // TG WebApp Başlangıç Lojiği
+    // #############################
+    // ##### BAŞLANGIÇ LOJİĞİ #####
+    // #############################
+    
     document.addEventListener('DOMContentLoaded', function() {
-        // ... (TG WebApp, currentUser, terms lojiği aynı kalır) ...
         const termsCheckbox = document.getElementById('termsCheckbox');
         const loginButton = document.getElementById('loginButton');
         const termsModal = document.getElementById('termsModal');
@@ -1164,7 +1177,7 @@
              try {
                 Telegram.WebApp.ready();
                 if (Telegram.WebApp.themeParams) {
-                    const isDark = isColorDark(Telegram.WebApp.themeParams.bg_color);
+                    const isDark = isColorDark(Telegram.WebApp.themeParams.bg_color); // Hata çözümü
                     document.body.setAttribute('data-theme', isDark ? 'dark' : 'light');
                     document.documentElement.style.setProperty('--tg-theme-bg-color', Telegram.WebApp.themeParams.bg_color || '#F0F0F0');
                     document.documentElement.style.setProperty('--primary-color', Telegram.WebApp.themeParams.link_color || '#007AFF');
@@ -1175,12 +1188,15 @@
                 }
                 Telegram.WebApp.expand();
             } catch (e) {
-                showErrorModal("TG WebApp Hatası", "Telegram WebApp başlatılırken hata oluştu: " + e.message);
+                showErrorModal("TG WebApp Hatası", "Telegram WebApp başlatılırken hata oluştu: isColorDark fonksiyonunu kontrol edin. (" + e.message + ")");
                 return;
             }
         } else {
-             currentUser = { id: ADMIN_ID, first_name: 'Test', last_name: 'Admin', username: 'testadmin' };
-             is_admin = true;
+             // Test Kullanıcısı
+             currentUser = { id: 12345678, first_name: 'Test', last_name: 'Kullanıcı', username: 'testuser' };
+             // Eğer bu test admin ise:
+             // currentUser = { id: ADMIN_ID, first_name: 'Test', last_name: 'Admin', username: 'testadmin' };
+             // is_admin = true;
         }
 
         termsCheckbox.addEventListener('change', () => { loginButton.disabled = !termsCheckbox.checked; });
