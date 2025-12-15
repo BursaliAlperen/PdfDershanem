@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>@Pdf_DershanemBot - Gelişmiş Reklam Yönetimi</title>
+    <title>@Pdf_DershanemBot - Sade Arayüz</title>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
@@ -14,80 +14,149 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     <style>
-        /* MODERN VE TEMİZ TASARIM DEĞİŞKENLERİ */
-        :root {
-            --tg-blue: #007AFF; 
-            --tg-green: #34C759;
-            --tg-red: #FF3B30;
-            --light-bg: #F8F9FA; 
-            --card-bg: #FFFFFF;
-            --text-dark: #1F2937; 
-            --text-secondary: #6B7280; 
-            --border-color: #E5E7EB;
-            --shadow-subtle: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); 
-            --border-radius-lg: 16px; 
-            --border-radius-md: 10px;
-        }
-
+        /* SADE TELEGRAM WEBAPP STİLİ */
         body {
-            font-family: 'SF Pro Text', system-ui, -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
-            background-color: var(--light-bg);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            padding: 0;
+            background-color: var(--tg-theme-bg-color, #F0F0F0);
+            color: var(--tg-theme-text-color, #000000);
             min-height: 100vh;
-            color: var(--text-dark);
-            -webkit-font-smoothing: antialiased;
+            display: flex;
+            flex-direction: column;
         }
 
         .telegram-app {
-            width: 100%; max-width: 400px; height: 100vh;
-            background-color: var(--light-bg); 
-            box-shadow: var(--shadow-subtle);
-            display: flex; flex-direction: column; overflow: hidden;
-            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
         }
         
         .hidden { display: none !important; }
 
-        /* ANA UYGULAMA İSKELET STİLLERİ */
-        .header { background-color: var(--card-bg); padding: 15px; display: flex; justify-content: center; align-items: center; font-size: 18px; font-weight: 700; border-bottom: 1px solid var(--border-color); }
-        .content-container { flex-grow: 1; overflow: hidden; position: relative; }
+        /* Başlık ve Navbar kaldırıldı, sadece içerik ve alt menü kaldı */
+        .content-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            position: relative;
+        }
         
         .content-page {
-            width: 100%; height: 100%; position: absolute; top: 0; left: 0; overflow-y: auto; 
-            padding: 15px; background-color: var(--light-bg); box-sizing: border-box; 
-            opacity: 0; transform: translateX(100%); transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            overflow-y: auto; 
+            padding: 10px;
+            box-sizing: border-box; 
+            opacity: 0;
+            transform: translateX(100%);
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            background-color: var(--tg-theme-bg-color, #F0F0F0);
         }
 
-        .content-page.active { opacity: 1; transform: translateX(0); z-index: 5; }
+        .content-page.active { 
+            opacity: 1; 
+            transform: translateX(0); 
+            z-index: 5; 
+        }
 
-        .list-section-title { font-size: 14px; font-weight: 600; color: var(--text-secondary); margin: 15px 0 10px 0; text-transform: uppercase; }
-        .list-card { background-color: var(--card-bg); margin: 0; border-radius: var(--border-radius-md); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); overflow: hidden; }
-        .list-item { display: flex; padding: 12px 15px; align-items: center; border-bottom: 1px solid var(--border-color); text-decoration: none; color: inherit; }
-        .list-icon { width: 30px; height: 30px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 15px; color: var(--card-bg); flex-shrink: 0; margin-right: 15px; }
-        .list-info { flex-grow: 1; }
-        .list-name { font-weight: 600; font-size: 15px; }
-        .list-detail { font-size: 13px; color: var(--text-secondary); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .list-meta { font-size: 12px; color: var(--text-secondary); flex-shrink: 0; margin-left: 10px; font-weight: 500;}
+        /* Liste ve Kart Stilleri */
+        .list-section-title { 
+            font-size: 14px; 
+            font-weight: 600; 
+            color: var(--tg-theme-hint-color, #999999); 
+            margin: 15px 10px 5px 10px; 
+            text-transform: uppercase; 
+        }
         
-        /* BANNER REKLAM STİLİ (Kare/Dikdörtgen) */
-        .ad-banner {
+        .list-card { 
+            background-color: var(--tg-theme-secondary-bg-color, #FFFFFF); 
+            margin: 0; 
+            border-radius: 10px; 
+            overflow: hidden; 
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .list-item { 
+            display: flex; 
+            padding: 12px 15px; 
+            align-items: center; 
+            border-bottom: 1px solid var(--tg-theme-hint-color, #E0E0E0); 
+            text-decoration: none; 
+            color: var(--tg-theme-text-color, #000000);
+            cursor: pointer;
+        }
+        .list-item:last-child { border-bottom: none; }
+        .list-icon { 
+            width: 30px; 
+            height: 30px; 
+            border-radius: 6px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            font-size: 15px; 
+            color: #FFFFFF; 
+            flex-shrink: 0; 
+            margin-right: 15px; 
+        }
+        .list-info { flex-grow: 1; }
+        .list-name { font-weight: 500; font-size: 15px; }
+        .list-detail { font-size: 13px; color: var(--tg-theme-hint-color, #999999); margin-top: 2px; }
+        .list-meta { font-size: 12px; color: var(--tg-theme-link-color, #007AFF); flex-shrink: 0; margin-left: 10px; font-weight: 500;}
+
+        /* Form Elemanları */
+        input[type="text"], input[type="file"], input[type="url"], input[type="number"], select {
             width: 100%;
-            height: 100px; 
-            background-color: #ffcc00; /* Açık sarı */
-            border-radius: var(--border-radius-md);
-            margin-bottom: 20px;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid var(--tg-theme-hint-color, #CCCCCC);
+            border-radius: 8px;
+            box-sizing: border-box;
+            background-color: var(--tg-theme-secondary-bg-color, #FFFFFF);
+            color: var(--tg-theme-text-color, #000000);
+            font-size: 15px;
+        }
+        
+        .action-button, .upload-button, .katil-btn {
+            border: none; 
+            padding: 12px; 
+            border-radius: 8px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            width: 100%;
+            text-decoration: none;
+            transition: opacity 0.2s;
+            margin-top: 10px;
+            background-color: var(--tg-theme-button-color, #007AFF);
+            color: var(--tg-theme-button-text-color, #FFFFFF);
+        }
+        
+        .action-button:disabled, .upload-button:disabled, .katil-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Banner Reklam Stili */
+        .ad-banner {
+            width: calc(100% - 20px); 
+            height: 80px; 
+            background-color: var(--tg-theme-secondary-bg-color, #FFFFFF);
+            border-radius: 10px;
+            margin: 10px auto 20px auto;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-            color: #333;
-            font-weight: 700;
-            font-size: 14px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            color: var(--tg-theme-text-color, #000000);
+            font-weight: 600;
+            font-size: 13px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
             text-decoration: none;
             overflow: hidden;
             position: relative;
@@ -99,21 +168,50 @@
             position: absolute;
             top: 0;
             left: 0;
-            opacity: 0.5;
+            opacity: 0.3;
         }
         .ad-banner span {
             position: relative;
             z-index: 2;
-            padding: 5px;
-            background-color: rgba(255, 255, 255, 0.8);
+            padding: 3px 8px;
+            background-color: var(--tg-theme-secondary-bg-color, rgba(255, 255, 255, 0.8));
             border-radius: 4px;
         }
         
-        /* TAM EKRAN AFİŞ (INTERSTITIAL) STİLİ */
+        /* Navigasyon Çubuğu */
+        .navbar { 
+            background-color: var(--tg-theme-secondary-bg-color, #FFFFFF); 
+            border-top: 1px solid var(--tg-theme-hint-color, #E0E0E0); 
+            display: flex; 
+            justify-content: space-around; 
+            padding: 5px 0 5px; 
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05); 
+            z-index: 10; 
+        }
+        .nav-item { 
+            flex: 1; 
+            font-size: 11px; 
+            color: var(--tg-theme-hint-color, #999999); 
+            cursor: pointer; 
+            text-align: center; 
+            font-weight: 500; 
+            padding: 5px 0;
+        }
+        .nav-item.active { 
+            color: var(--tg-theme-link-color, #007AFF); 
+            font-weight: 600; 
+        }
+        .nav-icon { 
+            display: block; 
+            font-size: 20px; 
+            margin-bottom: 2px; 
+        }
+
+        /* Tam Ekran Afiş (Interstitial) Stili (Minimal) */
         .interstitial-ad-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(0, 0, 0, 0.7);
+            background-color: rgba(0, 0, 0, 0.8);
             z-index: 9999; 
             display: none;
             justify-content: center;
@@ -122,13 +220,13 @@
         }
 
         .ad-afis-card {
-            background-color: var(--card-bg);
+            background-color: var(--tg-theme-secondary-bg-color, #FFFFFF);
             width: 90%;
             max-width: 350px;
-            border-radius: var(--border-radius-lg);
+            border-radius: 10px;
             padding: 20px;
             text-align: center;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
             position: relative;
         }
 
@@ -136,153 +234,81 @@
             width: 100%;
             height: 150px;
             object-fit: cover;
-            border-radius: var(--border-radius-md);
+            border-radius: 8px;
             margin-bottom: 15px;
         }
-
-        .ad-afis-card h3 {
-            margin-top: 0;
-            font-size: 18px;
-            color: var(--text-dark);
-        }
-
-        .ad-afis-card p {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-bottom: 20px;
-        }
-
-        .ad-afis-action {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .ad-afis-action button {
-            padding: 12px;
-            border-radius: var(--border-radius-md);
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .ad-afis-action .katil-btn {
-            background-color: var(--tg-green);
-            color: white;
-        }
-        .ad-afis-action .katil-btn:disabled {
-            background-color: var(--text-secondary);
-        }
-        
         .ad-afis-close {
             position: absolute;
-            top: 15px;
-            right: 15px;
-            width: 30px;
-            height: 30px;
-            background: rgba(255, 255, 255, 0.9);
+            top: 10px;
+            right: 10px;
+            background: var(--tg-theme-secondary-bg-color, #FFFFFF);
             border-radius: 50%;
-            border: 1px solid var(--border-color);
-            color: var(--text-dark);
-            font-size: 18px;
-            cursor: pointer;
-            line-height: 30px;
+            width: 25px;
+            height: 25px;
+            line-height: 25px;
             text-align: center;
             font-weight: 700;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s;
+            cursor: pointer;
+            color: var(--tg-theme-text-color, #000);
         }
-        .ad-afis-close:hover { transform: scale(1.1); }
-        
         .timer-badge {
             position: absolute;
-            top: -10px;
+            top: -15px;
             left: 50%;
             transform: translateX(-50%);
-            background-color: var(--tg-red);
-            color: white;
+            background-color: var(--tg-theme-button-color, #007AFF);
+            color: var(--tg-theme-button-text-color, #FFFFFF);
             padding: 4px 10px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
         }
 
-        /* Admin Reklam Form Stilleri */
-        .input-group { margin-bottom: 15px; }
-        .input-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
-        .input-group input, .input-group select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius-md);
-            box-sizing: border-box;
-            font-size: 15px;
-        }
-        .upload-button {
-            background-color: var(--tg-green);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: var(--border-radius-md);
-            cursor: pointer;
-            margin-top: 15px;
-            width: 100%;
-            transition: background-color 0.2s;
-        }
-        .upload-button:disabled {
-            background-color: var(--text-secondary);
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
     </style>
 </head>
 <body>
-<div class="telegram-app" id="app">
-    <div class="splash-screen" id="splashScreen">
-        <div class="splash-card">
-            <div class="splash-icon"><i class="fas fa-file-contract"></i></div>
-            <h2>Hoş Geldiniz!</h2>
-            <p>Botu kullanmak için Hizmet Şartlarını onaylayın.</p>
-            <div class="terms-container">
-                <input type="checkbox" id="termsCheckbox">
-                <label for="termsCheckbox" class="terms-text">Hizmet Şartlarını kabul ediyorum.</label>
-            </div>
-            <button id="loginButton" class="action-button" disabled><i class="fas fa-sign-in-alt"></i> Bota Giriş Yap</button>
+<div class="splash-screen" id="splashScreen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--tg-theme-bg-color, #F0F0F0); z-index: 1000; display: flex; justify-content: center; align-items: center;">
+    <div style="background: var(--tg-theme-secondary-bg-color, #FFFFFF); padding: 30px; border-radius: 10px; text-align: center; max-width: 300px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);">
+        <i class="fas fa-file-contract" style="font-size: 30px; color: var(--tg-theme-link-color, #007AFF); margin-bottom: 15px;"></i>
+        <h2 style="margin-top: 0; font-size: 18px;">Kullanım Koşulları</h2>
+        <p style="font-size: 14px; color: var(--tg-theme-hint-color, #999999);">Botu kullanmak için Hizmet Şartlarını onaylayın.</p>
+        <div style="display: flex; align-items: center; margin-bottom: 20px;">
+            <input type="checkbox" id="termsCheckbox" style="width: 18px; height: 18px; margin-right: 10px;">
+            <label for="termsCheckbox" style="font-size: 13px;">Şartları kabul ediyorum.</label>
         </div>
+        <button id="loginButton" class="action-button" disabled>Bota Giriş Yap</button>
     </div>
-    
-    <div id="mainAppContent" class="hidden" style="height: 100%; width: 100%; flex-direction: column;">
-        
-        <div class="header">
-            <span class="header-title" id="headerTitle">Ana Sayfa</span>
-        </div>
+</div>
 
+<div class="telegram-app" id="app">
+    
+    <div id="mainAppContent" class="hidden" style="flex-grow: 1;">
+        
         <div class="content-container">
             
             <div class="content-page active" id="page-home">
-                 <a href="https://t.me/AlperenTHE" target="_blank" class="sponsor-box">
-                    <i class="fas fa-bullhorn"></i> Güncel PDF'ler Sponsorlu Olarak Paylaşılıyor - Tıklayarak Destek Ol!
-                </a>
+                 <div style="padding: 10px; background: var(--tg-theme-secondary-bg-color); border-radius: 10px; color: var(--tg-theme-text-color); margin-bottom: 15px; font-size: 14px;">
+                    <i class="fas fa-info-circle" style="color: var(--tg-theme-link-color);"></i> Uygulamanın sadeleştirilmiş arayüzü aktif.
+                </div>
+                
                 <div class="list-section-title">VERİTABANI ÖZETİ</div>
                 <div class="list-card">
                     <div class="list-item">
-                        <div class="list-icon" style="background-color: var(--tg-red);"><i class="fas fa-book-open"></i></div>
+                        <div class="list-icon" style="background-color: #FF3B30;"><i class="fas fa-book-open"></i></div>
                         <div class="list-info"><div class="list-name">📚 PDF Kütüphanesi</div><div class="list-detail">Toplam Dosya: <span id="pdfCount">Yükleniyor...</span></div></div>
                         <div class="list-meta">Sayı</div>
                     </div>
                      <div class="list-item">
-                        <div class="list-icon" style="background-color: var(--tg-green);"><i class="fas fa-users"></i></div>
+                        <div class="list-icon" style="background-color: #34C759;"><i class="fas fa-users"></i></div>
                         <div class="list-info"><div class="list-name">💬 Ortak Sohbet Grubu</div><div class="list-detail">Son Mesaj: <span id="lastMsgOrtak">Yükleniyor...</span></div></div>
                         <div class="list-meta"><span id="timeOrtak">--:--</span></div>
                     </div>
                 </div>
-                <div style="padding: 15px 0;">
-                    <div class="list-section-title" style="margin-top: 5px;">İLETİŞİM</div>
-                </div>
+
+                <div class="list-section-title">İLETİŞİM</div>
                 <a href="https://t.me/AlperenTHE" target="_blank" class="list-card" style="text-decoration: none;">
                     <div class="list-item">
-                        <div class="list-icon" style="background-color: var(--tg-blue);"><i class="fab fa-telegram-plane"></i></div>
+                        <div class="list-icon" style="background-color: #007AFF;"><i class="fab fa-telegram-plane"></i></div>
                         <div class="list-info"><div class="list-name">Yönetici</div><div class="list-detail">Soru, öneri ve reklam için bize ulaşın.</div></div>
                         <div class="list-meta">@AlperenTHE</div>
                     </div>
@@ -291,13 +317,13 @@
 
             <div class="content-page" id="page-chats">
                 <a href="#" target="_blank" class="ad-banner" id="chatBannerAd">
-                    <img src="https://via.placeholder.com/400x100?text=Reklam+Alanı" alt="Reklam" id="chatBannerImage">
+                    <img src="https://via.placeholder.com/400x80?text=Reklam+Alanı" alt="Reklam" id="chatBannerImage">
                     <span id="chatBannerText">Reklam yükleniyor...</span>
                 </a>
 
                 <div class="list-section-title">GRUP VE KANAL BAĞLANTILARI</div>
                 <div class="list-card">
-                    <a href="https://t.me/example_duyuru" target="_blank" class="list-item">
+                     <a href="https://t.me/example_duyuru" target="_blank" class="list-item">
                         <div class="list-icon" style="background-color: #9c27b0;"><i class="fas fa-bullhorn"></i></div>
                         <div class="list-info"><div class="list-name">📢 Duyuru Kanalı</div><div class="list-detail">Önemli güncellemeler ve haberler.</div></div>
                         <div class="list-meta">Katıl</div>
@@ -308,7 +334,7 @@
                         <div class="list-meta">Katıl</div>
                     </a>
                     <a href="https://t.me/example_ortaksohbet" target="_blank" class="list-item">
-                        <div class="list-icon" style="background-color: var(--tg-blue);"><i class="fas fa-comment"></i></div>
+                        <div class="list-icon" style="background-color: #007AFF;"><i class="fas fa-comment"></i></div>
                         <div class="list-info"><div class="list-name">💬 Ortak Sohbet Grubu</div><div class="list-detail">Genel konuşma ve tanışma platformu.</div></div>
                         <div class="list-meta">Katıl</div>
                     </a>
@@ -316,7 +342,7 @@
 
                 <div class="list-section-title">AKTİF İNDİRİLEBİLİR PDF LİSTESİ</div>
                 <div class="list-card" id="pdfDownloadList">
-                    <div style="padding: 15px; text-align: center; color: var(--text-secondary);">PDF'ler yükleniyor...</div>
+                    <div style="padding: 15px; text-align: center; color: var(--tg-theme-hint-color);">PDF'ler yükleniyor...</div>
                 </div>
             </div>
 
@@ -324,11 +350,11 @@
                 <div class="list-section-title">KULLANICI BİLGİLERİ</div>
                 <div class="list-card">
                     <div class="list-item">
-                        <div class="list-icon" style="background-color: var(--tg-blue);"><i class="fas fa-id-badge"></i></div>
+                        <div class="list-icon" style="background-color: #007AFF;"><i class="fas fa-id-badge"></i></div>
                         <div class="list-info"><div class="list-name">Telegram ID</div><div class="list-detail" id="profile-id">Bilinmiyor</div></div>
                     </div>
                      <div class="list-item">
-                        <div class="list-icon" style="background-color: var(--tg-green);"><i class="fas fa-user-circle"></i></div>
+                        <div class="list-icon" style="background-color: #34C759;"><i class="fas fa-user-circle"></i></div>
                         <div class="list-info"><div class="list-name">Ad Soyad</div><div class="list-detail" id="profile-name">Yükleniyor...</div></div>
                     </div>
                     <div class="list-item">
@@ -341,81 +367,81 @@
             <div class="content-page" id="page-search">
                 <div class="list-section-title">PDF VE İÇERİK ARAMA</div>
                  <div style="margin-bottom: 20px; display: flex; gap: 10px;">
-                    <input type="text" id="searchInput" placeholder="Aranacak PDF veya Konu Adı" style="flex-grow: 1; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--border-radius-md); box-sizing: border-box; font-size: 15px;">
-                    <button onclick="handleSearch()" style="background-color: var(--tg-blue); color: white; border: none; padding: 10px 15px; border-radius: var(--border-radius-md); cursor: pointer;"><i class="fas fa-search"></i></button>
+                    <input type="text" id="searchInput" placeholder="Aranacak PDF veya Konu Adı" style="flex-grow: 1;">
+                    <button onclick="handleSearch()" class="action-button" style="width: auto; margin-top: 0; padding: 10px 15px;"><i class="fas fa-search"></i></button>
                 </div>
-                <div id="searchStatus" class="upload-status"></div>
+                <div id="searchStatus" style="font-size: 14px; margin-bottom: 10px;"></div>
                 
                 <a href="#" target="_blank" class="ad-banner" id="searchBannerAd" style="margin-bottom: 30px;">
-                    <img src="https://via.placeholder.com/400x100?text=Reklam+Alanı" alt="Reklam" id="searchBannerImage">
+                    <img src="https://via.placeholder.com/400x80?text=Reklam+Alanı" alt="Reklam" id="searchBannerImage">
                     <span id="searchBannerText">Reklam yükleniyor...</span>
                 </a>
 
                 <div class="list-section-title">POPÜLER ARAMALAR</div>
                 <div class="list-card" id="popularSearchesList">
-                    <div style="padding: 15px; text-align: center; color: var(--text-secondary);">Popüler aramalar yükleniyor...</div>
+                    <div style="padding: 15px; text-align: center; color: var(--tg-theme-hint-color);">Popüler aramalar yükleniyor...</div>
                 </div>
 
                 <div class="list-section-title">ARAMA GEÇMİŞİNİZ</div>
                 <div class="list-card" id="searchHistoryList">
-                     <div style="padding: 15px; text-align: center; color: var(--text-secondary);">Arama geçmişi yükleniyor...</div>
+                     <div style="padding: 15px; text-align: center; color: var(--tg-theme-hint-color);">Arama geçmişi yükleniyor...</div>
                 </div>
             </div>
             
             <div class="content-page" id="page-admin">
                 <div class="list-section-title">PDF DOSYA YÜKLEME</div>
-                <div class="file-upload-box">
-                    <label class="file-label" for="pdfFile">Yüklenecek PDF Dosyasını Seçin:</label>
-                    <input type="file" id="pdfFile" accept=".pdf" style="width: 100%;">
+                <div class="list-card" style="padding: 15px;">
+                    <label style="font-size: 14px;">Yüklenecek PDF Dosyasını Seçin:</label>
+                    <input type="file" id="pdfFile" accept=".pdf">
                     
-                    <label class="file-label" style="margin-top: 15px;">PDF Adı (Veritabanı Kaydı İçin):</label>
-                    <input type="text" id="pdfName" placeholder="Örn: 11. Sınıf Kimya Notları" style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: var(--border-radius-md); box-sizing: border-box;">
+                    <label style="font-size: 14px; margin-top: 15px;">PDF Adı:</label>
+                    <input type="text" id="pdfName" placeholder="Örn: 11. Sınıf Kimya Notları">
 
                     <button id="uploadButton" class="upload-button" disabled onclick="uploadPDF()">
-                        <i class="fas fa-cloud-upload-alt"></i> PDF'i Firebase'e Yükle
+                        <i class="fas fa-cloud-upload-alt"></i> PDF'i Yükle
                     </button>
-                    <div id="uploadStatus" class="upload-status">Bekleniyor...</div>
+                    <div id="uploadStatus" style="margin-top: 10px; font-size: 13px;">Bekleniyor...</div>
                 </div>
                 
                 <div class="list-section-title">REKLAM YÖNETİMİ</div>
-                <div class="file-upload-box">
-                    <div class="input-group">
-                        <label for="adKind">Reklam Türü:</label>
+                <div class="list-card" style="padding: 15px;">
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-size: 14px;">Reklam Türü:</label>
                         <select id="adKind">
                             <option value="banner">Banner Reklam (Sabit)</option>
-                            <option value="afis">Afiş Reklam (Tam Ekran/Zamanlı)</option>
+                            <option value="afis">Afiş Reklam (Tam Ekran)</option>
                         </select>
                     </div>
-                    <div class="input-group">
-                        <label for="adTitle">Başlık:</label>
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-size: 14px;">Başlık:</label>
                         <input type="text" id="adTitle" placeholder="Örn: Yeni Telegram Grubu!">
                     </div>
-                     <div class="input-group" id="adDescriptionGroup">
-                        <label for="adDescription">Açıklama (Afiş İçin):</label>
+                     <div style="margin-bottom: 15px;" id="adDescriptionGroup">
+                        <label style="font-size: 14px;">Açıklama (Afiş İçin):</label>
                         <input type="text" id="adDescription" placeholder="Örn: 2026 YKS Hazırlık grubu için hemen katıl!">
                     </div>
-                    <div class="input-group">
-                        <label for="adFile">Görsel (Banner/Afiş):</label>
-                        <input type="file" id="adFile" accept="image/*" style="width: 100%;">
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-size: 14px;">Görsel (Banner/Afiş):</label>
+                        <input type="file" id="adFile" accept="image/*">
                     </div>
-                    <div class="input-group">
-                        <label for="adTargetUrl">Hedef URL (Tıklayınca Yönlendirilecek Yer):</label>
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-size: 14px;">Hedef URL:</label>
                         <input type="url" id="adTargetUrl" placeholder="https://t.me/YeniGrup">
                     </div>
-                    <div class="input-group" id="adDurationGroup" style="display: none;">
-                        <label for="adDuration">Görüntüleme Süresi (Saniye - Afiş İçin):</label>
+                    <div style="margin-bottom: 15px; display: none;" id="adDurationGroup">
+                        <label style="font-size: 14px;">Görüntüleme Süresi (5-15sn):</label>
                         <input type="number" id="adDuration" value="10" min="5" max="15">
                     </div>
 
                     <button id="adUploadButton" class="upload-button" disabled onclick="uploadAdContent()">
-                        <i class="fas fa-upload"></i> Reklam İçeriğini Kaydet
+                        <i class="fas fa-upload"></i> Reklamı Kaydet
                     </button>
-                    <div id="adUploadStatus" class="upload-status"></div>
+                    <div id="adUploadStatus" style="margin-top: 10px; font-size: 13px;"></div>
                 </div>
 
                 <div class="list-section-title">KULLANICI YÖNETİMİ (KAYITLAR)</div>
                 <div class="list-card" id="userListAdmin">
-                     <div style="padding: 15px; text-align: center; color: var(--text-secondary);">Kullanıcı listesi çekiliyor...</div>
+                     <div style="padding: 15px; text-align: center; color: var(--tg-theme-hint-color);">Kullanıcı listesi çekiliyor...</div>
                 </div>
             </div>
 
@@ -444,13 +470,13 @@
         <div class="ad-afis-card">
              <span class="timer-badge" id="afisTimer"></span>
             <span class="ad-afis-close" id="afisCloseButton">X</span>
-            <a href="#" target="_blank" id="afisAdLink">
+            <a href="#" target="_blank" id="afisAdLink" style="color: inherit; text-decoration: none;">
                 <img src="" alt="Afiş Reklam Görseli" id="afisImage">
-                <h3 id="afisTitle"></h3>
+                <h3 id="afisTitle" style="margin-top: 0; color: var(--tg-theme-text-color);"></h3>
             </a>
-            <p id="afisDescription"></p>
-            <div class="ad-afis-action">
-                <button class="katil-btn" id="afisKatilButton" disabled>Reklamı Görüntülüyorsunuz...</button>
+            <p id="afisDescription" style="font-size: 14px; color: var(--tg-theme-hint-color);"></p>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button class="katil-btn" id="afisKatilButton" disabled style="background-color: #34C759; color: white; margin-top: 0;">Reklamı Görüntülüyorsunuz...</button>
             </div>
         </div>
     </div>
@@ -491,7 +517,6 @@
     // ##### 2. DOM YÜKLEME VE GİRİŞ MANTIKLARI #####
     // #######################################################
     document.addEventListener('DOMContentLoaded', function() {
-        // ... (Önceki DOM ve Giriş Mantığı) ...
         const termsCheckbox = document.getElementById('termsCheckbox');
         const loginButton = document.getElementById('loginButton');
         const splashScreen = document.getElementById('splashScreen');
@@ -504,15 +529,28 @@
         const adDurationGroup = document.getElementById('adDurationGroup');
         const afisCloseButton = document.getElementById('afisCloseButton');
         const afisKatilButton = document.getElementById('afisKatilButton');
+        const pdfFileInput = document.getElementById('pdfFile');
+        const pdfUploadButton = document.getElementById('uploadButton');
         
+        // --- Telegram WebApp Entegrasyonu ---
         if (window.Telegram && Telegram.WebApp) {
             Telegram.WebApp.ready();
-             if (Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.user) {
+            // Temaları uygula
+            document.documentElement.style.setProperty('--tg-theme-bg-color', Telegram.WebApp.themeParams.bg_color || '#F0F0F0');
+            document.documentElement.style.setProperty('--tg-theme-secondary-bg-color', Telegram.WebApp.themeParams.secondary_bg_color || '#FFFFFF');
+            document.documentElement.style.setProperty('--tg-theme-text-color', Telegram.WebApp.themeParams.text_color || '#000000');
+            document.documentElement.style.setProperty('--tg-theme-hint-color', Telegram.WebApp.themeParams.hint_color || '#999999');
+            document.documentElement.style.setProperty('--tg-theme-link-color', Telegram.WebApp.themeParams.link_color || '#007AFF');
+            document.documentElement.style.setProperty('--tg-theme-button-color', Telegram.WebApp.themeParams.button_color || '#007AFF');
+            document.documentElement.style.setProperty('--tg-theme-button-text-color', Telegram.WebApp.themeParams.button_text_color || '#FFFFFF');
+
+            if (Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.user) {
                 currentUser = Telegram.WebApp.initDataUnsafe.user;
             }
+            Telegram.WebApp.expand();
         }
 
-        // Giriş Butonu Mantığı
+        // --- Giriş Ekranı Mantığı ---
         termsCheckbox.addEventListener('change', () => {
              loginButton.disabled = !termsCheckbox.checked;
              loginButton.classList.toggle('active', termsCheckbox.checked);
@@ -526,26 +564,23 @@
                 updateProfileInfo(currentUser); 
                 fetchRealtimeData();
                 fetchPDFList();
-                fetchBannerAd(); // Banner reklamları yükle
-                lastAdDisplayTime = Date.now(); // Reklam zamanlayıcısını başlat
+                fetchBannerAd(); 
+                lastAdDisplayTime = Date.now(); 
             }
         });
 
-        // Navigasyon ve Afiş Reklamı Gösterme Mantığı
+        // --- Navigasyon ve Sayfa Geçişi Mantığı ---
         function navigateTo(pageId) {
             navItems.forEach(item => {
                 const isActive = item.getAttribute('data-page') === pageId;
                 item.classList.toggle('active', isActive);
-                if (isActive) {
-                    document.getElementById('headerTitle').textContent = item.textContent.trim();
-                }
             });
 
             contentPages.forEach(page => {
                 page.classList.toggle('active', page.id === `page-${pageId}`);
             });
 
-            // Her sayfa değişiminde reklam gösterimini kontrol et
+            // Her sayfa değişiminde reklam gösterimini kontrol et (1 dakikada 2 kez mantığı)
             checkAndShowInterstitialAd(); 
             
             if (pageId === 'search') fetchSearchData(); 
@@ -560,22 +595,30 @@
 
         navigateTo('home'); 
 
-        // Admin Reklam Form Kontrolleri
+        // --- Admin Form Kontrolleri ---
         adKindSelect.addEventListener('change', function() {
             const isAfis = this.value === 'afis';
             adDurationGroup.style.display = isAfis ? 'block' : 'none';
+            document.getElementById('adDescriptionGroup').style.display = isAfis ? 'block' : 'none';
         });
 
+        // Reklam Formu Kontrolleri
         [adFile, document.getElementById('adTitle'), document.getElementById('adTargetUrl')].forEach(el => {
             el.addEventListener('input', () => {
                 adUploadButton.disabled = !adFile.files.length || !document.getElementById('adTitle').value.trim() || !document.getElementById('adTargetUrl').value.trim();
             });
         });
-        
-        // Afiş Reklam Kapatma Butonu
-        afisCloseButton.addEventListener('click', hideInterstitialAd);
 
-        // Afiş Reklam Katıl Butonu (Sayaç sıfırlanınca aktifleşecek)
+        // PDF Formu Kontrolleri
+        pdfFileInput.addEventListener('change', function() {
+            pdfUploadButton.disabled = !this.files.length || this.files[0].type !== 'application/pdf' || !document.getElementById('pdfName').value.trim();
+        });
+        document.getElementById('pdfName').addEventListener('input', function() {
+            pdfUploadButton.disabled = !pdfFileInput.files.length || pdfFileInput.files[0].type !== 'application/pdf' || !this.value.trim();
+        });
+        
+        // Afiş Reklam Kapatma Butonu ve Katıl Butonu
+        afisCloseButton.addEventListener('click', hideInterstitialAd);
         afisKatilButton.addEventListener('click', function() {
             if (!this.disabled) {
                 const link = document.getElementById('afisAdLink').href;
@@ -589,50 +632,35 @@
     // ##### 3. REKLAM YÖNETİMİ FONKSİYONLARI #####
     // #######################################################
 
-    /**
-     * Firebase'den Banner reklam verilerini çeker ve sayfadaki banner alanlarını günceller.
-     */
     function fetchBannerAd() {
         if (!db) return;
-
         db.ref('ads/banner').once('value', (snapshot) => {
             const adData = snapshot.val();
-            
-            // Eğer reklam varsa
             if (adData && adData.url) {
                 const bannerElements = [
                     { link: document.getElementById('chatBannerAd'), image: document.getElementById('chatBannerImage'), text: document.getElementById('chatBannerText') },
                     { link: document.getElementById('searchBannerAd'), image: document.getElementById('searchBannerImage'), text: document.getElementById('searchBannerText') }
                 ];
-                
                 bannerElements.forEach(el => {
                     if (el.link) el.link.href = adData.targetUrl || '#';
                     if (el.image) el.image.src = adData.url;
-                    if (el.text) el.text.textContent = adData.title || 'Sponsorlu İçerik';
+                    if (el.text) el.text.textContent = adData.title || 'Reklam Alanı - Tıklayın';
                 });
             }
         });
     }
 
-    /**
-     * Tam ekran afiş reklamını Firebase'den çeker ve göstermeye hazır hale getirir.
-     */
     function fetchInterstitialAd(callback) {
         if (!db) { callback(null); return; }
-
         db.ref('ads/afis').once('value', (snapshot) => {
             const adData = snapshot.val();
             callback(adData && adData.url ? adData : null);
         });
     }
 
-    /**
-     * Reklam gösterim sıklığını kontrol eder ve gerekirse tam ekran afiş reklamını gösterir.
-     */
     function checkAndShowInterstitialAd() {
-        // Şu anki zamanı kontrol et
         const currentTime = Date.now();
-        // 1 dakikada 2 kez gösterim (60 saniye / 2 gösterim = her 30 saniyede bir)
+        // 1 dakikada 2 kez = her 30 saniyede bir
         const adInterval = 30000; 
         
         if (currentTime - lastAdDisplayTime >= adInterval) {
@@ -646,10 +674,6 @@
         }
     }
 
-    /**
-     * Afiş reklamını tam ekran gösterir ve geri sayımı başlatır.
-     * @param {object} adData - Reklam verisi (title, description, url, targetUrl, duration)
-     */
     function showInterstitialAd(adData) {
         const overlay = document.getElementById('interstitialAdOverlay');
         const afisImage = document.getElementById('afisImage');
@@ -663,7 +687,7 @@
         let duration = parseInt(adData.duration) || 10;
         let countdown = duration;
 
-        afisImage.src = adData.url || 'https://via.placeholder.com/350x150?text=Reklam+Görseli';
+        afisImage.src = adData.url || '';
         afisTitle.textContent = adData.title || 'Sponsorlu İçerik';
         afisDescription.textContent = adData.description || 'Bu içeriği görüntülemek için lütfen bekleyin.';
         afisAdLink.href = adData.targetUrl || '#';
@@ -688,16 +712,11 @@
     }
 
     function hideInterstitialAd() {
-        const overlay = document.getElementById('interstitialAdOverlay');
-        overlay.style.display = 'none';
+        document.getElementById('interstitialAdOverlay').style.display = 'none';
     }
 
-    /**
-     * Admin panelinden reklam içeriğini yükler (Görseli Storage'a, veriyi RTDB'ye).
-     */
     function uploadAdContent() {
         if (!storage || !db) return;
-
         const adKind = document.getElementById('adKind').value;
         const adFile = document.getElementById('adFile').files[0];
         const adTitle = document.getElementById('adTitle').value.trim();
@@ -707,17 +726,16 @@
         const adUploadStatus = document.getElementById('adUploadStatus');
         const adUploadButton = document.getElementById('adUploadButton');
 
-        if (!adFile || !adTitle || !adTargetUrl) {
+        if (!adFile || !adTitle || !adTargetUrl || (adKind === 'afis' && !adDescription)) {
             adUploadStatus.textContent = "⚠️ Tüm zorunlu alanları doldurun ve bir görsel seçin.";
-            adUploadStatus.classList.add('error');
+            adUploadStatus.style.color = '#FF3B30';
             return;
         }
 
         adUploadButton.disabled = true;
-        adUploadStatus.classList.remove('success', 'error');
         adUploadStatus.textContent = `⏳ Görsel yükleniyor...`;
+        adUploadStatus.style.color = '#007AFF';
 
-        // 1. Görseli Firebase Storage'a yükle
         const fileName = `${adKind}_${Date.now()}_${adFile.name}`;
         const storageRef = storage.ref(`ads/${fileName}`);
         const uploadTask = storageRef.put(adFile);
@@ -729,11 +747,10 @@
             }, 
             (error) => {
                 adUploadStatus.textContent = `❌ Yükleme Başarısız: ${error.message}`;
-                adUploadStatus.classList.add('error');
+                adUploadStatus.style.color = '#FF3B30';
                 adUploadButton.disabled = false;
             }, 
             () => {
-                // 2. URL'yi al ve RTDB'ye kaydet
                 uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
                     const adData = {
                         title: adTitle,
@@ -743,5 +760,312 @@
                         uploadedBy: (currentUser ? currentUser.username || 'Admin' : 'Anonim Admin'),
                         timestamp: firebase.database.ServerValue.TIMESTAMP
                     };
+                    if (adKind === 'afis') {
+                        adData.description = adDescription;
+                        adData.duration = parseInt(adDuration) || 10;
+                    }
 
-                    if (adKind === 'af
+                    db.ref(`ads/${adKind}`).set(adData).then(() => {
+                        adUploadStatus.textContent = `✅ ${adKind === 'afis' ? 'Afiş' : 'Banner'} reklam başarıyla güncellendi!`;
+                        adUploadStatus.style.color = '#34C759';
+                        adUploadButton.disabled = false;
+                        if (adKind === 'banner') fetchBannerAd(); 
+                    }).catch(error => {
+                        adUploadStatus.textContent = `❌ RTDB Kaydı Başarısız: ${error.message}`;
+                        adUploadStatus.style.color = '#FF3B30';
+                        adUploadButton.disabled = false;
+                    });
+                });
+            }
+        );
+    }
+    
+    // #######################################################
+    // ##### 4. DİĞER FONKSİYONLAR (Kullanıcı, PDF, Arama) #####
+    // #######################################################
+
+    function saveUserToDatabase(user) {
+        if (!db || !user || !user.id) return;
+        const userData = {
+            first_name: user.first_name || '',
+            last_name: user.last_name || '',
+            username: user.username || '',
+            is_admin: false,
+            last_login: firebase.database.ServerValue.TIMESTAMP
+        };
+        db.ref(`users/${user.id}`).update(userData).catch(error => console.error("Kullanıcı kaydı/güncellemesi hatası:", error));
+    }
+
+    function updateProfileInfo(user) {
+        if (user) {
+            document.getElementById('profile-id').textContent = user.id || 'Yok';
+            document.getElementById('profile-name').textContent = `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Bilinmiyor';
+            document.getElementById('profile-username').textContent = user.username ? `@${user.username}` : 'Yok';
+        }
+    }
+
+    function fetchRealtimeData() {
+        if (!db) return; 
+        db.ref('pdf/count').on('value', (snapshot) => {
+            document.getElementById('pdfCount').textContent = snapshot.val() !== null ? snapshot.val().toLocaleString('tr-TR') : "0";
+        });
+        ['ortak', 'test'].forEach(chatKey => {
+             db.ref(`chats/${chatKey}`).on('value', snap => {
+                const data = snap.val();
+                const lastMsgEl = document.getElementById(`lastMsg${chatKey.charAt(0).toUpperCase() + chatKey.slice(1)}`);
+                const timeEl = document.getElementById(`time${chatKey.charAt(0).toUpperCase() + chatKey.slice(1)}`);
+                if (lastMsgEl) lastMsgEl.textContent = data && data.lastMessage ? data.lastMessage : 'Yeni mesaj yok.';
+                if (timeEl) timeEl.textContent = data && data.time ? data.time : '---';
+            });
+        });
+    }
+
+    function fetchPDFList() {
+        if (!db) return; 
+        const listElement = document.getElementById('pdfDownloadList');
+        listElement.innerHTML = '<div style="padding: 15px; text-align: center; color: var(--tg-theme-hint-color);">PDF\'ler yükleniyor...</div>';
+        db.ref('pdf/files').limitToLast(15).on('value', (snapshot) => {
+            listElement.innerHTML = '';
+            const files = snapshot.val();
+            if (!files) {
+                listElement.innerHTML = '<div style="padding: 15px; text-align: center; color: var(--tg-theme-hint-color);">Henüz yüklenmiş PDF yok.</div>';
+                return;
+            }
+            const fileKeys = Object.keys(files).reverse();
+            fileKeys.forEach(key => {
+                const file = files[key];
+                const listItem = document.createElement('a');
+                listItem.href = file.url;
+                listItem.target = '_blank';
+                listItem.classList.add('list-item');
+                listItem.innerHTML = `
+                    <div class="list-icon" style="background-color: #FF3B30;"><i class="fas fa-file-pdf"></i></div>
+                    <div class="list-info">
+                        <div class="list-name">${file.name}</div>
+                        <div class="list-detail">Yükleyen: ${file.uploadedBy || 'Bilinmiyor'}</div>
+                    </div>
+                    <div class="list-meta" style="color: var(--tg-theme-link-color);"><i class="fas fa-download"></i> İndir</div>
+                `;
+                listElement.appendChild(listItem);
+            });
+        });
+    }
+
+    function handleSearch() {
+        const searchText = document.getElementById('searchInput').value.trim();
+        const statusElement = document.getElementById('searchStatus');
+        const userId = currentUser ? currentUser.id : null;
+
+        statusElement.textContent = '';
+        statusElement.style.color = 'inherit';
+
+        if (!searchText) {
+            statusElement.textContent = '⚠️ Lütfen bir arama terimi girin.';
+            statusElement.style.color = '#FF3B30';
+            setTimeout(() => { statusElement.textContent = ''; }, 3000);
+            return;
+        }
+
+        statusElement.textContent = `⏳ "${searchText}" aranıyor...`;
+        statusElement.style.color = '#007AFF';
+
+        if (userId) {
+            db.ref(`searches/history/${userId}`).push({
+                term: searchText,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            });
+        }
+        
+        const sanitizedTerm = searchText.toLowerCase().replace(/[.#$\[\]\/]/g, "_");
+        const popularRef = db.ref(`searches/popular/${sanitizedTerm}`);
+
+        popularRef.transaction((currentData) => {
+            if (currentData === null) {
+                return { term: searchText, count: 1 };
+            } else {
+                currentData.count = (currentData.count || 0) + 1;
+                return currentData;
+            }
+        });
+
+        setTimeout(() => {
+            statusElement.textContent = `✅ "${searchText}" için 3 sonuç bulundu (Arama geçmişinize kaydedildi).`;
+            statusElement.style.color = '#34C759';
+            fetchSearchData();
+            document.getElementById('searchInput').value = ''; 
+        }, 1500);
+
+        setTimeout(() => { statusElement.textContent = ''; }, 5000);
+    }
+
+    function fetchSearchData() {
+        if (!db) return;
+
+        const historyList = document.getElementById('searchHistoryList');
+        const popularList = document.getElementById('popularSearchesList');
+        const userId = currentUser ? currentUser.id : null;
+
+        historyList.innerHTML = '<div style="padding: 15px; text-align: center; color: var(--tg-theme-hint-color);">Arama geçmişi yükleniyor...</div>';
+        popularList.innerHTML = '<div style="padding: 15px; text-align: center; color: var(--tg-theme-hint-color);">Popüler aramalar yükleniyor...</div>';
+        
+        if (userId) {
+             db.ref(`searches/history/${userId}`).limitToLast(5).on('value', (snapshot) => {
+                historyList.innerHTML = '';
+                const history = snapshot.val();
+                if (!history) {
+                    historyList.innerHTML = '<div style="padding: 15px; text-align: center; color: var(--tg-theme-hint-color);">Henüz arama yapmadınız.</div>';
+                    return;
+                }
+                const keys = Object.keys(history).reverse();
+                keys.forEach(key => {
+                    const item = history[key];
+                    const listItem = createSearchListItem(item.term, new Date(item.timestamp).toLocaleTimeString('tr-TR', {hour: '2-digit', minute:'2-digit'}), 'fas fa-history');
+                    historyList.appendChild(listItem);
+                });
+             });
+        } else {
+             historyList.innerHTML = '<div style="padding: 15px; text-align: center; color: var(--tg-theme-hint-color);">Giriş yapmadan geçmişe erişilemez.</div>';
+        }
+
+        db.ref('searches/popular').orderByChild('count').limitToLast(5).on('value', (snapshot) => {
+            popularList.innerHTML = '';
+            const popular = snapshot.val();
+            if (!popular) {
+                popularList.innerHTML = '<div style="padding: 15px; text-align: center; color: var(--tg-theme-hint-color);">Popüler arama bulunamadı.</div>';
+                return;
+            }
+            const popularArray = Object.values(popular).sort((a, b) => b.count - a.count);
+            
+            popularArray.forEach((item, index) => {
+                const listItem = createSearchListItem(item.term, `Tekrar: ${item.count}`, 'fas fa-chart-line', index + 1);
+                popularList.appendChild(listItem);
+            });
+        });
+    }
+    
+    function createSearchListItem(name, detail, iconClass, rank = null) {
+        const div = document.createElement('div');
+        div.classList.add('list-item');
+        div.style.cursor = 'pointer'; 
+        div.onclick = () => { document.getElementById('searchInput').value = name; handleSearch(); };
+
+        let iconColor = '#999999';
+        if (rank === 1) iconColor = '#FFD700'; 
+        else if (rank === 2) iconColor = '#C0C0C0'; 
+        else if (rank === 3) iconColor = '#CD7F32';
+        
+        const rankContent = rank ? `<span style="color: black;">${rank}</span>` : `<i class="${iconClass}"></i>`;
+
+        div.innerHTML = `
+            <div class="list-icon" style="background-color: ${iconColor}; font-weight: 700; font-size: ${rank ? '16px' : '15px'};">
+               ${rankContent}
+            </div>
+            <div class="list-info">
+                <div class="list-name">${name}</div>
+                <div class="list-detail">${detail}</div>
+            </div>
+        `;
+        return div;
+    }
+
+
+    function fetchUserList() {
+        if (!db) return;
+
+        const userListEl = document.getElementById('userListAdmin');
+        userListEl.innerHTML = '<div style="padding: 15px; text-align: center; color: var(--tg-theme-hint-color);">Kullanıcı listesi çekiliyor...</div>';
+
+        db.ref('users').limitToLast(20).on('value', (snapshot) => {
+            userListEl.innerHTML = '';
+            const users = snapshot.val();
+            if (!users) {
+                userListEl.innerHTML = '<div style="padding: 15px; text-align: center; color: var(--tg-theme-hint-color);">Kayıtlı kullanıcı bulunamadı.</div>';
+                return;
+            }
+
+            const userKeys = Object.keys(users).reverse();
+            userKeys.forEach(key => {
+                const user = users[key];
+                const listItem = document.createElement('div');
+                listItem.classList.add('list-item');
+
+                const name = user.first_name || 'Bilinmiyor';
+                const detail = user.username ? `@${user.username}` : `ID: ${key}`;
+                const iconBg = user.is_admin ? '#FF6347' : '#007AFF';
+
+                listItem.innerHTML = `
+                    <div class="list-icon" style="background-color: ${iconBg};"><i class="fas fa-${user.is_admin ? 'user-shield' : 'user'}"></i></div>
+                    <div class="list-info">
+                        <div class="list-name">${name} ${user.last_name || ''}</div>
+                        <div class="list-detail">${detail}</div>
+                    </div>
+                    <div class="list-meta">${user.is_admin ? 'ADMIN' : 'Kullanıcı'}</div>
+                `;
+                userListEl.appendChild(listItem);
+            });
+
+        });
+    }
+    
+    function uploadPDF() {
+        if (!storage || !db) {
+             document.getElementById('uploadStatus').textContent = "❌ Firebase başlatılamadı!";
+             document.getElementById('uploadStatus').style.color = '#FF3B30';
+             return;
+        }
+
+        const pdfFile = document.getElementById('pdfFile').files[0];
+        const pdfName = document.getElementById('pdfName').value.trim();
+        const uploadStatus = document.getElementById('uploadStatus');
+        const uploadButton = document.getElementById('uploadButton');
+
+        if (!pdfFile || pdfFile.type !== 'application/pdf' || !pdfName) {
+            uploadStatus.textContent = "⚠️ Lütfen geçerli bir PDF dosyası seçin ve adını girin.";
+            uploadStatus.style.color = '#FF3B30';
+            return;
+        }
+
+        uploadButton.disabled = true;
+        uploadStatus.textContent = `⏳ ${pdfFile.name} yükleniyor...`;
+        uploadStatus.style.color = '#007AFF';
+
+        const fileName = `${Date.now()}_${pdfFile.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+        const storageRef = storage.ref(`pdfs/${fileName}`);
+        const uploadTask = storageRef.put(pdfFile);
+
+        uploadTask.on('state_changed', 
+            (snapshot) => {
+                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                uploadStatus.textContent = `⏳ Yükleniyor: ${progress.toFixed(0)}%`;
+            }, 
+            (error) => {
+                uploadStatus.textContent = `❌ Yükleme Başarısız: ${error.message}`;
+                uploadStatus.style.color = '#FF3B30';
+                uploadButton.disabled = false;
+            }, 
+            () => {
+                uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                    db.ref('pdf/files').push({
+                        name: pdfName,
+                        url: downloadURL,
+                        uploadedBy: (currentUser ? currentUser.username || currentUser.first_name : 'Admin'),
+                        timestamp: firebase.database.ServerValue.TIMESTAMP
+                    }).then(() => {
+                        db.ref('pdf/count').transaction((currentCount) => {
+                            return (currentCount || 0) + 1;
+                        });
+
+                        uploadStatus.textContent = `✅ PDF başarıyla yüklendi ve kaydedildi!`;
+                        uploadStatus.style.color = '#34C759';
+                        document.getElementById('pdfFile').value = ''; 
+                        document.getElementById('pdfName').value = ''; 
+                        uploadButton.disabled = true;
+                        fetchPDFList();
+                    });
+                });
+            }
+        );
+    }
+</script>
+</body>
+</html>
