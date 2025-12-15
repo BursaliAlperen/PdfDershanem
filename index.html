@@ -326,7 +326,7 @@
         let currentUserId = null; 
 
         // #######################################################
-        // ##### 2. DOM VE REALTIME DB LOGİĞİ (ZAMAN AŞIMI EKLENDİ) #####
+        // ##### 2. DOM VE REALTIME DB LOGİĞİ (GÜVENLİK VE TIMEOUT KONTROLLÜ) #####
         // #######################################################
         document.addEventListener('DOMContentLoaded', function() {
             // DOM Elemanları
@@ -336,15 +336,18 @@
             const loadingStatus = document.getElementById('loadingStatus');
             const splashMessage = document.getElementById('splashMessage');
             
-            const bannerTop = document.getElementById('bannerTop');
-            const bannerTopText = document.getElementById('bannerTopText');
-            const bannerMid = document.getElementById('bannerMid');
-            const bannerMidText = document.getElementById('bannerMidText');
-            
             // --- A. Telegram ID Algılama ve Otomatik Giriş ---
 
             function startApp() {
                 let user;
+
+                // ⚠️ DÜZELTME: Firebase Başlatma Kontrolü
+                if (!db) {
+                    loadingStatus.classList.add('hidden');
+                    errorMessage.textContent = "FATAL HATA: Firebase veritabanı bağlantısı kurulamadı. Lütfen konsolu kontrol edin.";
+                    errorMessage.classList.remove('hidden');
+                    return; 
+                }
                 
                 try {
                     // Telegram Mini App (WebApp) kullanıcı bilgilerini yakala
@@ -375,8 +378,8 @@
              */
             function startListeningForMembership(userId, userData) {
                 const userRef = db.ref(`users/${userId}`);
-                let isMemberChecked = false; // Kontrolün yapılıp yapılmadığını takip et
-                let isListening = true; // Dinlemeyi kontrol etme flag'i
+                let isMemberChecked = false;
+                let isListening = true; 
                 
                 // Botun kontrol etmesi için ilk kaydı oluştur/güncelle (Sinyal)
                 const initialUpdate = {
@@ -387,13 +390,13 @@
                     lastActive: firebase.database.ServerValue.TIMESTAMP
                 };
                 userRef.update(initialUpdate).catch(e => {
-                    console.log("RTDB'ye yazma denemesi kural hatası verdi:", e.message);
+                    console.log("RTDB'ye yazma denemesi kural hatası verdi (Normal olabilir, Bot yazacak):", e.message);
                 });
 
 
                 // Realtime dinleme başlat
                 userRef.on('value', (snapshot) => {
-                    if (!isListening) return; // Eğer zaman aşımı nedeniyle kapatıldıysa geri dön
+                    if (!isListening) return;
 
                     const data = snapshot.val();
                     
@@ -405,13 +408,13 @@
                         mainAppContent.classList.remove('hidden');
                         mainAppContent.style.display = 'flex'; 
                         fetchRealtimeData(); 
-                        userRef.off('value'); // Başarılı girişten sonra dinlemeyi kapat
+                        userRef.off('value'); 
                         
                     } else {
                         // ÜYE DEĞİL veya KONTROL GEREKİYOR: Giriş ekranını göster
                         mainAppContent.classList.add('hidden');
                         splashScreen.classList.remove('hidden');
-                        errorMessage.classList.add('hidden'); // Hata mesajını temizle
+                        errorMessage.classList.add('hidden'); 
 
                         if (data && data.status === 'checking') {
                             loadingStatus.classList.remove('hidden');
@@ -423,23 +426,31 @@
                             errorMessage.textContent = '⚠️ Üyelik doğrulanamadı. Lütfen kanala katıldığınızdan emin olun ve uygulamayı tekrar başlatın.';
                             errorMessage.classList.remove('hidden');
                             splashMessage.innerHTML = 'Bota giriş yapmak için kanala **katılmalısın**!';
-                            userRef.off('value'); // Kontrol sonucu geldiği için dinlemeyi kapat
+                            userRef.off('value'); 
                         } else {
-                             // isMember henüz ayarlanmadıysa veya ilk kez veriye bakılıyorsa
+                             // Veri bekleniyor (ilk verinin gelmediği durum)
                              loadingStatus.classList.remove('hidden');
-                             loadingStatus.innerHTML = '<i class="fas fa-sync fa-spin"></i> Veri bekleniyor... (Botun veriyi işlemesi bekleniyor)';
+                             loadingStatus.innerHTML = '<i class="fas fa-sync fa-spin"></i> Veri bekleniyor... (Bot veya Firebase bağlantısı bekleniyor)';
                         }
+                    }
+                }, (error) => { // ⚠️ DÜZELTME: Dinleme Hatası Yönetimi (Erişim reddedilirse)
+                    if (isListening) {
+                        isListening = false;
+                        loadingStatus.classList.add('hidden');
+                        errorMessage.textContent = `⚠️ Veritabanı Bağlantı Hatası: Veri okuma engellendi. Firebase kurallarını kontrol edin. Hata kodu: ${error.code}`;
+                        errorMessage.classList.remove('hidden');
+                        userRef.off('value'); 
                     }
                 });
 
                 // *** ZAMAN AŞIMI KONTROLÜ (TIMEOUT) ***
-                // 10 saniye içinde bot üyelik durumunu güncellemezse kullanıcıya hata göster.
+                // 10 saniye sonra hala yanıt gelmediyse hata göster.
                 setTimeout(() => {
                     if (!isMemberChecked && isListening) {
                         isListening = false;
-                        userRef.off('value'); // Dinlemeyi durdur
+                        userRef.off('value'); 
                         loadingStatus.classList.add('hidden');
-                        errorMessage.textContent = '⏱️ Zaman aşımı hatası: Üyelik kontrolü tamamlanamadı. Bu, botun Firebase verisini güncellemediği anlamına gelir. Lütfen botun çalışır durumda olduğundan emin olun ve uygulamayı tekrar başlatın.';
+                        errorMessage.textContent = '⏱️ Zaman aşımı hatası: Botun veritabanını güncellemesi bekleniyor. Lütfen botun çalıştığından emin olun ve uygulamayı yeniden başlatın.';
                         errorMessage.classList.remove('hidden');
                         splashMessage.innerHTML = 'Bir sorun oluştu. Lütfen botun çalışıp çalışmadığını kontrol edip tekrar deneyin.';
                     }
@@ -453,26 +464,49 @@
             // --- B. Dinamik Uygulama Verileri Çekme Fonksiyonları (RTDB) ---
             
             function fetchRealtimeData() {
-                // Bu fonksiyon, sadece ana uygulama açıldığında çalışır.
                 const pdfCountElement = document.getElementById('pdfCount');
                 db.ref('pdf/count').on('value', (snapshot) => {
                     pdfCountElement.textContent = snapshot.val() !== null ? snapshot.val() : "0";
                 });
                 
-                // Diğer veri çekme işlemleri...
+                const bannerTopText = document.getElementById('bannerTopText');
+                const bannerMidText = document.getElementById('bannerMidText');
+                db.ref('config/banners').on('value', (snapshot) => {
+                    const banners = snapshot.val();
+                    if (banners) {
+                        if (banners.top && banners.top.text) bannerTopText.textContent = banners.top.text;
+                        if (banners.mid && banners.mid.text) bannerMidText.textContent = banners.mid.text;
+                    }
+                });
+                
+                // Chat verilerini çekme (Ortak Sohbet)
                 db.ref('chats/ortak/lastMessage').on('value', snap => {
                     document.getElementById('lastMsgOrtak').textContent = snap.val() || 'Yeni mesaj yok.';
                 });
                 db.ref('chats/ortak/time').on('value', snap => {
                     document.getElementById('timeOrtak').textContent = snap.val() || '---';
                 });
-                // ... ve diğer chat verileri...
                 
+                // Chat verilerini çekme (Test Grubu)
+                db.ref('chats/test/lastMessage').on('value', snap => {
+                    document.getElementById('lastMsgTest').textContent = snap.val() || 'Yeni mesaj yok.';
+                });
+                db.ref('chats/test/time').on('value', snap => {
+                    document.getElementById('timeTest').textContent = snap.val() || '---';
+                });
+
+                // Chat verilerini çekme (Duyuru Kanalı)
+                db.ref('chats/duyuru/lastMessage').on('value', snap => {
+                    document.getElementById('lastMsgDuyuru').textContent = snap.val() || 'Yeni duyuru yok.';
+                });
+                db.ref('chats/duyuru/time').on('value', snap => {
+                    document.getElementById('timeDuyuru').textContent = snap.val() || '---';
+                });
             }
         });
     </script>
     <script>
-        // Diğer Arayüz İşlevselliği
+        // Navigasyon tıklama olayları
         document.querySelectorAll('.nav-item').forEach(item => {
             item.addEventListener('click', function() {
                 document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
