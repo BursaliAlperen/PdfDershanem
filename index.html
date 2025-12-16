@@ -638,7 +638,7 @@
     }
     
     // #############################
-    // ##### GÜNCELLENMİŞ ÜYELİK KONTROL LOGİĞİ (GERÇEK API İSTEĞİ) #####
+    // ##### GÜNCELLENMİŞ ÜYELİK KONTROL LOGİĞİ (HATA DÜZELTMELİ) #####
     // #############################
     
     window.checkChannelMembership = function() {
@@ -648,8 +648,11 @@
             return;
         }
         
-        if (window.Telegram && Telegram.WebApp) {
-             Telegram.WebApp.showProgress(true);
+        // DÜZELTME: Hata veren showProgress yerine MainButton'ı kullan
+        if (window.Telegram && Telegram.WebApp && Telegram.WebApp.MainButton) {
+            Telegram.WebApp.MainButton.setText('Erişim Kontrol Ediliyor...');
+            Telegram.WebApp.MainButton.show();
+            Telegram.WebApp.MainButton.showProgress(true); // BU ARTIK ÇALIŞMALI
         }
         
         fetch(CHECK_MEMBERSHIP_ENDPOINT, {
@@ -672,8 +675,10 @@
             return response.json();
         })
         .then(data => {
-            if (window.Telegram && Telegram.WebApp) {
-                 Telegram.WebApp.showProgress(false);
+            // İlerleme çubuğunu ve MainButton'ı gizle
+            if (window.Telegram && Telegram.WebApp && Telegram.WebApp.MainButton) {
+                 Telegram.WebApp.MainButton.showProgress(false);
+                 Telegram.WebApp.MainButton.hide();
             }
             
             // Backend'den gelen is_member cevabına göre kontrol
@@ -696,8 +701,12 @@
             loginButton.disabled = !termsCheckbox.checked || !isChannelMember;
         })
         .catch(error => {
+            // Hata durumunda ilerleme çubuğunu ve MainButton'ı gizle
+            if (window.Telegram && Telegram.WebApp && Telegram.WebApp.MainButton) {
+                 Telegram.WebApp.MainButton.showProgress(false);
+                 Telegram.WebApp.MainButton.hide();
+            }
             if (window.Telegram && Telegram.WebApp) {
-                 Telegram.WebApp.showProgress(false);
                  Telegram.WebApp.showAlert(`Bağlantı Hatası: ${error.message}`);
             }
             console.error("API hatası:", error);
