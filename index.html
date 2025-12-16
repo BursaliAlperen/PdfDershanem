@@ -319,6 +319,13 @@
             pointer-events: none !important; 
             display: none !important;
         }
+        .modal-content {
+             max-width: 350px; 
+             padding: 18px; 
+             background-color: var(--secondary-color); 
+             border-radius: var(--card-radius); 
+             box-shadow: var(--shadow-modern);
+        }
         
         /* Admin Paneli */
         #page-admin-instance {
@@ -674,13 +681,13 @@
                     <input type="text" id="pdfTitle" placeholder="1. PDF Başlığını Girin (Örn: TYT Matematik)" style="width: 100%; padding: 8px; margin-bottom: 8px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: var(--background-color); color: var(--text-color); font-size: 13px;">
                     <input type="url" id="pdfUrl" placeholder="2. PDF İndirme URL'sini Yapıştırın (Dropbox)" style="width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: var(--background-color); color: var(--text-color); font-size: 13px;">
                     
-                    <div class="list-section-title" style="padding: 0; margin: 0 0 8px 0; color: var(--text-color); font-size: 13px;">3. Zorunlu Reklam Sayısı (PDF indirmek için)</div>
-                    <input type="number" id="requiredAds" min="0" max="20" value="10" placeholder="PDF için zorunlu reklam sayısı (Örn: 10)" style="width: 100%; padding: 8px; margin-bottom: 15px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: var(--background-color); color: var(--text-color); font-size: 13px;">
+                    <div class="list-section-title" style="padding: 0; margin: 0 0 8px 0; color: var(--text-color); font-size: 13px;">3. Zorunlu Reklam Sayısı (20-50 arası olmalı)</div>
+                    <input type="number" id="requiredAds" min="20" max="50" value="20" placeholder="PDF için zorunlu reklam sayısı (20 ile 50 arası)" style="width: 100%; padding: 8px; margin-bottom: 15px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: var(--background-color); color: var(--text-color); font-size: 13px;">
                     
                     <button class="action-button" id="uploadPdfButton" onclick="uploadPDF()" style="font-size: 14px; padding: 9px 16px;">PDF Kaydını Ekle</button>
                 </div>
                 
-                <div class="list-section-title">MEVCUT PDF LİSTESİ</div>
+                <div class="list-section-title">MEVCUT PDF LİSTESİ (Sabitleme ve Silme)</div>
                 <div class="list-card" id="adminPdfList">
                     <div style="padding: 15px; text-align: center; color: var(--hint-color); font-size: 13px;">Mevcut PDF'ler yükleniyor...</div>
                 </div>
@@ -709,15 +716,28 @@
     </div>
     
     <div class="modal-overlay hidden" id="errorModal">
-        <div class="modal-content" style="max-width: 350px; padding: 18px; background-color: var(--secondary-color); border-radius: var(--card-radius); box-shadow: var(--shadow-modern);">
+        <div class="modal-content">
             <h3 id="errorModalTitle" style="color: #FF3B30; font-size: 16px;"><span class="material-symbols-rounded" style="font-size: 20px; vertical-align: middle;">warning</span> Hata!</h3>
             <p id="errorModalMessage" style="font-size: 13px;"></p>
             <button onclick="document.getElementById('errorModal').classList.add('hidden')" class="action-button" style="background-color: #FF9500; font-size: 13px; padding: 8px 16px; margin-top: 10px;">Tamam</button>
         </div>
     </div>
 
+    <div class="modal-overlay hidden" id="pinningModal">
+        <div class="modal-content">
+            <h3 style="font-size: 16px;">PDF Sabitleme Etiketi Seç</h3>
+            <p id="pinModalPdfTitle" style="font-size: 13px; color: var(--hint-color); margin-top: 5px; margin-bottom: 15px; font-weight: 600;"></p>
+            
+            <div id="pinningTagContainer" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px;">
+                </div>
+
+            <button id="unpinButton" class="action-button" onclick="setPinTag(null)" style="background-color: #FF3B30; font-size: 13px; padding: 8px 16px; margin-top: 10px;">Sabitlemeyi Kaldır</button>
+            <button onclick="document.getElementById('pinningModal').classList.add('hidden')" class="action-button" style="background-color: var(--tg-theme-hint-color); font-size: 13px; padding: 8px 16px; margin-top: 10px;">İptal</button>
+        </div>
+    </div>
+
     <div class="modal-overlay hidden" id="adProgressModal">
-        <div class="modal-content" style="max-width: 350px; padding: 20px; background-color: var(--secondary-color); border-radius: var(--card-radius); box-shadow: var(--shadow-modern); text-align: center;">
+        <div class="modal-content" style="text-align: center;">
             <h3 id="progressModalTitle" style="margin-top: 0; font-size: 18px; color: var(--primary-color);">İndirme Başlatılıyor...</h3>
             <p id="progressModalFileName" style="font-size: 14px; margin-bottom: 15px;"></p>
             
@@ -728,7 +748,7 @@
             </div>
             
             <button id="watchAdButton" class="action-button" onclick="handleWatchAdClick()">
-                Reklam İzle ve İlerle (1/10)
+                Reklam İzle ve İlerle (1/20)
             </button>
             
             <button id="downloadButton" class="action-button hidden" onclick="finalizeDownload()" style="background-color: #34C759; margin-top: 10px;">
@@ -811,6 +831,15 @@
         'notlar': 'Özet Notlar',
         'diger': 'Diğer'
     };
+    
+    // YENİ: Sabitleme Etiketleri Sözlüğü
+    const PIN_TAGS = {
+        'admin': 'Yönetici Seçimi',
+        'populer': 'Popüler',
+        'en_cok_aranan': 'En Çok Aranan',
+        'sadece_bizde_olan': 'Sadece Bizde Olan'
+    };
+    let currentPinningPdfKey = null; // Sabitleme modal'ı için aktif PDF anahtarı
     
     // #############################
     // ##### NİHAİ SÖZLÜK: KISALTMA, YAZIM VE ÖZEL İSİM TAMAMLAMA #####
@@ -1478,6 +1507,16 @@
 
         // 2. SIRALAMA
         pdfsArray.sort((a, b) => {
+            // ÖNCELİK SIRALAMASI: Sabitlenmiş PDF'leri en üste taşı
+            const pinA = a.pinned_tag ? 1 : 0;
+            const pinB = b.pinned_tag ? 1 : 0;
+            
+            // Sabitlenmiş (pinned_tag: 1) olanlar, sabitlenmemiş (pinned_tag: 0) olanlardan önce gelsin (1-0 = 1, yani b önce)
+            if (pinB - pinA !== 0) {
+                return pinB - pinA;
+            }
+
+            // Normal sıralama mantığı
             if (currentSort === 'newest') {
                 return (b.created_at || 0) - (a.created_at || 0); // En Yeni (Büyükten Küçüğe)
             } else if (currentSort === 'oldest') {
@@ -1506,7 +1545,7 @@
             listCard.classList.add('list-card');
 
             pdfsArray.forEach(pdf => {
-                const { key, title, url, required_ads, downloads } = pdf;
+                const { key, title, url, required_ads, downloads, pinned_tag } = pdf;
 
                 const safeTitle = (title || '').replace(/'/g, "\\'");
                 const safeUrl = (url || '').replace(/'/g, "\\'");
@@ -1528,7 +1567,12 @@
                     metaText = 'Ücretsiz İndir';
                 }
                 
-                const hostIconHtml = getHostIconHtml(url); // YENİ: Host İkonunu al
+                const hostIconHtml = getHostIconHtml(url); 
+                
+                // Sabitlenme etiketi
+                const pinTagHtml = pinned_tag ? 
+                    `<span style="background-color: #FF9500; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-left: 8px;">${PIN_TAGS[pinned_tag] || 'Sabit'}</span>` 
+                    : '';
 
                 const item = document.createElement('div');
                 item.classList.add('list-item');
@@ -1539,6 +1583,7 @@
                     <div class="list-info" style="flex-grow: 1;">
                         <div class="list-name-container">
                             <div class="list-name">${title}</div>
+                            ${pinTagHtml}
                             ${hostIconHtml} 
                         </div>
                         <div class="list-detail">${metaText} - İndirme: ${downloads || 0}</div>
@@ -1614,8 +1659,9 @@
             return;
         }
 
-        if (isNaN(requiredAds) || requiredAds < 0 || requiredAds > 20) {
-             showErrorModal("Geçersiz Reklam Sayısı", "Zorunlu reklam sayısı 0 ile 20 arasında olmalıdır.");
+        // REKLAM LİMİTİ KONTROLÜ: 20 ile 50 arasında olmalı.
+        if (isNaN(requiredAds) || requiredAds < 20 || requiredAds > 50) {
+             showErrorModal("Geçersiz Reklam Sayısı", "Zorunlu reklam sayısı 20 ile 50 arasında olmalıdır.");
              return;
         }
         
@@ -1640,7 +1686,7 @@
             if (window.Telegram && Telegram.WebApp) Telegram.WebApp.showAlert("PDF başarıyla eklendi!");
             document.getElementById('pdfTitle').value = '';
             document.getElementById('pdfUrl').value = '';
-            document.getElementById('requiredAds').value = '10'; 
+            document.getElementById('requiredAds').value = '20'; // Varsayılanı 20'ye çektik
             fetchAdminPdfList();
             updatePdfTitleFromUrl(); // PlaceHolder'ı temizle
         }).catch(e => {
@@ -1648,6 +1694,51 @@
         });
     }
     
+    // YENİ FONKSİYON: Sabitleme Modal'ını Açma
+    window.openPinningModal = function(key, title, currentTag) {
+        if (!is_admin) return;
+        
+        currentPinningPdfKey = key;
+        document.getElementById('pinModalPdfTitle').textContent = `Sabitlenecek PDF: ${title}`;
+        
+        const container = document.getElementById('pinningTagContainer');
+        container.innerHTML = '';
+        
+        for (const tagKey in PIN_TAGS) {
+            const tagText = PIN_TAGS[tagKey];
+            const button = document.createElement('button');
+            button.classList.add('action-button');
+            button.style.cssText = `width: auto; flex-grow: 1; font-size: 13px; padding: 8px 10px; margin: 0; background-color: ${currentTag === tagKey ? 'var(--primary-color)' : 'var(--background-color)'}; color: ${currentTag === tagKey ? 'white' : 'var(--text-color)'}; border: 1px solid ${currentTag === tagKey ? 'var(--primary-color)' : 'var(--border-color)'};`;
+            button.textContent = tagText;
+            button.setAttribute('onclick', `setPinTag('${tagKey}')`);
+            container.appendChild(button);
+        }
+        
+        document.getElementById('unpinButton').style.display = currentTag ? 'block' : 'none';
+
+        document.getElementById('pinningModal').classList.remove('hidden');
+    }
+
+    // YENİ FONKSİYON: Sabitleme Etiketini Kaydetme
+    window.setPinTag = function(tag) {
+        if (!currentPinningPdfKey || !is_admin) return;
+        
+        const updates = {};
+        // Eğer tag null ise veya 'null' stringi gelirse (Sabitlemeyi Kaldır butonu için)
+        updates['pinned_tag'] = (tag === 'null' || tag === null) ? null : tag; 
+        
+        db.ref('pdfs/' + currentPinningPdfKey).update(updates)
+            .then(() => {
+                const tagMessage = (tag === 'null' || tag === null) ? 'Sabitleme kaldırıldı.' : `'${PIN_TAGS[tag]}' olarak sabitlendi!`;
+                if (window.Telegram && Telegram.WebApp) Telegram.WebApp.showAlert(tagMessage);
+                document.getElementById('pinningModal').classList.add('hidden');
+                fetchAdminPdfList();
+                fetchPDFList(); 
+            })
+            .catch(e => showErrorModal("Sabitleme Hatası", e.message));
+    }
+
+
     window.fetchAdminPdfList = function() {
         const listContainer = document.getElementById('adminPdfList');
         if (!listContainer || !db) return;
@@ -1666,6 +1757,7 @@
             const sortedKeys = Object.keys(pdfs).sort((a, b) => {
                 const downloadsA = pdfs[a].downloads || 0;
                 const downloadsB = pdfs[b].downloads || 0;
+                // İndirmeye göre azalan sıralama
                 return downloadsB - downloadsA; 
             });
 
@@ -1679,18 +1771,26 @@
 
                     const adsText = pdf.required_ads > 0 ? `(${pdf.required_ads} Reklam)` : '(Ücretsiz)';
                     const hostIconHtml = getHostIconHtml(pdf.url);
+                    
+                    // YENİ: Sabitleme Durumu
+                    const currentTag = pdf.pinned_tag;
+                    const pinTagText = currentTag ? `<span style="color: #FF9500; font-weight: 700; margin-left: 5px;">[${PIN_TAGS[currentTag] || 'Sabit'}]</span>` : '';
+                    const pinButtonColor = currentTag ? '#FF9500' : '#007AFF';
+                    const safeTitle = (pdf.title || '').replace(/'/g, "\\'");
+
 
                     item.innerHTML = `
                         <div class="list-icon pdf-icon-bg"><span class="material-symbols-rounded">picture_as_pdf</span></div>
                         <div class="list-info" style="flex-grow: 1; max-width: calc(100% - 150px);">
                             <div class="list-name-container">
-                                <div class="list-name">${pdf.title} ${adsText}</div>
+                                <div class="list-name">${pdf.title} ${adsText} ${pinTagText}</div> 
                                 ${hostIconHtml}
                             </div>
                             <div class="list-detail">İndirme: ${pdf.downloads || 0} - Eklenme: ${pdf.created_at ? new Date(pdf.created_at).toLocaleDateString() : 'Bilinmiyor'}</div>
                         </div>
-                        <div class="list-meta" style="flex-shrink: 0; margin-left: auto;">
-                             <button style="background-color: #FF3B30; color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 12px; cursor: pointer;" onclick="deletePdf('${key}', '${(pdf.title || '').replace(/'/g, "\\'")}')">Sil</button>
+                        <div class="list-meta" style="flex-shrink: 0; margin-left: auto; display: flex; gap: 5px;">
+                             <button style="background-color: ${pinButtonColor}; color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 12px; cursor: pointer;" onclick="openPinningModal('${key}', '${safeTitle}', '${currentTag}')">Sabitle</button>
+                             <button style="background-color: #FF3B30; color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 12px; cursor: pointer;" onclick="deletePdf('${key}', '${safeTitle}')">Sil</button>
                         </div>
                     `;
                     listContainer.appendChild(item);
