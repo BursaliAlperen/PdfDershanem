@@ -256,6 +256,7 @@
             color: var(--primary-color); 
             flex-shrink: 0; 
             margin-left: auto; 
+            text-align: right;
         }
         .action-button { 
             background-color: var(--primary-color); 
@@ -349,6 +350,20 @@
             background-color: var(--secondary-color);
             border-bottom: 1px solid var(--border-color);
             margin-bottom: 10px;
+        }
+
+        /* İlerleme Çubuğu Stili */
+        .progress-bar {
+            height: 4px;
+            background-color: var(--background-color);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: #34C759; /* Yeşil renk */
+            transition: width 0.3s ease;
         }
     </style>
 </head>
@@ -566,6 +581,31 @@
         </div>
     </div>
 
+    <div class="modal-overlay hidden" id="adProgressModal">
+        <div class="modal-content" style="max-width: 350px; padding: 20px; background-color: var(--secondary-color); border-radius: var(--card-radius); box-shadow: var(--shadow-modern); text-align: center;">
+            <h3 id="progressModalTitle" style="margin-top: 0; font-size: 18px; color: var(--primary-color);">İndirme Başlatılıyor...</h3>
+            <p id="progressModalFileName" style="font-size: 14px; margin-bottom: 15px;"></p>
+            
+            <p id="progressModalStatus" style="font-size: 13px; font-weight: 600; margin: 0 0 8px 0; color: #34C759;"></p>
+            
+            <div class="progress-bar" style="margin-bottom: 20px;">
+                <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+            </div>
+            
+            <button id="watchAdButton" class="action-button" onclick="handleWatchAdClick()">
+                Reklam İzle ve İlerle (1/10)
+            </button>
+            
+            <button id="downloadButton" class="action-button hidden" onclick="finalizeDownload()" style="background-color: #34C759; margin-top: 10px;">
+                PDF'i İndir!
+            </button>
+            
+            <button onclick="closeProgressModal()" class="action-button" style="background-color: var(--tg-theme-hint-color); font-size: 13px; padding: 8px 16px; margin-top: 15px;">
+                İptal Et ve Geri Dön
+            </button>
+        </div>
+    </div>
+
     <div class="bottom-nav">
         <div class="nav-item active" data-tab="home" id="navHomeButton">
             <span class="material-symbols-rounded">home</span>
@@ -608,9 +648,16 @@
     let db;
     let currentUser = null; 
     let is_admin = false;
-    let isChannelMember = true; // KANAL KONTROLÜ KALDIRILDIĞI İÇİN HER ZAMAN TRUE
+    let isChannelMember = true; // Kanal kontrolü kaldırıldığı için her zaman TRUE
     
-    let pendingDownload = { key: null, name: null, url: null, required_ads: 0 }; 
+    // Şu anda işlenen PDF bilgileri
+    let currentPdf = { 
+        key: null, 
+        title: null, 
+        url: null, 
+        required_ads: 0,
+        watched_ads: 0 // Kullanıcının o PDF için izlediği reklam sayısı
+    }; 
 
     function initializeApp() {
         const loadingStatus = document.getElementById('loadingStatus');
@@ -655,8 +702,6 @@
         }
     }
     
-    // KANAL KONTROLÜ İLE İLGİLİ checkChannelMembership fonksiyonu TAMAMEN KALDIRILDI.
-    
     // #############################
     // ##### AVATAR VE RENK FONKSİYONLARI #####
     // #############################
@@ -696,116 +741,174 @@
     }
     
     // #############################
-    // ##### REKLAM İZLEME SİSTEMİ #####
+    // ##### REKLAM İZLEME VE İNDİRME SİSTEMİ #####
     // #############################
     
-    window.watchAdAndProceed = function() {
-        return new Promise((resolve, reject) => {
-            
-            if (window.showAdexora) {
-                
-                if (window.Telegram && Telegram.WebApp) {
-                    Telegram.WebApp.showPopup({
-                        title: "Reklam Hazırlanıyor",
-                        message: `PDF kilidini açmak için ${pendingDownload.required_ads} reklam daha izlenmeli. Lütfen ekrandaki reklamı bekleyin ve izleyin.`,
-                        buttons: [{ id: 'ok', text: 'Tamam' }]
-                    });
-                }
-                
-                window.showAdexora()
-                    .then(() => {
-                        if (pendingDownload.required_ads > 0) {
-                            pendingDownload.required_ads--;
-                        }
-                        resolve();
-                    })
-                    .catch(e => {
-                        const errorMessage = `Reklam izleme görevi tamamlanamadı. Lütfen tekrar deneyin. (Hata: ${e.message || 'Bilinmeyen Hata'})`;
-                        
-                        if (window.Telegram && Telegram.WebApp) {
-                            Telegram.WebApp.showAlert(`GÖREV BAŞARISIZ: ${errorMessage}`);
-                        } else {
-                            console.error("Adexora Reklam Hatası:", e);
-                            showErrorModal("Reklam İzleme Hatası", errorMessage);
-                        }
-                        reject(new Error(errorMessage));
-                    });
-            } else {
-                if (window.Telegram && Telegram.WebApp) {
-                     Telegram.WebApp.showConfirm(`UYARI: Reklam servisi yüklenemedi. Test amacıyla reklamı atlayıp devam etmek ister misunuz?`, (ok) => {
-                         if (ok) {
-                             if (pendingDownload.required_ads > 0) {
-                                pendingDownload.required_ads--;
-                             }
-                             resolve(); 
-                         } else {
-                             reject(new Error("Reklam servisi kullanılamıyor."));
-                         }
-                     });
-                } else {
-                    console.warn("Adexora reklam servisi yüklenemedi. Test amaçlı atlanıyor.");
-                    if (pendingDownload.required_ads > 0) {
-                        pendingDownload.required_ads--;
-                    }
-                    resolve();
-                }
-            }
+    window.openProgressModal = function(key, title, url, requiredAds) {
+        if (!currentUser) return;
+
+        currentPdf.key = key;
+        currentPdf.title = title;
+        currentPdf.url = url;
+        currentPdf.required_ads = requiredAds;
+        currentPdf.watched_ads = 0; // Başlangıçta 0 varsayılır
+        
+        // Modal elemanlarını güncelle
+        document.getElementById('progressModalTitle').textContent = "İndirme Gereksinimleri";
+        document.getElementById('progressModalFileName').textContent = `PDF: ${title}`;
+        document.getElementById('downloadButton').classList.add('hidden');
+        document.getElementById('watchAdButton').classList.remove('hidden');
+
+        // Kullanıcının daha önce izlediği reklam sayısını Firebase'den çek
+        const userPdfRef = db.ref(`users/${currentUser.id}/pdf_progress/${key}`);
+        userPdfRef.once('value').then(snapshot => {
+            const progress = snapshot.val();
+            currentPdf.watched_ads = (progress && progress.watched_ads) ? progress.watched_ads : 0;
+            updateProgressModalUI();
+            document.getElementById('adProgressModal').classList.remove('hidden');
+        }).catch(e => {
+            console.error("Reklam ilerlemesi çekilemedi:", e);
+            updateProgressModalUI();
+            document.getElementById('adProgressModal').classList.remove('hidden');
         });
     }
 
-    window.finalizeDownload = function(name, url, key) {
-         if (!url) return;
-         
-         db.ref('pdfs/' + key).child('downloads').transaction((current) => {
-             return (current || 0) + 1;
-         });
-         
-         window.open(url, '_blank');
-         
-         if (window.Telegram && Telegram.WebApp) {
-             Telegram.WebApp.showAlert(`İndirme başlatıldı: ${name}`);
-             Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-         }
-         
-         pendingDownload = { key: null, name: null, url: null, required_ads: 0 }; 
+    window.closeProgressModal = function() {
+        document.getElementById('adProgressModal').classList.add('hidden');
+        currentPdf = { key: null, title: null, url: null, required_ads: 0, watched_ads: 0 };
     }
     
-    window.handlePDFDownload = async function(key, name, url) {
-        if (!currentUser) return;
-        
-        const snapshot = await db.ref('pdfs/' + key).once('value');
-        const pdf = snapshot.val();
-        let requiredAds = pdf && pdf.required_ads ? parseInt(pdf.required_ads) : 10; 
-        
-        pendingDownload = { key, name, url, required_ads: requiredAds }; 
-        
-        if (requiredAds > 0) {
-            
-            while (pendingDownload.required_ads > 0) {
-                
-                try {
-                    await watchAdAndProceed(); 
-                    
-                    if (pendingDownload.required_ads > 0) {
-                        if (window.Telegram && Telegram.WebApp) {
-                             Telegram.WebApp.showAlert(`Tebrikler, bir reklam daha izlendi! Kalan reklam: ${pendingDownload.required_ads}`);
-                        }
-                    }
-                    
-                } catch (e) {
-                    console.warn("Reklam zinciri başarısız oldu, indirme iptal edildi.");
-                    return; 
-                }
-            }
-            
-            if (pendingDownload.required_ads === 0) {
-                finalizeDownload(name, url, key);
-            }
+    function updateProgressModalUI() {
+        const { required_ads, watched_ads, title } = currentPdf;
+        const remainingAds = required_ads - watched_ads;
+        const progressPercent = required_ads > 0 ? (watched_ads / required_ads) * 100 : 100;
 
+        document.getElementById('progressFill').style.width = `${progressPercent}%`;
+        
+        if (remainingAds <= 0) {
+            document.getElementById('progressModalStatus').textContent = "Tebrikler! İndirmeye hazırsınız.";
+            document.getElementById('watchAdButton').classList.add('hidden');
+            document.getElementById('downloadButton').classList.remove('hidden');
         } else {
-             finalizeDownload(name, url, key);
+            document.getElementById('progressModalStatus').textContent = `İlerleme: ${watched_ads} / ${required_ads} Reklam İzlediniz.`;
+            document.getElementById('watchAdButton').textContent = `Reklam İzle ve İlerle (${remainingAds} Tane Kaldı)`;
+            document.getElementById('watchAdButton').classList.remove('hidden');
+            document.getElementById('downloadButton').classList.add('hidden');
         }
     }
+
+    window.handleWatchAdClick = function() {
+        const adButton = document.getElementById('watchAdButton');
+        adButton.disabled = true;
+        adButton.textContent = "Reklam Yükleniyor...";
+        
+        if (window.showAdexora) {
+            // Adexora reklamını başlat
+            window.showAdexora()
+                .then(() => {
+                    // ✅ Reklam Başarıyla İzlenirse (Ödül Mantığı)
+                    adButton.textContent = "İlerleme Kaydediliyor...";
+
+                    if (currentPdf.watched_ads < currentPdf.required_ads) {
+                        currentPdf.watched_ads++;
+                    }
+
+                    // Firebase'e yeni ilerlemeyi kaydet
+                    db.ref(`users/${currentUser.id}/pdf_progress/${currentPdf.key}`).update({
+                        watched_ads: currentPdf.watched_ads,
+                        last_ad_watch: firebase.database.ServerValue.TIMESTAMP
+                    }).then(() => {
+                        updateProgressModalUI();
+                        if (window.Telegram && Telegram.WebApp) {
+                             Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+                        }
+                    }).catch(e => {
+                         showErrorModal("Veri Kayıt Hatası", "İzlenen reklam sayısı kaydedilemedi. " + e.message);
+                    });
+
+                    // UI'ı temizle ve butonu tekrar aktif et (eğer indirme hazır değilse)
+                    adButton.disabled = false;
+                    updateProgressModalUI();
+                    fetchPDFList(); // PDF listesini güncelle
+                    
+                })
+                .catch(e => {
+                    // ❌ Hata Durumu (Reklam Atlandı/Yüklenemedi)
+                    console.error("Adexora Reklam Hatası:", e);
+                    if (window.Telegram && Telegram.WebApp) {
+                         Telegram.WebApp.showAlert("Hata: Reklam izlenemedi veya atlandı. Lütfen tekrar deneyin.");
+                    } else {
+                         showErrorModal("Reklam Hatası", "Reklam yüklenirken bir sorun oluştu. Lütfen bağlantınızı kontrol edin.");
+                    }
+                    adButton.disabled = false;
+                    updateProgressModalUI();
+                });
+        } else {
+            // Adexora Yüklenmediyse (Simülasyon Değil, Güvenlik!)
+            const confirmMsg = "Reklam servisi yüklenemedi. Test amaçlı reklamı atlayıp bir ilerleme kaydetmek ister misiniz?";
+            if (window.Telegram && Telegram.WebApp) {
+                 Telegram.WebApp.showConfirm(confirmMsg, (ok) => {
+                     if (ok) {
+                          if (currentPdf.watched_ads < currentPdf.required_ads) {
+                            currentPdf.watched_ads++;
+                          }
+                          db.ref(`users/${currentUser.id}/pdf_progress/${currentPdf.key}`).update({
+                            watched_ads: currentPdf.watched_ads,
+                            last_ad_watch: firebase.database.ServerValue.TIMESTAMP
+                          }).then(() => {
+                             updateProgressModalUI();
+                             adButton.disabled = false;
+                             fetchPDFList();
+                          });
+                     } else {
+                        adButton.disabled = false;
+                        adButton.textContent = "Reklam İzle ve İlerle";
+                     }
+                 });
+            } else {
+                 showErrorModal("Sistem Hatası", "Reklam servisi kullanılamıyor. Tarayıcıda veya bot arayüzünde deneyin.");
+                 adButton.disabled = false;
+                 adButton.textContent = "Reklam İzle ve İlerle";
+            }
+        }
+    }
+
+    window.finalizeDownload = function() {
+        const { key, title, url, required_ads, watched_ads } = currentPdf;
+
+        if (watched_ads < required_ads) {
+             showErrorModal("Eksik İlerleme", "İndirmeyi tamamlamak için gerekli reklam sayısını henüz izlemediniz.");
+             return;
+        }
+
+        if (!url) return;
+         
+        // 1. PDF indirme sayacını artır
+        db.ref('pdfs/' + key).child('downloads').transaction((current) => {
+             return (current || 0) + 1;
+        });
+         
+        // 2. İndirmeyi başlat
+        window.open(url, '_blank');
+         
+        // 3. UI geri bildirim
+        if (window.Telegram && Telegram.WebApp) {
+             Telegram.WebApp.showAlert(`İndirme başlatıldı: ${title}`);
+             Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+        }
+         
+        // 4. Modal'ı kapat ve durumu sıfırla
+        closeProgressModal(); 
+    }
+    
+    window.handlePDFDownloadClick = function(key, title, url, requiredAds) {
+        if (!currentUser) {
+            showErrorModal("Giriş Yapılmadı", "Lütfen önce bota giriş yapın.");
+            return;
+        }
+        openProgressModal(key, title, url, requiredAds);
+    }
+
     
     // #############################
     // ##### NAVİGASYON YÖNETİMİ #####
@@ -923,9 +1026,14 @@
         const pdfCountSpan = document.getElementById('pdfCount');
         if (!listContainer || !db) return;
 
-        db.ref('pdfs').on('value', (snapshot) => {
+        // PDF Listesini ve Kullanıcı İlerlemesini Tek Seferde Çek
+        Promise.all([
+            db.ref('pdfs').once('value'),
+            db.ref(`users/${currentUser.id}/pdf_progress`).once('value')
+        ]).then(([pdfsSnapshot, progressSnapshot]) => {
             listContainer.innerHTML = '';
-            const pdfs = snapshot.val();
+            const pdfs = pdfsSnapshot.val();
+            const userProgress = progressSnapshot.val() || {};
             let count = 0;
 
             if (!pdfs) {
@@ -940,349 +1048,11 @@
                     count++;
                     const item = document.createElement('div');
                     item.classList.add('list-item');
+                    
                     const safeTitle = pdf.title.replace(/'/g, "\\'");
                     const safeUrl = pdf.url.replace(/'/g, "\\'");
-                    item.setAttribute('onclick', `handlePDFDownload('${key}', '${safeTitle}', '${safeUrl}')`);
+                    const requiredAds = pdf.required_ads ? parseInt(pdf.required_ads) : 0;
                     
-                    const requiredAds = pdf.required_ads && parseInt(pdf.required_ads) > 0 ? parseInt(pdf.required_ads) : 0;
-
-                    const requiredAdsText = requiredAds > 0 
-                        ? `<span style="color: #FF9500; font-weight: 700;">${requiredAds} Reklam Gerekli</span>` 
-                        : 'Ücretsiz İndir';
-                        
-                    item.innerHTML = `
-                        <div class="list-icon" style="background-color: #5856D6;"><span class="material-symbols-rounded">download</span></div>
-                        <div class="list-info">
-                            <div class="list-name">${pdf.title}</div>
-                            <div class="list-detail">İndirme: ${pdf.downloads || 0} - ${requiredAdsText}</div>
-                        </div>
-                        <div class="list-meta" style="color: var(--primary-color);"><span class="material-symbols-rounded">file_download</span></div>
-                    `;
-                    listContainer.appendChild(item);
-                }
-            });
-            pdfCountSpan.textContent = count;
-            if (count === 0) {
-                 listContainer.innerHTML = `<div style="padding: 15px; text-align: center; color: var(--hint-color); font-size: 13px;">Henüz yüklü PDF bulunmamaktadır.</div>`;
-            }
-        });
-    }
-    
-    // #############################
-    // ##### ADMIN PANEL FONKSİYONLARI #####
-    // #############################
-
-    window.openAdminModal = function() {
-        if (!is_admin) return;
-        document.getElementById('page-admin-instance').classList.remove('hidden');
-        fetchAdminPdfList();
-        fetchAdminUserList();
-        changeAdminTab('pdf');
-        
-        if (window.Telegram && Telegram.WebApp) {
-             Telegram.WebApp.BackButton.show();
-             Telegram.WebApp.onEvent('backButtonClicked', closeAdminModal);
-             Telegram.WebApp.setTitle('Admin Paneli');
-        }
-    }
-
-    window.closeAdminModal = function() {
-        document.getElementById('page-admin-instance').classList.add('hidden');
-        
-        if (window.Telegram && Telegram.WebApp) {
-            Telegram.WebApp.BackButton.hide();
-            Telegram.WebApp.offEvent('backButtonClicked', closeAdminModal);
-        }
-        changeTab('home');
-    }
-    
-    window.changeAdminTab = function(tabId) {
-        document.querySelectorAll('.admin-tab').forEach(tab => tab.classList.add('hidden'));
-        document.querySelectorAll('.bottom-nav .nav-item[data-admin-tab]').forEach(item => item.classList.remove('active'));
-
-        const activeTab = document.getElementById(`admin-tab-${tabId}`);
-        const activeNavItem = document.querySelector(`.bottom-nav .nav-item[data-admin-tab="${tabId}"]`);
-
-        if (activeTab) activeTab.classList.remove('hidden');
-        if (activeNavItem) activeNavItem.classList.add('active');
-        
-        if (tabId === 'users') {
-            fetchAdminUserList();
-        }
-    }
-    
-    window.uploadPDF = function() {
-        if (!is_admin || !db) return;
-        
-        const title = document.getElementById('pdfTitle').value.trim();
-        const url = document.getElementById('pdfUrl').value.trim();
-        const requiredAds = parseInt(document.getElementById('requiredAds').value);
-        
-        if (!title || !url) {
-            showErrorModal("Gerekli Alan", "Lütfen PDF Başlığını ve URL'sini doldurun.");
-            return;
-        }
-
-        if (isNaN(requiredAds) || requiredAds < 0 || requiredAds > 20) {
-             showErrorModal("Geçersiz Reklam Sayısı", "Zorunlu reklam sayısı 0 ile 20 arasında olmalıdır.");
-             return;
-        }
-
-        const pdfData = {
-            title: title,
-            url: url,
-            required_ads: requiredAds,
-            downloads: 0,
-            created_at: firebase.database.ServerValue.TIMESTAMP
-        };
-
-        db.ref('pdfs').push(pdfData).then(() => {
-            if (window.Telegram && Telegram.WebApp) Telegram.WebApp.showAlert("PDF başarıyla eklendi!");
-            document.getElementById('pdfTitle').value = '';
-            document.getElementById('pdfUrl').value = '';
-            document.getElementById('requiredAds').value = '10'; 
-            fetchAdminPdfList();
-        }).catch(e => {
-            showErrorModal("PDF Ekleme Hatası", e.message);
-        });
-    }
-    
-    window.fetchAdminPdfList = function() {
-        const listContainer = document.getElementById('adminPdfList');
-        if (!listContainer || !db) return;
-
-        db.ref('pdfs').on('value', (snapshot) => {
-            listContainer.innerHTML = '';
-            const pdfs = snapshot.val();
-            let count = 0;
-
-            if (!pdfs) {
-                listContainer.innerHTML = `<div style="padding: 15px; text-align: center; color: var(--hint-color); font-size: 13px;">Henüz yüklü PDF bulunmamaktadır.</div>`;
-                document.getElementById('totalPdfCountAnalysis').textContent = '0';
-                return;
-            }
-
-            Object.keys(pdfs).forEach(key => {
-                const pdf = pdfs[key];
-                if (!pdf.is_deleted) {
-                    count++;
-                    const item = document.createElement('div');
-                    item.classList.add('list-item');
-                    item.style.flexWrap = 'wrap';
-
-                    const adsText = pdf.required_ads > 0 ? `(${pdf.required_ads} Reklam)` : '(Ücretsiz)';
-
-                    item.innerHTML = `
-                        <div class="list-icon" style="background-color: #5856D6;"><span class="material-symbols-rounded">description</span></div>
-                        <div class="list-info" style="flex-grow: 1; max-width: calc(100% - 150px);">
-                            <div class="list-name">${pdf.title} ${adsText}</div>
-                            <div class="list-detail">İndirme: ${pdf.downloads || 0} - Eklenme: ${pdf.created_at ? new Date(pdf.created_at).toLocaleDateString() : 'Bilinmiyor'}</div>
-                        </div>
-                        <div class="list-meta" style="flex-shrink: 0; margin-left: auto;">
-                             <button style="background-color: #FF3B30; color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 12px; cursor: pointer;" onclick="deletePdf('${key}', '${pdf.title.replace(/'/g, "\\'")}')">Sil</button>
-                        </div>
-                    `;
-                    listContainer.appendChild(item);
-                }
-            });
-            document.getElementById('totalPdfCountAnalysis').textContent = count;
-            if (count === 0) {
-                 listContainer.innerHTML = `<div style="padding: 15px; text-align: center; color: var(--hint-color); font-size: 13px;">Henüz yüklü PDF bulunmamaktadır.</div>`;
-            }
-        });
-    }
-
-    window.deletePdf = function(key, title) {
-        if (!is_admin || !db) return;
-        
-        if (window.Telegram && Telegram.WebApp) {
-             Telegram.WebApp.showConfirm(`"${title}" PDF kaydını kalıcı olarak silmek istediğinizden emin misiniz?`, (ok) => {
-                 if (ok) {
-                     db.ref('pdfs/' + key).update({ is_deleted: true, deleted_at: firebase.database.ServerValue.TIMESTAMP })
-                         .then(() => {
-                            Telegram.WebApp.showAlert("PDF başarıyla silindi!");
-                            fetchAdminPdfList();
-                         })
-                         .catch(e => showErrorModal("Silme Hatası", e.message));
-                 }
-             });
-        }
-    }
-
-    window.fetchAdminUserList = function() {
-        const listContainer = document.getElementById('adminUserList');
-        if (!listContainer || !db) return;
-
-        db.ref('users').orderByChild('last_active').limitToLast(50).on('value', (snapshot) => {
-             listContainer.innerHTML = '';
-             const users = snapshot.val();
-             let totalCount = 0;
-             let todayActiveCount = 0;
-             const today = new Date().toDateString();
-
-             if (users) {
-                 const userArray = Object.keys(users).map(key => ({ id: key, ...users[key] }));
-                 userArray.sort((a, b) => b.last_active - a.last_active);
-
-                 userArray.forEach(user => {
-                     totalCount++;
-                     const lastActiveDate = new Date(user.last_active);
-                     if (lastActiveDate.toDateString() === today) {
-                         todayActiveCount++;
-                     }
-
-                     const item = document.createElement('div');
-                     item.classList.add('list-item');
-                     
-                     const name = user.first_name || 'Bilinmiyor';
-                     const username = user.username ? `@${user.username}` : 'Kullanıcı Adı Yok';
-                     const status = user.is_banned ? `<span style="color: #FF3B30; font-weight: 700;">(YASAKLI)</span>` : (user.is_admin ? `(ADMİN)` : '');
-                     const banButtonText = user.is_banned ? 'Yasak Kaldır' : 'Yasakla';
-                     const banButtonColor = user.is_banned ? '#34C759' : '#FF3B30';
-
-                     item.innerHTML = `
-                         <div class="list-icon" style="background-color: ${user.is_admin ? '#FF9500' : '#007AFF'};"><span class="material-symbols-rounded">person</span></div>
-                         <div class="list-info" style="flex-grow: 1; max-width: calc(100% - 150px);">
-                             <div class="list-name">${name} ${status}</div>
-                             <div class="list-detail">${username} - Son Aktif: ${lastActiveDate.toLocaleTimeString()}</div>
-                         </div>
-                         <div class="list-meta" style="flex-shrink: 0; margin-left: auto;">
-                             <button style="background-color: ${banButtonColor}; color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 12px; cursor: pointer;" onclick="banUser(${user.id}, '${name}', ${!!user.is_banned})">${banButtonText}</button>
-                         </div>
-                     `;
-                     listContainer.appendChild(item);
-                 });
-             } else {
-                 listContainer.innerHTML = `<div style="padding: 15px; text-align: center; color: var(--hint-color); font-size: 13px;">Kayıtlı kullanıcı bulunmamaktadır.</div>`;
-             }
-             document.getElementById('totalUsersCount').textContent = totalCount;
-             document.getElementById('todayActiveUsers').textContent = todayActiveCount;
-        });
-    }
-
-    window.banUser = function(userId, name, isBanned) {
-        if (!is_admin || !db) return;
-        
-        const confirmMessage = isBanned 
-            ? `"${name}" kullanıcısının yasağını kaldırmak istediğinizden emin misiniz?`
-            : `"${name}" kullanıcısını kalıcı olarak yasaklamak istediğinizden emin misiniz?`;
-
-        if (window.Telegram && Telegram.WebApp) {
-             Telegram.WebApp.showConfirm(confirmMessage, (ok) => {
-                 if (ok) {
-                     db.ref('users/' + userId).update({ is_banned: !isBanned, ban_timestamp: !isBanned ? firebase.database.ServerValue.TIMESTAMP : null })
-                         .then(() => {
-                            Telegram.WebApp.showAlert(`Kullanıcı başarıyla ${isBanned ? 'yasağı kaldırıldı' : 'yasaklandı'}!`);
-                            fetchAdminUserList();
-                         })
-                         .catch(e => showErrorModal("Yasaklama Hatası", e.message));
-                 }
-             });
-        }
-    }
-    
-    // #############################
-    // ##### BOŞ BIRAKILAN REKLAM AYARLARI FONKSİYONLARI #####
-    // #############################
-    window.fetchAdSettings = function() { /* Boş Bırakıldı */ }
-    window.saveAdBannerConfig = function() { /* Boş Bırakıldı */ }
-    window.fetchAdBannerConfig = function() { 
-        const banner = document.getElementById('homeSponsorCard'); 
-        if (banner) banner.style.display = 'block';
-    }
-    window.removeAdBannerConfig = function() { /* Boş Bırakıldı */ }
-    
-    // #############################
-    // ##### BAŞLANGIÇ LOJİĞİ #####
-    // #############################
-    
-    window.showInitialAd = function() {
-         if (window.showAdexora) {
-              window.showAdexora().then(() => {
-                 console.log("Giriş reklamı başarıyla izlendi.");
-              }).catch(e => {
-                 console.warn("Giriş reklamı atlandı veya hata verdi:", e.message);
-              });
-         }
-    }
-    
-    document.addEventListener('DOMContentLoaded', function() {
-        initializeApp();
-
-        const termsCheckbox = document.getElementById('termsCheckbox');
-        const loginButton = document.getElementById('loginButton');
-        
-        // KANAL KONTROLÜ İLE İLGİLİ BUTON EVENT'LERİ KALDIRILDI.
-
-        termsCheckbox.addEventListener('change', () => { 
-            loginButton.disabled = !termsCheckbox.checked; // SADECE ŞARTLARA BAĞLI
-        });
-        
-        loginButton.addEventListener('click', function() {
-            // isChannelMember kontrolü kaldırıldı
-            if (termsCheckbox.checked && currentUser && db) { 
-                loginButton.disabled = true;
-                loginButton.textContent = 'Veriler yükleniyor...';
-                
-                saveUserToDatabase(currentUser).then(() => {
-                    
-                    showInitialAd();
-                    
-                    document.getElementById('splashScreen').classList.add('hidden');
-                    
-                    const mainAppContent = document.getElementById('mainAppContent');
-                    mainAppContent.classList.remove('hidden');
-                    mainAppContent.style.display = 'flex'; 
-
-                    changeTab('home'); 
-                    
-                    fetchAndShowProfileInfo(currentUser.id); 
-                }).catch(err => {
-                    // Kullanıcı verisi kaydedilemese bile uygulamayı başlat
-                    showInitialAd();
-                    
-                    document.getElementById('splashScreen').classList.add('hidden');
-                    const mainAppContent = document.getElementById('mainAppContent');
-                    mainAppContent.classList.remove('hidden');
-                    mainAppContent.style.display = 'flex'; 
-                    changeTab('home'); 
-                    fetchAndShowProfileInfo(currentUser.id); 
-                    if (window.Telegram && Telegram.WebApp) {
-                        Telegram.WebApp.showAlert(`Uyarı: Veri kaydı sırasında bir sorun oluştu, ancak uygulama başlatıldı. Hata: ${err.message}`);
-                    }
-                });
-            } else if (!db) {
-                 showErrorModal("Bağlantı Hatası", "Firebase bağlantısı kurulamadığı için giriş yapılamıyor.");
-                 loginButton.disabled = false;
-                 loginButton.textContent = 'Bota Giriş Yap';
-            }
-        });
-        
-        document.getElementById('readTermsLink').addEventListener('click', function(e) {
-            e.preventDefault();
-            document.getElementById('termsModal').classList.remove('hidden');
-        });
-        
-        document.getElementById('closeTermsModal').addEventListener('click', function() {
-            document.getElementById('termsModal').classList.add('hidden');
-            termsCheckbox.checked = false; 
-            loginButton.disabled = true;
-        });
-
-        document.getElementById('acceptTermsModal').addEventListener('click', function() {
-            document.getElementById('termsModal').classList.add('hidden');
-            termsCheckbox.checked = true; 
-            loginButton.disabled = false; // Şartlar kabul edildiği an buton açılır
-        });
-        
-        function setupCriticalEventListeners() {
-            document.getElementById('navHomeButton').addEventListener('click', () => changeTab('home'));
-            document.getElementById('navPdfButton').addEventListener('click', () => changeTab('pdf-list'));
-            document.getElementById('navProfileButton').addEventListener('click', () => changeTab('profile'));
-        }
-
-        setupCriticalEventListeners(); 
-    });
-</script>
-</body>
-</html>
+                    // Kullanıcının ilerlemesini çek
+                    const watchedAds = userProgress[key] && userProgress[key].watched_ads ? userProgress[key].watched_ads : 0;
+                    const remainingAds = requiredAds -
