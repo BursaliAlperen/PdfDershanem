@@ -1,17 +1,17 @@
 import requests
 import os
-import json
 from flask import Flask, request, jsonify
 
 # -----------------------------------------------------------
 # GÜVENLİK AYARLARI VE BAŞLANGIÇ
 # -----------------------------------------------------------
-# Render üzerinden okunan Bot Token. Botunuzu bu değişkenle başlatın.
+# BOT_TOKEN, Render panelinizdeki Ortam Değişkeninden okunur.
 BOT_TOKEN = os.environ.get("BOT_TOKEN") 
 REQUIRED_CHANNEL_USERNAME = "@KrallarPDF"
 FLASK_PORT = int(os.environ.get("PORT", 5000))
 
 if not BOT_TOKEN:
+    # Bu hata mesajını Render loglarında görmelisiniz.
     print("FATAL HATA: BOT_TOKEN ortam değişkeni ayarlanmadı! API çalışmayacak.")
 
 app = Flask(__name__)
@@ -37,13 +37,13 @@ def check_user_membership(user_id):
         
         if data.get('ok') and 'result' in data:
             status = data['result']['status']
-            # member, administrator, creator = üye
             if status in ['member', 'administrator', 'creator']:
                 return True
             else:
                 return False
         else:
-            print(f"Telegram API Hatası: {data.get('description', 'Bilinmeyen Hata - Bot kanalda yönetici mi?')}")
+            # Telegram API'den gelen hatayı logla (Örn: Bot kanalda yönetici değil)
+            print(f"Telegram API Hatası: {data.get('description', 'Bilinmeyen Hata')}")
             return False
             
     except requests.exceptions.RequestException as e:
@@ -58,12 +58,13 @@ def check_membership_api():
     """Web App'ten gelen üyelik kontrol isteğini karşılar."""
     # CORS (Cross-Origin Resource Sharing) başlıkları
     headers = {
-        'Access-Control-Allow-Origin': '*', 
+        'Access-Control-Allow-Origin': '*', # Her kaynaktan gelen isteklere izin ver
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type',
         'Content-Type': 'application/json'
     }
     
+    # Pre-flight isteği (OPTIONS) için yanıt
     if request.method == 'OPTIONS':
         return ('', 204, headers)
 
@@ -84,5 +85,4 @@ def check_membership_api():
 
 if __name__ == '__main__':
     print(f"Flask Sunucusu Başlatılıyor. PORT: {FLASK_PORT}")
-    # Render'da host=0.0.0.0 kullanmak önemlidir.
     app.run(host='0.0.0.0', port=FLASK_PORT)
