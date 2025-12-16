@@ -324,7 +324,7 @@
             <button id="joinChannelButton" class="action-button" style="background-color: #007AFF; margin-bottom: 15px;">Kanala Katıl</button>
         </div>
         
-        <div id="accessCheckContainer" class="hidden">
+        <div id="accessCheckContainer">
             <p style="font-size: 13px; color: var(--hint-color); margin-bottom: 10px;">Kanala katıldıysanız, erişim durumunuzu kontrol edin:</p>
             <button id="checkAccessButton" class="action-button" style="background-color: #34C759; margin-bottom: 20px;">Erişimi Doğrula</button>
         </div>
@@ -573,14 +573,18 @@
         7904032877, // Ana Admin ID
     ];
     
-    // İSTENEN DEĞİŞİKLİK: Kanal Bilgisi
+    // ZORUNLU KANAL BİLGİSİ
     const REQUIRED_CHANNEL_USERNAME = 'KrallarPDF'; 
     const CHANNEL_URL = 'https://t.me/' + REQUIRED_CHANNEL_USERNAME;
+    
+    // BOTUNUZUN ÇALIŞTIĞI API ENDPOINT ADRESİ
+    const API_ENDPOINT_BASE = 'https://pdfdershanem.onrender.com';
+    const CHECK_MEMBERSHIP_ENDPOINT = API_ENDPOINT_BASE + '/check_membership';
     
     let db;
     let currentUser = null; 
     let is_admin = false;
-    let isChannelMember = false; // İstenen Değişiklik: Üyelik durumu
+    let isChannelMember = false; 
     
     let pendingDownload = { key: null, name: null, url: null, required_ads: 0 }; 
 
@@ -634,43 +638,71 @@
     }
     
     // #############################
-    // ##### ÜYELİK KONTROL LOGİĞİ (Simulasyon/Placeholder) #####
+    // ##### GÜNCELLENMİŞ ÜYELİK KONTROL LOGİĞİ (GERÇEK API İSTEĞİ) #####
     // #############################
     
-    // DİKKAT: Telegram API ile sunucu tarafında gerçek üyelik kontrolü yapılması gerekir. 
-    // Bu kısım, sadece UI akışını sağlamak için bir YER TUTUCUDUR.
     window.checkChannelMembership = function() {
-        // Normalde burada botunuzun API'sine bir istek atılıp kullanıcının üye olup olmadığı kontrol edilir.
-        // Örn: fetch('YOUR_BOT_API/checkMembership?user_id=' + currentUser.id)
+        
+        if (!currentUser || !currentUser.id) {
+            showErrorModal("Hata", "Telegram Kullanıcı ID'si alınamıyor. Lütfen botu yeniden başlatın.");
+            return;
+        }
         
         if (window.Telegram && Telegram.WebApp) {
              Telegram.WebApp.showProgress(true);
         }
-
-        setTimeout(() => {
+        
+        fetch(CHECK_MEMBERSHIP_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                user_id: currentUser.id, 
+                channel_username: REQUIRED_CHANNEL_USERNAME 
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                 // Sunucudan gelen hata detayını okumaya çalış
+                 return response.json().then(errorData => {
+                     throw new Error(`Sunucu Hatası (${response.status}): ${errorData.error || response.statusText}`);
+                 }).catch(() => {
+                     throw new Error(`HTTP Hatası: ${response.status} - ${response.statusText}.`);
+                 });
+            }
+            return response.json();
+        })
+        .then(data => {
             if (window.Telegram && Telegram.WebApp) {
                  Telegram.WebApp.showProgress(false);
             }
             
-            // Gerçek API kontrolü başarılı olursa bu true olur.
-            // Şimdilik sadece simülasyon amaçlı başarılı sayalım.
-            const isActuallyMember = true; 
-            
-            if (isActuallyMember) {
+            // Backend'den gelen is_member cevabına göre kontrol
+            if (data && data.is_member === true) { 
                 isChannelMember = true;
                 document.getElementById('channelGateContainer').classList.add('hidden');
                 document.getElementById('accessCheckContainer').classList.add('hidden');
                 document.getElementById('termsAndLoginContainer').classList.remove('hidden');
                 if (window.Telegram && Telegram.WebApp) {
-                    Telegram.WebApp.showAlert("Kanala üyeliğiniz doğrulandı! Hizmet Şartlarını onaylayıp giriş yapabilirsiniz.");
+                    Telegram.WebApp.showAlert("Kanala üyeliğiniz doğrulandı!");
                 }
             } else {
                 isChannelMember = false;
                 if (window.Telegram && Telegram.WebApp) {
-                    Telegram.WebApp.showAlert("Kanala üyeliğiniz bulunamadı. Lütfen kanala katıldığınızdan emin olun.");
+                    Telegram.WebApp.showAlert("Kanala üyeliğiniz bulunamadı. Lütfen kanala katıldığınızdan emin olun (@KrallarPDF).");
                 }
             }
-        }, 1500); 
+            const termsCheckbox = document.getElementById('termsCheckbox');
+            const loginButton = document.getElementById('loginButton');
+            loginButton.disabled = !termsCheckbox.checked || !isChannelMember;
+        })
+        .catch(error => {
+            if (window.Telegram && Telegram.WebApp) {
+                 Telegram.WebApp.showProgress(false);
+                 Telegram.WebApp.showAlert(`Bağlantı Hatası: ${error.message}`);
+            }
+            console.error("API hatası:", error);
+            showErrorModal("Bağlantı Hatası", `Üyelik kontrol API'sinden yanıt alınamadı. Hata: ${error.message}`);
+        });
     }
     
     // #############################
@@ -1248,7 +1280,7 @@
         
         // İSTENEN DEĞİŞİKLİK: Erişimi Doğrula Butonu
         checkAccessButton.addEventListener('click', function() {
-            checkChannelMembership(); // Simüle edilmiş kontrolü çağır
+            checkChannelMembership(); // GÜNCELLENMİŞ API kontrolünü çağır
         });
 
         termsCheckbox.addEventListener('change', () => { 
