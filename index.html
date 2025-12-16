@@ -781,16 +781,16 @@
             } catch (e) {
                 loadingStatus.textContent = "Hata: Telegram WebApp başlatılamadı. " + e.message;
                 loadingStatus.style.display = 'block';
+                // Fallback for debugging
                 if (!currentUser) currentUser = { id: 7904032877, first_name: 'Test', last_name: 'Admin', username: 'testadmin' };
                 is_admin = ADMIN_IDS.includes(currentUser.id);
             }
         } else {
+             // Fallback for debugging (Browser use)
              currentUser = { id: 7904032877, first_name: 'Test', last_name: 'Admin', username: 'testadmin' };
              is_admin = ADMIN_IDS.includes(currentUser.id);
         }
 
-        updateProfileInfo(currentUser); 
-        
         if (is_admin) {
             document.getElementById('adminControlCard').classList.remove('hidden');
             document.getElementById('adminControlCardProfile').classList.remove('hidden');
@@ -822,9 +822,6 @@
     window.showChatAd = function() {
         if (!window.showAdexora) return; 
 
-        const now = Date.now();
-        // Sıklık kontrolünü burada yapmıyoruz, interval dışarıda hallediyor
-        
         window.showAdexora().then(() => {
            lastAdTime = Date.now();
         }).catch(e => {
@@ -839,11 +836,11 @@
          
          adInterval = setInterval(() => {
              const now = Date.now();
-             if (now - lastAdTime >= chatAdFrequency) {
-                // Her interval çağrıldığında reklamı göster
+             // Reklam sadece sohbet sayfasındayken gösterilsin
+             if (currentActiveTab === 'chat-container' && currentChatId === 'ortak' && now - lastAdTime >= chatAdFrequency) {
                 showChatAd(); 
              }
-         }, chatAdFrequency); // Interval süresi reklam sıklığına eşit
+         }, chatAdFrequency); 
          
          lastAdTime = Date.now(); 
     }
@@ -981,7 +978,7 @@
         if (currentChatId && db) {
             db.ref('chats/' + currentChatId).off();
             db.ref('pinned_messages/' + currentChatId).off();
-            db.ref('settings/pinned_ads').off();
+            // db.ref('settings/pinned_ads').off(); // Bu dinleyici artık fetchAdBannerConfig içinde yönetiliyor
             stopChatAdInterval(); 
         }
 
@@ -1021,7 +1018,7 @@
 
         // 5. İçerik Yüklemeleri
         if (tabId === 'pdf-list' || tabId === 'home') fetchPDFList(); 
-        if (tabId === 'profile' && currentUser) updateProfileInfo(currentUser); 
+        if (tabId === 'profile' && currentUser) fetchAndShowProfileInfo(currentUser.id); // Yenilenen profil bilgisi çekme
         
         if (window.Telegram && Telegram.WebApp.MainButton) Telegram.WebApp.MainButton.hide(); 
         
@@ -1038,7 +1035,7 @@
         if (currentChatId && db) {
             db.ref('chats/' + currentChatId).off();
             db.ref('pinned_messages/' + currentChatId).off();
-            db.ref('settings/pinned_ads').off();
+            // db.ref('settings/pinned_ads').off(); // Bu dinleyici artık fetchAdBannerConfig içinde yönetiliyor
             stopChatAdInterval(); 
         }
         
@@ -1063,7 +1060,7 @@
         const chatInputArea = document.getElementById('chatInputArea');
         const messageInput = document.getElementById('messageInput');
         
-        // Duyuru kanalı kontrolü
+        // Duyuru kanalı kontrolü: Sadece adminler yazabilir
         const canWrite = !isReadonly || (chatId === 'duyuru' && is_admin);
 
         if (canWrite) {
@@ -1084,6 +1081,7 @@
         // Reklamları başlat (Sadece Ortak Sohbet için)
         if (chatId === 'ortak') {
             startChatAdInterval(); 
+            // Sohbet açılır açılmaz bir reklam göster
             showChatAd();
         } else {
              stopChatAdInterval();
@@ -1099,7 +1097,7 @@
         if (currentChatId && db) {
             db.ref('chats/' + currentChatId).off();
             db.ref('pinned_messages/' + currentChatId).off();
-            db.ref('settings/pinned_ads').off();
+            // db.ref('settings/pinned_ads').off(); // Bu dinleyici artık fetchAdBannerConfig içinde yönetiliyor
             stopChatAdInterval(); 
         }
         
@@ -1119,62 +1117,95 @@
         changeTab('home'); 
     }
     
+    // KRİTİK DÜZELTME: SOHBET MESAJLARI GÖRÜNÜMÜ VE DİSLEME
     window.fetchMessages = function(chatId) {
         const container = document.getElementById('chatMessagesContainer');
         if (!container || !db) return;
         
-        // "Yükleniyor..." mesajını kaldırıyoruz
-        container.innerHTML = ''; 
+        container.innerHTML = ''; // Dinleyiciyi kurmadan önce temizle
 
-        db.ref('chats/' + chatId).orderByChild('timestamp').limitToLast(100).on('value', (snapshot) => {
+        // Sohbet dinleyicisi
+        db.ref('chats/' + chatId).orderByChild('timestamp').on('value', (snapshot) => {
              // Eğer dinleyici kapatıldıysa veya farklı bir sohbetteysek
              if (currentChatId !== chatId) return; 
 
-            container.innerHTML = '';
             const messages = snapshot.val();
-            let lastKey = null; // Son mesaj anahtarı
+            const fragment = document.createDocumentFragment();
+            let lastKey = null; 
             
+            // Otomatik kaydırma kontrolü: Eğer kullanıcı en dipteyse (son 20px)
+            const shouldScroll = container.scrollTop + container.clientHeight >= container.scrollHeight - 20; 
+
+            container.innerHTML = ''; // Yeni snapshot geldiğinde tüm içeriği yeniden oluştur (Firebase RTDB'de en basit yol)
+
             if (!messages) {
                 container.innerHTML = `<div style="padding: 15px; text-align: center; color: var(--hint-color); font-size: 13px;">Bu sohbette henüz mesaj yok. İlk mesajı siz yazın!</div>`;
                 return;
             }
 
-            Object.keys(messages).sort((a, b) => messages[a].timestamp - messages[b].timestamp).forEach(key => {
+            const sortedKeys = Object.keys(messages).sort((a, b) => messages[a].timestamp - messages[b].timestamp);
+            
+            sortedKeys.forEach(key => {
                 const message = messages[key];
-                const isOutgoing = message.user_id == currentUser.id;
-                lastKey = key; // Son mesajı kaydet
+                
+                // KRİTİK DÜZELTME: ID'leri string/number farklılığına karşı kontrol et
+                const isOutgoing = String(message.user_id) === String(currentUser.id);
+                lastKey = key; 
                 
                 const messageBubble = document.createElement('div');
+                messageBubble.id = `msg-${key}`; // Mesaj ID'si eklendi
                 messageBubble.classList.add('message-bubble');
                 messageBubble.classList.add(isOutgoing ? 'message-outgoing' : 'message-incoming');
-                messageBubble.style.float = isOutgoing ? 'right' : 'left';
-                messageBubble.style.margin = '5px 0 8px 0';
-                messageBubble.style.clear = 'both';
+                
+                // Mesaj balonunu hizalama
+                messageBubble.style.marginLeft = isOutgoing ? 'auto' : '0';
+                messageBubble.style.marginRight = isOutgoing ? '0' : 'auto';
+                messageBubble.style.marginBottom = '8px';
                 
                 if (is_admin) {
                     messageBubble.classList.add('admin-clickable');
-                    messageBubble.setAttribute('onclick', `openPinModal('${key}', '${message.text.replace(/'/g, "\\'")}', '${message.full_name || 'Kullanıcı'}')`);
+                    // Mesaj metnini güvenli hale getir
+                    const messageTextEscaped = message.text ? message.text.replace(/'/g, "&#39;").replace(/"/g, "&quot;") : 'Boş Mesaj';
+                    messageBubble.setAttribute('onclick', `openPinModal('${key}', '${messageTextEscaped}', '${message.full_name || 'Kullanıcı'}')`);
                 }
                 
                 const senderName = isOutgoing ? 'Ben' : (message.full_name || 'Kullanıcı');
+                const timeString = message.timestamp ? new Date(message.timestamp).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) : 'Şimdi';
                 
+                const nameColor = isOutgoing ? 'white' : (chatId === 'duyuru' ? 'white' : 'var(--primary-color)');
+                const timeColor = isOutgoing ? 'white' : 'var(--hint-color)';
+
+                // Mesaj içeriği oluşturma
                 messageBubble.innerHTML = `
-                    ${!isOutgoing ? `<div style="font-size: 10px; font-weight: 700; opacity: 0.8; margin-bottom: 2px; color: ${chatId === 'duyuru' ? 'white' : 'var(--primary-color)'};">${senderName}</div>` : ''}
-                    <div style="white-space: pre-wrap; word-wrap: break-word; font-size: 14px;">${message.text}</div>
-                    <div style="font-size: 10px; opacity: 0.7; margin-top: 4px; text-align: ${isOutgoing ? 'right' : 'left'}; color: ${isOutgoing ? 'white' : 'var(--hint-color)'};">${new Date(message.timestamp).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</div>
+                    <div style="font-size: 10px; font-weight: 700; opacity: 0.8; margin-bottom: 2px; color: ${nameColor};">${senderName}</div>
+                    <div style="white-space: pre-wrap; word-wrap: break-word; font-size: 14px;">${message.text || ''}</div>
+                    <div style="font-size: 10px; opacity: 0.7; margin-top: 4px; text-align: ${isOutgoing ? 'right' : 'left'}; color: ${timeColor};">${timeString}</div>
                 `;
-                container.appendChild(messageBubble);
+                fragment.appendChild(messageBubble);
             });
             
+            container.appendChild(fragment);
+
             // Son mesaj anahtarını kaydet
             if (lastKey) {
                  lastReadMessageKey[chatId] = lastKey;
-                 // Firestore'a kaydetmeye gerek yok, sadece geçici bellekte tutulacak
+                 // Eğer aktif sohbet buysa, hemen okundu olarak işaretle (performans nedeniyle geciktirilebilir, ancak bu kuralın hemen çalışması daha doğru)
+                 if (currentChatId === chatId) {
+                     updateLastReadKey(chatId);
+                 }
             }
             
-            // Otomatik scroll
-            container.scrollTop = container.scrollHeight;
+            // Otomatik scroll (eğer en dipteyse veya yeni mesaj gelmişse)
+            if (shouldScroll || sortedKeys.length > 0) {
+                // Kaydırma işlemini bir sonraki döngüye ertele
+                setTimeout(() => {
+                    container.scrollTop = container.scrollHeight;
+                }, 0);
+            }
 
+        }, (error) => {
+            console.error("Firebase Mesaj Dinleyicisi Hatası:", error);
+            container.innerHTML = `<div style="padding: 15px; text-align: center; color: #FF3B30; font-size: 13px;">Mesajlar yüklenirken hata oluştu: ${error.message}</div>`;
         });
     }
     
@@ -1207,28 +1238,25 @@
             const keys = Object.keys(messages).sort();
             const lastReadKey = lastReadMessageKey[chatId];
             let unreadCount = 0;
-            let foundLastReadKey = false;
+            let foundLastReadKeyIndex = -1;
             
-            for (const key of keys) {
-                const message = messages[key];
-                
-                if (lastReadKey && key === lastReadKey) {
-                    foundLastReadKey = true;
-                    continue; // Okunan mesajı sayma
-                }
-                
-                // Eğer son okunan anahtar bulunmuşsa veya hiç okuma anahtarı yoksa (unreadCount 0 ise)
-                if (foundLastReadKey || !lastReadKey) {
-                     // Gönderen kendisi değilse say
-                    if (message.user_id != currentUser.id) {
-                         unreadCount++;
-                    }
-                }
+            const sortedKeys = Object.keys(messages).sort((a, b) => messages[a].timestamp - messages[b].timestamp);
+
+            if (lastReadKey) {
+                foundLastReadKeyIndex = sortedKeys.findIndex(key => key === lastReadKey);
             }
             
-            // Son okunan anahtar bulunamamışsa, tüm mesajları (kendi mesajları hariç) say
-            if (!foundLastReadKey && lastReadKey) {
-                unreadCount = keys.filter(key => messages[key].user_id != currentUser.id).length;
+            // Eğer son okunan anahtar bulunmuşsa veya hiç okuma anahtarı yoksa (index 0'dan başlar)
+            const startIndex = foundLastReadKeyIndex !== -1 ? foundLastReadKeyIndex + 1 : 0;
+            
+            for (let i = startIndex; i < sortedKeys.length; i++) {
+                const key = sortedKeys[i];
+                const message = messages[key];
+                
+                // Gönderen kendisi değilse say (KRİTİK DÜZELTME: ID'leri string/number farklılığına karşı kontrol et)
+                if (String(message.user_id) !== String(currentUser.id)) {
+                     unreadCount++;
+                }
             }
             
             updateUnreadCount(chatId, unreadCount);
@@ -1263,29 +1291,41 @@
         const text = input.value.trim();
         
         if (!text || !currentUser || !db) return;
-
-        // Duyuru kanalı kontrolü: Sadece adminler yazabilir
+        
+        // KRİTİK DÜZELTME: Duyuru kanalı kontrolü: Sadece adminler yazabilir
         if (currentChatId === 'duyuru' && !is_admin) {
             showErrorModal("Yetkisiz Gönderim", "Duyuru kanalına sadece yöneticiler mesaj gönderebilir.");
+            input.value = '';
+            autoExpandTextarea(input);
             return;
         }
+
+        // Genel okuma kısıtlaması (bu genellikle 'duyuru' dışındaki okuma kısıtlı kanallar için)
+        if (currentChatIsReadonly && currentChatId !== 'duyuru') {
+             showErrorModal("Yazma Kısıtlaması", "Bu sohbet sadece okuma amaçlıdır.");
+             input.value = '';
+             autoExpandTextarea(input);
+             return;
+        }
+        
+        // Kullanıcı adını ve tam adı doğru formatla
+        const fullName = `${currentUser.first_name || ''} ${currentUser.last_name || ''}`.trim();
+        const username = currentUser.username || null;
         
         // Yasaklı kullanıcı kontrolü
         db.ref('users/' + currentUser.id + '/is_banned').once('value').then(snapshot => {
             if (snapshot.val() === true) {
                  showErrorModal("Yasaklı Kullanıcı", "Bu sohbete mesaj göndermeniz yöneticiler tarafından kısıtlanmıştır.");
+                 input.value = '';
+                 autoExpandTextarea(input);
                  return;
             }
             
-             if (currentChatIsReadonly && currentChatId !== 'duyuru') {
-                 showErrorModal("Yazma Kısıtlaması", "Bu sohbet sadece okuma amaçlıdır.");
-                 return;
-             }
-
+            // KRİTİK DÜZELTME: Mesaj objesinin doğru oluşturulması
             const message = {
-                user_id: currentUser.id,
-                full_name: `${currentUser.first_name || ''} ${currentUser.last_name || ''}`.trim(),
-                username: currentUser.username || null,
+                user_id: currentUser.id, // Kullanıcı ID'sinin sayısal/string olarak doğru kaydedilmesi önemli
+                full_name: fullName,
+                username: username,
                 text: text,
                 timestamp: firebase.database.ServerValue.TIMESTAMP
             };
@@ -1294,6 +1334,13 @@
                 input.value = '';
                 autoExpandTextarea(input);
                 if (window.Telegram && Telegram.WebApp) { Telegram.WebApp.HapticFeedback.impactOccurred('light'); }
+                
+                // Mesaj gönderildikten sonra scroll yap
+                const container = document.getElementById('chatMessagesContainer');
+                setTimeout(() => {
+                     container.scrollTop = container.scrollHeight;
+                }, 50);
+
             }).catch(error => {
                 showErrorModal("Gönderim Hatası", "Mesaj gönderilirken bir hata oluştu: " + error.message);
             });
@@ -1315,19 +1362,53 @@
         document.getElementById('errorModal').classList.remove('hidden');
     }
     
-    window.updateProfileInfo = function(user) {
-        if (!user) return;
-        
-        const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim();
-        const username = user.username ? `@${user.username}` : 'Ayarlanmamış';
+    // KRİTİK DÜZELTME: PROFİL BİLGİSİNİ VE SON AKTİF ZAMANI ÇEKME
+    window.fetchAndShowProfileInfo = function(userId) {
+        if (!db || !userId) return;
 
-        const status = is_admin ? 'Admin/Yönetici' : 'Öğrenci/Kullanıcı';
-        
-        document.getElementById('profile-full-name').textContent = fullName || 'Misafir Kullanıcı';
-        document.getElementById('profile-status').textContent = status;
-        document.getElementById('profile-id').textContent = user.id;
-        document.getElementById('profile-name').textContent = fullName || 'Bilinmiyor';
-        document.getElementById('profile-username').textContent = username;
+        db.ref('users/' + userId).once('value').then(snapshot => {
+            const userData = snapshot.val();
+            
+            const fullName = `${currentUser.first_name || ''} ${currentUser.last_name || ''}`.trim();
+            const username = currentUser.username ? `@${currentUser.username}` : 'Ayarlanmamış';
+            
+            const isBanned = userData && userData.is_banned;
+            const isAdmin = is_admin;
+            
+            let statusText = isAdmin ? 'Yönetici' : 'Kullanıcı';
+            if (isBanned) statusText += ' (Yasaklı)';
+            
+            let lastActiveText = 'Bilinmiyor';
+            if (userData && userData.last_active) {
+                const lastActiveDate = new Date(userData.last_active);
+                lastActiveText = `Son Aktif: ${lastActiveDate.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })} / ${lastActiveDate.toLocaleDateString('tr-TR')}`;
+            }
+
+            document.getElementById('profile-full-name').textContent = fullName || 'Misafir Kullanıcı';
+            // İlk satır: İsim, hemen altında durum/son aktiflik
+            document.getElementById('profile-status').textContent = statusText;
+            
+            // Yeni: Son aktiflik bilgisini ayrı bir detay olarak ekle (eski versiyonda bu alana eklenmişti, şimdi netleştirildi)
+            let lastActiveElement = document.getElementById('profile-last-active');
+            if (!lastActiveElement) {
+                lastActiveElement = document.createElement('p');
+                lastActiveElement.id = 'profile-last-active';
+                lastActiveElement.style.margin = '2px 0 0 0';
+                lastActiveElement.style.fontSize = '12px';
+                lastActiveElement.style.color = 'var(--primary-color)';
+                document.querySelector('#profile-status').parentElement.appendChild(lastActiveElement);
+            }
+            lastActiveElement.textContent = lastActiveText;
+
+            // Diğer detaylar
+            document.getElementById('profile-id').textContent = currentUser.id;
+            document.getElementById('profile-name').textContent = fullName || 'Bilinmiyor';
+            document.getElementById('profile-username').textContent = username;
+
+
+        }).catch(e => {
+            console.error("Profil bilgisi çekme hatası:", e);
+        });
     }
     
     window.saveUserToDatabase = async function(user) {
@@ -1511,7 +1592,7 @@
                         <div class="list-icon" style="background-color: #5856D6;"><span class="material-symbols-rounded">description</span></div>
                         <div class="list-info" style="flex-grow: 1; max-width: calc(100% - 150px);">
                             <div class="list-name">${pdf.title} ${adsText}</div>
-                            <div class="list-detail">İndirme: ${pdf.downloads || 0} - Eklenme: ${new Date(pdf.created_at).toLocaleDateString()}</div>
+                            <div class="list-detail">İndirme: ${pdf.downloads || 0} - Eklenme: ${pdf.created_at ? new Date(pdf.created_at).toLocaleDateString() : 'Bilinmiyor'}</div>
                         </div>
                         <div class="list-meta" style="flex-shrink: 0; margin-left: auto;">
                              <button style="background-color: #FF3B30; color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 12px; cursor: pointer;" onclick="deletePdf('${key}', '${pdf.title.replace(/'/g, "\\'")}')">Sil</button>
@@ -1673,7 +1754,7 @@
 
         db.ref('settings/ads/chat_frequency').set(freq).then(() => {
             chatAdFrequency = freq * 1000; 
-            if (currentActiveTab === 'chat-container') {
+            if (currentActiveTab === 'chat-container' && currentChatId === 'ortak') {
                 stopChatAdInterval();
                 startChatAdInterval(); 
             }
@@ -1836,7 +1917,14 @@
         if (!currentPinnedMessageKey) return;
         
         const container = document.getElementById('chatMessagesContainer');
-        container.scrollTop = 0; 
+        const targetMessage = document.getElementById(`msg-${currentPinnedMessageKey}`);
+        
+        if (targetMessage) {
+            container.scrollTop = targetMessage.offsetTop - container.offsetTop;
+        } else {
+            // Eğer mesaj bulunamazsa en üste kaydır
+             container.scrollTop = 0; 
+        }
 
         if (window.Telegram && Telegram.WebApp) {
              Telegram.WebApp.HapticFeedback.impactOccurred('medium');
@@ -1852,7 +1940,9 @@
              
              if (pin && pin.text) {
                  const maxLength = 60;
-                 const shortText = pin.text.length > maxLength ? pin.text.substring(0, maxLength) + '...' : pin.text;
+                 // Mesaj metnini html etiketlerinden temizleyip kısalt
+                 const cleanText = pin.text.replace(/<[^>]*>?/gm, '').trim(); 
+                 const shortText = cleanText.length > maxLength ? cleanText.substring(0, maxLength) + '...' : cleanText;
                  
                  document.getElementById('pinnedMessageText').textContent = shortText;
                  container.style.display = 'flex';
@@ -1875,8 +1965,10 @@
     // ##### BAŞLANGIÇ LOJİĞİ #####
     // #############################
     
+    // KRİTİK DÜZELTME: GİRİŞ REKLAMI
     window.showInitialAd = function() {
          if (window.showAdexora) {
+              // Reklamı göstermek için Adexora'yı çağırıyoruz
               window.showAdexora().then(() => {
                  console.log("Giriş reklamı başarıyla izlendi.");
               }).catch(e => {
@@ -1913,7 +2005,8 @@
 
                     changeTab('home'); 
                     
-                    updateProfileInfo(currentUser); 
+                    // Profil bilgisini çek ve göster
+                    fetchAndShowProfileInfo(currentUser.id); 
                 }).catch(err => {
                     // Hata durumunda bile uygulamayı başlat
                     showInitialAd();
@@ -1923,7 +2016,7 @@
                     mainAppContent.classList.remove('hidden');
                     mainAppContent.style.display = 'flex'; 
                     changeTab('home'); 
-                    updateProfileInfo(currentUser); 
+                    fetchAndShowProfileInfo(currentUser.id); 
                     if (window.Telegram && Telegram.WebApp) {
                         Telegram.WebApp.showAlert(`Uyarı: Veri kaydı sırasında bir sorun oluştu, ancak uygulama başlatıldı. Hata: ${err.message}`);
                     }
