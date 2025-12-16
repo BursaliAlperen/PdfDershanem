@@ -1,88 +1,59 @@
-import requests
-import os
-from flask import Flask, request, jsonify
+from telegram.error import TelegramError
+# ... (diğer import ve setup'lar) ...
 
-# -----------------------------------------------------------
-# GÜVENLİK AYARLARI VE BAŞLANGIÇ
-# -----------------------------------------------------------
-# BOT_TOKEN, Render panelinizdeki Ortam Değişkeninden okunur.
-BOT_TOKEN = os.environ.get("BOT_TOKEN") 
-REQUIRED_CHANNEL_USERNAME = "@KrallarPDF"
-FLASK_PORT = int(os.environ.get("PORT", 5000))
-
-if not BOT_TOKEN:
-    # Bu hata mesajını Render loglarında görmelisiniz.
-    print("FATAL HATA: BOT_TOKEN ortam değişkeni ayarlanmadı! API çalışmayacak.")
-
-app = Flask(__name__)
-
-# -----------------------------------------------------------
-# TELEGRAM ÜYELİK KONTROL İŞLEVİ
-# -----------------------------------------------------------
-def check_user_membership(user_id):
-    """Kullanıcının Telegram kanalına üye olup olmadığını kontrol eder."""
-    if not BOT_TOKEN:
-        return False
-        
-    telegram_api_url = f"https://api.telegram.org/bot{BOT_TOKEN}/getChatMember"
-    params = {
-        'chat_id': REQUIRED_CHANNEL_USERNAME,
-        'user_id': user_id
-    }
-    
-    try:
-        response = requests.get(telegram_api_url, params=params, timeout=5)
-        response.raise_for_status() 
-        data = response.json()
-        
-        if data.get('ok') and 'result' in data:
-            status = data['result']['status']
-            if status in ['member', 'administrator', 'creator']:
-                return True
-            else:
-                return False
-        else:
-            # Telegram API'den gelen hatayı logla (Örn: Bot kanalda yönetici değil)
-            print(f"Telegram API Hatası: {data.get('description', 'Bilinmeyen Hata')}")
-            return False
-            
-    except requests.exceptions.RequestException as e:
-        print(f"İstek Hatası (getChatMember): {e}")
-        return False
-
-# -----------------------------------------------------------
-# WEB APP'İN İSTEK ATACAĞI API ENDPOINT'İ VE CORS AYARI
-# -----------------------------------------------------------
 @app.route('/check_membership', methods=['POST', 'OPTIONS'])
-def check_membership_api():
-    """Web App'ten gelen üyelik kontrol isteğini karşılar."""
-    # CORS (Cross-Origin Resource Sharing) başlıkları
-    headers = {
-        'Access-Control-Allow-Origin': '*', # Her kaynaktan gelen isteklere izin ver
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Content-Type': 'application/json'
+def check_membership():
+    # CORS PRE-FLIGHT isteğini hemen yanıtla
+    if request.method == 'OPTIONS':
+        return '', 204, {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type',
+        }
+        
+    # Varsayılan hata yanıtı
+    default_error_response = {
+        'is_member': False, 
+        'error': 'Sunucu beklenmedik bir hata verdi.'
     }
     
-    # Pre-flight isteği (OPTIONS) için yanıt
-    if request.method == 'OPTIONS':
-        return ('', 204, headers)
-
     try:
-        data = request.get_json()
+        data = request.json
         user_id = data.get('user_id')
+        channel_username = data.get('channel_username')
         
-        if not user_id:
-            return jsonify({'is_member': False, 'error': 'User ID missing in request'}), 400, headers
-            
-        is_member = check_user_membership(user_id)
+        if not user_id or not channel_username:
+            response = jsonify({'is_member': False, 'error': 'Eksik Kullanici ID veya Kanal Adi'})
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response, 400
+
+        # Bot API İSTEĞİ
+        # Eğer bot.get_chat_member bu noktada bir hata verirse (Örn: Kanal bulunamadı, BOT_TOKEN yanlış)
+        # kod aşağı atlar ve except bloklarından biri yakalar.
+        member = bot.get_chat_member(chat_id='@' + channel_username, user_id=user_id)
         
-        return jsonify({'is_member': is_member}), 200, headers
+        # Üyelik kontrolü
+        is_member = member.status in ['member', 'administrator', 'creator']
+        
+        # BAŞARILI DURUM: JSON yanıtı gönderiliyor
+        response = jsonify({'is_member': is_member})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
+
+    except TelegramError as e:
+        # Telegram API'den kaynaklanan hatalar (Örn: Bot kanalda yönetici değil, kanal adı yanlış)
+        print(f"Telegram API Hatasi: {e}")
+        
+        # Hata durumunda bile Frontend'in beklediği JSON formatını döndür
+        response = jsonify({'is_member': False, 'error': f'Telegram API Hatasi: {e.message}'})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response, 500
         
     except Exception as e:
-        print(f"Genel API Hatası: {e}")
-        return jsonify({'is_member': False, 'error': str(e)}), 500, headers
-
-if __name__ == '__main__':
-    print(f"Flask Sunucusu Başlatılıyor. PORT: {FLASK_PORT}")
-    app.run(host='0.0.0.0', port=FLASK_PORT)
+        # Kodun içindeki diğer hatalar (Örn: JSON parse hatası)
+        print(f"Genel Hata: {e}")
+        
+        # Hata durumunda bile Frontend'in beklediği JSON formatını döndür
+        response = jsonify({'is_member': False, 'error': f'Sunucu Iç Hatasi: {e}'})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response, 500
