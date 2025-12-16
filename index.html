@@ -577,7 +577,7 @@
     const REQUIRED_CHANNEL_USERNAME = 'KrallarPDF'; 
     const CHANNEL_URL = 'https://t.me/' + REQUIRED_CHANNEL_USERNAME;
     
-    // BOTUNUZUN ÇALIŞTIĞI API ENDPOINT ADRESİ
+    // BOTUNUZUN ÇALIŞTIĞI API ENDPOINT ADRESİ (RENDER ADRESİ)
     const API_ENDPOINT_BASE = 'https://pdfdershanem.onrender.com';
     const CHECK_MEMBERSHIP_ENDPOINT = API_ENDPOINT_BASE + '/check_membership';
     
@@ -1270,7 +1270,7 @@
         const joinChannelButton = document.getElementById('joinChannelButton');
         const checkAccessButton = document.getElementById('checkAccessButton');
         
-        // İSTENEN DEĞİŞİKLİK: Kanala Katıl Butonu
+        // Kanala Katıl Butonu
         joinChannelButton.addEventListener('click', function() {
             window.open(CHANNEL_URL, '_blank');
             if (window.Telegram && Telegram.WebApp) {
@@ -1278,9 +1278,10 @@
             }
         });
         
-        // İSTENEN DEĞİŞİKLİK: Erişimi Doğrula Butonu
+        // Erişimi Doğrula Butonu (API Çağrısı)
         checkAccessButton.addEventListener('click', function() {
-            checkChannelMembership(); // GÜNCELLENMİŞ API kontrolünü çağır
+            console.log("Erişimi Doğrula butonuna tıklandı.");
+            checkChannelMembership(); // GÜNCEL API kontrolünü çağır
         });
 
         termsCheckbox.addEventListener('change', () => { 
