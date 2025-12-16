@@ -20,25 +20,20 @@
 
         // 2. KLAVYE KISAYOLU ENGELLEME (F12, Ctrl+Shift+I, J, C, U vb.)
         document.addEventListener('keydown', function(e) {
-            // F12
             if (e.key === 'F12') {
                 e.preventDefault();
             }
-            
-            // Ctrl+Shift+I, J, C
             if ((e.ctrlKey || e.metaKey) && (e.shiftKey)) {
                 if (['I', 'J', 'C'].includes(e.key.toUpperCase())) {
                     e.preventDefault();
                 }
             }
-            
-            // Ctrl+U (Sayfa Kaynağını Görüntüle)
             if ((e.ctrlKey || e.metaKey) && e.key.toUpperCase() === 'U') {
                 e.preventDefault();
             }
         });
 
-        // 3. GELİŞTİRİCİ ARAÇLARI KONTROLÜ (Baypas Engellemeye Karşı Caydırma)
+        // 3. GELİŞTİRİCİ ARAÇLARI KONTROLÜ
         const threshold = 160; 
         let devToolsOpen = false;
 
@@ -48,11 +43,9 @@
                 
                 if (!devToolsOpen) {
                     devToolsOpen = true;
-                    // Konsol açıldığında Telegram Web App'ten geri dönmeye zorla
                     if (window.Telegram && Telegram.WebApp) {
                         Telegram.WebApp.close(); 
                     } else {
-                        // Tarayıcıda test ediliyorsa uyarı ver
                         console.error("Uyarı: Geliştirici araçları tespit edildi ve kapatılıyor.");
                     }
                 }
@@ -366,20 +359,10 @@
         <h1 style="margin-top: 0; font-size: 22px; font-weight: 800; color: var(--primary-color);">@PdfDershanem_Bot</h1>
         <span class="material-symbols-rounded" style="font-size: 42px; color: var(--primary-color); margin-bottom: 12px;">book</span>
         <h2 style="margin-top: 0; font-size: 20px; font-weight: 700;">PDF Dershanem</h2>
-        <p style="font-size: 14px; color: var(--hint-color);">Botu kullanmaya başlamak için onaylayın.</p>
+        <p style="font-size: 14px; color: var(--hint-color);">Botu kullanmaya başlamak için şartları kabul edin.</p>
         
-        <div id="channelGateContainer">
-            <p style="font-size: 13px; font-weight: 600; color: #FF3B30; margin-bottom: 10px;">Bota erişim için önce kanalımıza katılmalısınız!</p>
-            <button id="joinChannelButton" class="action-button" style="background-color: #007AFF; margin-bottom: 15px;">Kanala Katıl</button>
-        </div>
-        
-        <div id="accessCheckContainer">
-            <p style="font-size: 13px; color: var(--hint-color); margin-bottom: 10px;">Kanala katıldıysanız, erişim durumunuzu kontrol edin:</p>
-            <button id="checkAccessButton" class="action-button" style="background-color: #34C759; margin-bottom: 20px;">Erişimi Doğrula</button>
-        </div>
-        
-        <div id="termsAndLoginContainer" class="hidden">
-            <div style="display: flex; align-items: center; margin-bottom: 20px; margin-top: 12px;">
+        <div id="termsAndLoginContainer">
+            <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px; margin-top: 12px;">
                 <input type="checkbox" id="termsCheckbox" style="width: 18px; height: 18px; margin-right: 8px; accent-color: var(--primary-color);">
                 <label for="termsCheckbox" style="font-size: 13px; margin-top: 0; font-weight: 400;">Hizmet Şartlarını okudum ve kabul ediyorum. (<a href="#" id="readTermsLink" style="color: var(--primary-color);">Oku</a>)</label>
             </div>
@@ -607,7 +590,7 @@
     
     // YAPILANDIRMA
     const firebaseConfig = {
-      apiKey: "AIzaSyArNeaPYGiPg-K7O19Xg4btYhqfnzvyCtw", // GÜVENLİK RİSKİ: Bu key Frontend'de görünür
+      apiKey: "AIzaSyArNeaPYGiPg-K7O19Xg4btYhqfnzvyCtw", 
       authDomain: "pdfdershanem.firebaseapp.com",
       databaseURL: "https://pdfdershanem-default-rtdb.firebaseio.com", 
       projectId: "pdfdershanem",
@@ -622,18 +605,10 @@
         7904032877, // Ana Admin ID - GÜVENLİK RİSKİ: Bu ID Frontend'de görünür
     ];
     
-    // ZORUNLU KANAL BİLGİSİ
-    const REQUIRED_CHANNEL_USERNAME = 'KrallarPDF'; 
-    const CHANNEL_URL = 'https://t.me/' + REQUIRED_CHANNEL_USERNAME;
-    
-    // BOTUNUZUN ÇALIŞTIĞI API ENDPOINT ADRESİ (RENDER ADRESİ)
-    const API_ENDPOINT_BASE = 'https://pdfdershanem.onrender.com';
-    const CHECK_MEMBERSHIP_ENDPOINT = API_ENDPOINT_BASE + '/check_membership';
-    
     let db;
     let currentUser = null; 
     let is_admin = false;
-    let isChannelMember = false; 
+    let isChannelMember = true; // KANAL KONTROLÜ KALDIRILDIĞI İÇİN HER ZAMAN TRUE
     
     let pendingDownload = { key: null, name: null, url: null, required_ads: 0 }; 
 
@@ -659,7 +634,6 @@
                     currentUser = Telegram.WebApp.initDataUnsafe.user;
                     is_admin = ADMIN_IDS.includes(currentUser.id); 
                 } else {
-                     // Misafir kullanıcı veya başlatma verisi yoksa
                      currentUser = { id: 999999999, first_name: 'Misafir', last_name: 'Kullanıcı', username: 'misafir' };
                      is_admin = false;
                 }
@@ -667,12 +641,10 @@
             } catch (e) {
                 loadingStatus.textContent = "Hata: Telegram WebApp başlatılamadı. " + e.message;
                 loadingStatus.style.display = 'block';
-                // Fallback for debugging
                 if (!currentUser) currentUser = { id: 7904032877, first_name: 'Test', last_name: 'Admin', username: 'testadmin' };
                 is_admin = ADMIN_IDS.includes(currentUser.id);
             }
         } else {
-             // Fallback for debugging (Browser use)
              currentUser = { id: 7904032877, first_name: 'Test', last_name: 'Admin', username: 'testadmin' };
              is_admin = ADMIN_IDS.includes(currentUser.id);
         }
@@ -681,107 +653,9 @@
             document.getElementById('adminControlCard').classList.remove('hidden');
             document.getElementById('adminControlCardProfile').classList.remove('hidden');
         }
-        
-        // Kanal kontrol mekanizmasını göster
-        document.getElementById('channelGateContainer').classList.remove('hidden');
-        document.getElementById('accessCheckContainer').classList.remove('hidden');
     }
     
-    // #############################
-    // ##### GÜNCELLENMİŞ ÜYELİK KONTROL LOGİĞİ (HATA VE KESİNTİ DÜZELTMELİ) #####
-    // #############################
-    
-    window.checkChannelMembership = function() {
-        
-        if (!currentUser || !currentUser.id) {
-            showErrorModal("Hata", "Telegram Kullanıcı ID'si alınamıyor. Lütfen botu yeniden başlatın.");
-            return;
-        }
-        
-        // Hata veren showProgress yerine MainButton'ı kullan
-        if (window.Telegram && Telegram.WebApp && Telegram.WebApp.MainButton) {
-            Telegram.WebApp.MainButton.setText('Erişim Kontrol Ediliyor...');
-            Telegram.WebApp.MainButton.show();
-            Telegram.WebApp.MainButton.showProgress(true); 
-        }
-        
-        // API isteğini başlat
-        fetch(CHECK_MEMBERSHIP_ENDPOINT, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                user_id: currentUser.id, 
-                channel_username: REQUIRED_CHANNEL_USERNAME 
-            })
-        })
-        .then(response => {
-            // İlerleme çubuğunu gizle
-            if (window.Telegram && Telegram.WebApp && Telegram.WebApp.MainButton) {
-                 Telegram.WebApp.MainButton.showProgress(false);
-            }
-            
-            // 404, 500 gibi HTTP hatalarını kontrol et
-            if (!response.ok) {
-                 // Yanıt gövdesini JSON olarak okumaya çalış (hata detayını almak için)
-                 return response.json().then(errorData => {
-                     // Hata detayını sunucu yanıtından al
-                     throw new Error(`Sunucu Hatası (${response.status}): ${errorData.error || response.statusText}`);
-                 }).catch(e => {
-                     // JSON okuma başarısız olursa (Bu, 'Unexpected end of JSON input' hatasının yakalandığı yerdir)
-                     if (e.name === 'SyntaxError' || e.message.includes('JSON input')) {
-                          // Render'ın uyku modu veya ağ kesintisi hatası için özel mesaj
-                          throw new Error(`Bağlantı Kesintisi (RENDER UYKU MODU). Lütfen 15 saniye bekleyip tekrar deneyin.`);
-                     }
-                     // Diğer hata durumları
-                     throw new Error(`HTTP Hatası: ${response.status} - ${response.statusText}.`);
-                 });
-            }
-            // Başarılıysa JSON yanıtını al
-            return response.json();
-        })
-        .then(data => {
-            // İlerleme çubuğunu ve MainButton'ı gizle
-            if (window.Telegram && Telegram.WebApp && Telegram.WebApp.MainButton) {
-                 Telegram.WebApp.MainButton.hide();
-            }
-            
-            // Backend'den gelen is_member cevabına göre kontrol
-            if (data && data.is_member === true) { 
-                isChannelMember = true;
-                document.getElementById('channelGateContainer').classList.add('hidden');
-                document.getElementById('accessCheckContainer').classList.add('hidden');
-                document.getElementById('termsAndLoginContainer').classList.remove('hidden');
-                if (window.Telegram && Telegram.WebApp) {
-                    Telegram.WebApp.showAlert("Kanala üyeliğiniz doğrulandı!");
-                }
-            } else {
-                isChannelMember = false;
-                if (window.Telegram && Telegram.WebApp) {
-                    Telegram.WebApp.showAlert("Kanala üyeliğiniz bulunamadı. Lütfen kanala katıldığınızdan emin olun (@KrallarPDF).");
-                }
-            }
-            const termsCheckbox = document.getElementById('termsCheckbox');
-            const loginButton = document.getElementById('loginButton');
-            loginButton.disabled = !termsCheckbox.checked || !isChannelMember;
-        })
-        .catch(error => {
-            // Tüm ağ ve Backend hataları burada yakalanır
-            
-            // İlerleme çubuğunu ve MainButton'ı gizle
-            if (window.Telegram && Telegram.WebApp && Telegram.WebApp.MainButton) {
-                 Telegram.WebApp.MainButton.showProgress(false);
-                 Telegram.WebApp.MainButton.hide();
-            }
-            
-            const errorMessage = error.message;
-
-            if (window.Telegram && Telegram.WebApp) {
-                 Telegram.WebApp.showAlert(`Bağlantı/Doğrulama Hatası: ${errorMessage}`);
-            }
-            console.error("API hatası:", error);
-            showErrorModal("Bağlantı Hatası", `Üyelik kontrol API'sinden yanıt alınamadı. Hata: ${errorMessage}`);
-        });
-    }
+    // KANAL KONTROLÜ İLE İLGİLİ checkChannelMembership fonksiyonu TAMAMEN KALDIRILDI.
     
     // #############################
     // ##### AVATAR VE RENK FONKSİYONLARI #####
@@ -1337,27 +1211,16 @@
 
         const termsCheckbox = document.getElementById('termsCheckbox');
         const loginButton = document.getElementById('loginButton');
-        const joinChannelButton = document.getElementById('joinChannelButton');
-        const checkAccessButton = document.getElementById('checkAccessButton');
         
-        joinChannelButton.addEventListener('click', function() {
-            window.open(CHANNEL_URL, '_blank');
-            if (window.Telegram && Telegram.WebApp) {
-                 Telegram.WebApp.showAlert(`Lütfen kanala katıldıktan sonra "Erişimi Doğrula" butonuna tıklayın.`);
-            }
-        });
-        
-        checkAccessButton.addEventListener('click', function() {
-            console.log("Erişimi Doğrula butonuna tıklandı.");
-            checkChannelMembership(); 
-        });
+        // KANAL KONTROLÜ İLE İLGİLİ BUTON EVENT'LERİ KALDIRILDI.
 
         termsCheckbox.addEventListener('change', () => { 
-            loginButton.disabled = !termsCheckbox.checked || !isChannelMember; 
+            loginButton.disabled = !termsCheckbox.checked; // SADECE ŞARTLARA BAĞLI
         });
         
         loginButton.addEventListener('click', function() {
-            if (termsCheckbox.checked && isChannelMember && currentUser && db) { 
+            // isChannelMember kontrolü kaldırıldı
+            if (termsCheckbox.checked && currentUser && db) { 
                 loginButton.disabled = true;
                 loginButton.textContent = 'Veriler yükleniyor...';
                 
@@ -1375,6 +1238,7 @@
                     
                     fetchAndShowProfileInfo(currentUser.id); 
                 }).catch(err => {
+                    // Kullanıcı verisi kaydedilemese bile uygulamayı başlat
                     showInitialAd();
                     
                     document.getElementById('splashScreen').classList.add('hidden');
@@ -1387,10 +1251,6 @@
                         Telegram.WebApp.showAlert(`Uyarı: Veri kaydı sırasında bir sorun oluştu, ancak uygulama başlatıldı. Hata: ${err.message}`);
                     }
                 });
-            } else if (!isChannelMember) {
-                 showErrorModal("Erişim Engellendi", "Lütfen bota erişim için zorunlu kanala katıldığınızdan emin olun ve 'Erişimi Doğrula' butonuna tıklayın.");
-                 loginButton.disabled = true;
-                 loginButton.textContent = 'Bota Giriş Yap';
             } else if (!db) {
                  showErrorModal("Bağlantı Hatası", "Firebase bağlantısı kurulamadığı için giriş yapılamıyor.");
                  loginButton.disabled = false;
@@ -1412,9 +1272,7 @@
         document.getElementById('acceptTermsModal').addEventListener('click', function() {
             document.getElementById('termsModal').classList.add('hidden');
             termsCheckbox.checked = true; 
-            if (isChannelMember) { 
-                 loginButton.disabled = false; 
-            }
+            loginButton.disabled = false; // Şartlar kabul edildiği an buton açılır
         });
         
         function setupCriticalEventListeners() {
