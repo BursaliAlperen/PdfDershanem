@@ -22,8 +22,9 @@
             if ((e.ctrlKey || e.metaKey) && e.key.toUpperCase() === 'U') { e.preventDefault(); }
         });
     </script>
+    
     <style>
-        /* CSS STİLLERİ: TELEGRAM TEMA UYUMLU */
+        /* CSS STİLLERİ: TELEGRAM TEMA UYUMLU (ÖNCEKİ KODDAKİ TÜM STİLLER AYNI KALMIŞTIR) */
         :root {
             --primary-color: var(--tg-theme-link-color, #007AFF);
             --secondary-color: var(--tg-theme-secondary-bg-color, #FFFFFF);
@@ -98,7 +99,7 @@
             position: absolute; 
             top: 0; 
             left: 0; 
-            overflow-y: auto; /* Sayfanın tamamı kayabilir */
+            overflow-y: auto; 
             padding: 10px 0; 
             box-sizing: border-box; 
             display: none; 
@@ -154,14 +155,14 @@
             font-size: 12px;
             font-weight: 600;
             color: var(--hint-color);
-            margin: 5px 0 8px 0; /* Artık dış kapsayıcıda padding var */
+            margin: 5px 0 8px 0; 
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
         
         .list-card { 
             background-color: var(--secondary-color); 
-            margin: 0 0 12px 0; /* Artık dış kapsayıcıda padding var */
+            margin: 0 0 12px 0; 
             border-radius: var(--card-radius); 
             overflow: hidden; 
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); 
@@ -193,7 +194,10 @@
             flex-shrink: 0; 
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); 
         }
-
+        .pdf-icon-bg {
+            background-color: #FF3B30 !important; 
+        }
+        
         #profileIcon {
             width: 60px; 
             height: 60px; 
@@ -207,15 +211,48 @@
             color: white;
             font-weight: 600;
         }
-
+        .list-info {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1; 
+        }
+        .list-name-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2px; 
+        }
         .list-name { 
             font-weight: 600; 
             font-size: 14px;
+            line-height: 1.2;
         }
+        .host-icon {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            line-height: 18px;
+            text-align: center;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            color: white;
+            margin-left: 6px;
+            vertical-align: middle;
+            flex-shrink: 0;
+        }
+        .host-dropbox {
+            background-color: #0061FE;
+        }
+        .host-google {
+            background-color: #0F9D58;
+        }
+        .host-other {
+            background-color: var(--hint-color);
+        }
+
         .list-detail { 
             font-size: 11px;
             color: var(--hint-color); 
-            margin-top: 2px; 
         }
         .list-meta { 
             font-size: 12px;
@@ -294,7 +331,7 @@
         
         /* Yeni Alt Bilgi Stili */
         .app-footer-info {
-            padding: 15px 0; /* Yatay padding'i dış kapsayıcıdan alacak */
+            padding: 15px 0; 
             text-align: center;
             font-size: 11px;
             color: var(--hint-color);
@@ -328,9 +365,10 @@
         }
         .progress-fill {
             height: 100%;
-            background-color: #34C759; /* Yeşil renk */
+            background-color: #34C759; 
             transition: width 0.3s ease;
         }
+        
         /* İNDİRME MODALI ORTALAMA DÜZELTMESİ */
         #adProgressModal .modal-content {
             display: flex;
@@ -375,8 +413,8 @@
             -webkit-overflow-scrolling: touch;
             white-space: nowrap;
             margin: 0; 
-            padding: 0 12px; /* Yan boşlukları buraya taşıdık */
-            flex-shrink: 0; /* İçeriğin kayması için küçülmesini engeller */
+            padding: 0 12px; 
+            flex-shrink: 0; 
         }
         .category-nav-scroll {
             display: inline-flex;
@@ -407,9 +445,9 @@
         #page-pdf-list {
             display: flex; 
             flex-direction: column; 
-            overflow-y: auto; /* Sayfanın kendisi kaydırılabilir olsun */
-            padding: 0; /* Üst padding'i kaldırıp content-wrapper'a taşıyoruz */
-            padding-bottom: 70px; /* Navigasyon için boşluk */
+            overflow-y: auto; 
+            padding: 0; 
+            padding-bottom: 70px; 
         }
 
         /* Yeni Kapsayıcı: Yan boşlukları ve sabit içeriği yönetir */
@@ -421,13 +459,13 @@
         /* PDF LİSTESİ CONTAINER'I DÜZELTMESİ */
         #pdfDownloadList {
             flex-grow: 1; 
-            overflow-y: visible; /* Sayfa kaydığı için bu visible olmalı */
+            overflow-y: visible; 
             margin-bottom: 0;
-            padding: 0 12px; /* Yan boşlukları burada veriyoruz */
+            padding: 0 12px; 
         }
         
         #pdfDownloadList .list-card {
-             margin: 0 0 12px 0; /* Yan boşluk dışarıdan verildiği için */
+             margin: 0 0 12px 0; 
              border-radius: var(--card-radius);
         }
 
@@ -510,7 +548,7 @@
             <div class="list-section-title" style="margin: 5px 12px 8px 12px;">PDF KÜTÜPHANESİ</div>
             <div class="list-card">
                 <div class="list-item" id="homePdfListCard" onclick="changeTab('pdf-list')">
-                    <div class="list-icon" style="background-color: #FF3B30;"><span class="material-symbols-rounded">collections_bookmark</span></div>
+                    <div class="list-icon pdf-icon-bg"><span class="material-symbols-rounded">collections_bookmark</span></div>
                     <div class="list-info"><div class="list-name">Tüm PDF Dosyaları</div><div class="list-detail">Toplam Dosya: <span id="pdfCount">Yükleniyor...</span></div></div>
                     <div class="list-meta" style="color: var(--primary-color);"><span class="material-symbols-rounded">chevron_right</span></div>
                 </div>
@@ -773,6 +811,79 @@
         'notlar': 'Özet Notlar',
         'diger': 'Diğer'
     };
+    
+    // #############################
+    // ##### NİHAİ SÖZLÜK: KISALTMA, YAZIM VE ÖZEL İSİM TAMAMLAMA #####
+    // #############################
+
+    const ABBREVIATION_DICT = {
+        // === Özel İsimler ve Markalar (Bitişik veya Kısaltılmış Halleri) ===
+        "altugen": "Altıgen", // Altü G Ne -> Altıgen
+        "altgn": "Altıgen",
+        "bilgisarmal": "Bilgi Sarmal", 
+        "biyikli": "Bıyıklı",
+        "bes": "Beş", 
+        "birey": "Birey",
+        "ap": "APOTEMİ", 
+        "ozd": "Özdebir", 
+        "acilyayin": "Acil Yayınları",
+        "krallar": "Krallar",
+        "pdfokyanus": "PDF Okyanusu", 
+        "pdfokyanusu": "PDF Okyanusu",
+        "baris": "Barış", // Yayınevi
+        "benimhocam": "Benim Hocam",
+        "vp": "Video Programı", // Video Ders Notları için yaygın kısaltma
+    
+        // === Sınavlar ve Seviyeler ===
+        "tyt": "TYT",
+        "ayt": "AYT",
+        "yks": "YKS",
+        "lgs": "LGS",
+        "ales": "ALES",
+        "dgs": "DGS",
+        "kpss": "KPSS",
+        
+        // === Dersler ve Branşlar (Kısaltma ve Eksik Harf Hataları) ===
+        "mat": "Matematik",
+        "mtmtk": "Matematik",
+        "fizk": "Fizik",
+        "fiz": "Fizik",
+        "kmya": "Kimya",
+        "biyo": "Biyoloji",
+        "edeb": "Edebiyat",
+        "trh": "Tarih",
+        "cog": "Coğrafya",
+        "cografya": "Coğrafya",
+        "geo": "Geometri",
+        "turkce": "Türkçe",
+        "ing": "İngilizce",
+        
+        // === Kaynak Tipleri ve İçerik Biçimleri ===
+        "den": "Deneme",
+        "tg1": "TG-1", // Deneme serisi
+        "sb": "Soru Bankası",
+        "nts": "Notları",
+        "ozet": "Özet",
+        "konu": "Konu",
+        "anltm": "Anlatım",
+        "fasikul": "Fasikül",
+        "kitapcigi": "Kitapçığı",
+        "klv": "Kılavuzu",
+        "cevap": "Cevap",
+        "anahtar": "Anahtarı",
+        "kamp": "Kamp",
+        "coz": "Çözüm",
+        "soru": "Soru",
+        "ders": "Ders",
+        
+        // === Diğer Yaygın Kelimeler ===
+        "grubu": "Grubu", 
+        "tamamlama": "Tamamlama",
+        "pdf": "PDF",
+        "kitabi": "Kitabı",
+        "cilt": "Cilt",
+        "tarz": "Tarz",
+    };
 
     function initializeApp() {
         const loadingStatus = document.getElementById('loadingStatus');
@@ -803,10 +914,12 @@
             } catch (e) {
                 loadingStatus.textContent = "Hata: Telegram WebApp başlatılamadı. " + e.message;
                 loadingStatus.style.display = 'block';
+                // Fallback for testing in browser if Telegram init fails
                 if (!currentUser) currentUser = { id: 7904032877, first_name: 'Test', last_name: 'Admin', username: 'testadmin' };
                 is_admin = ADMIN_IDS.includes(currentUser.id);
             }
         } else {
+             // Browser test environment
              currentUser = { id: 7904032877, first_name: 'Test', last_name: 'Admin', username: 'testadmin' };
              is_admin = ADMIN_IDS.includes(currentUser.id);
         }
@@ -821,7 +934,7 @@
     }
     
     // #############################
-    // ##### DROBOX URL İŞLEME FONKSİYONU #####
+    // ##### DROBOX URL İŞLEME FONKSİYONU (NİHAİ - GÜNCEL SÖZLÜK İLE) #####
     // #############################
 
     window.updatePdfTitleFromUrl = function() {
@@ -836,15 +949,12 @@
 
         let fileName = '';
 
-        // 1. Dropbox linki (Normal paylaşım linki)
+        // 1. Dosya adını çekme (Önceki mantık aynı)
         const matchDropbox = url.match(/\/([^\/]+\.pdf)(?:\?|$)/i);
         
         if (matchDropbox && matchDropbox[1]) {
             fileName = decodeURIComponent(matchDropbox[1]);
-        } 
-        
-        // 2. Eğer hala boşsa veya farklı bir URL yapısıysa 
-        else {
+        } else {
              const urlParts = url.split('/');
              const lastPart = urlParts[urlParts.length - 1];
              if (lastPart.includes('.')) {
@@ -852,15 +962,49 @@
              }
         }
 
-        // Dosya adından uzantıyı ve gereksiz karakterleri temizle
         if (fileName) {
-            let cleanTitle = fileName.replace(/\.pdf$/i, '').replace(/[\-_\.]/g, ' '); 
-            cleanTitle = cleanTitle.toLowerCase().split(' ').map((s) => s.charAt(0).toUpperCase() + s.substring(1)).join(' ');
+            let cleanTitle = fileName;
+
+            // A) Dosya uzantısını kaldır
+            cleanTitle = cleanTitle.replace(/\.pdf$/i, '');
+            
+            // B) Ayırıcı karakterleri (tire, alt çizgi, nokta) boşlukla değiştir
+            cleanTitle = cleanTitle.replace(/[\-_\.]/g, ' '); 
+            
+            // C) Fazla boşlukları tek boşluğa indir
+            cleanTitle = cleanTitle.replace(/\s+/g, ' ').trim();
+            
+            // D) Her kelimenin ilk harfini küçük yap (Sözlük kontrolü için)
+            let words = cleanTitle.toLowerCase().split(' ');
+            
+            // E) KISALTMA/YAZIM KONTROLÜ VE DÜZELTME (Yeni Sözlük Kullanımı)
+            let correctedWords = words.map(word => {
+                const lowerWord = word.toLocaleLowerCase('tr-TR'); // Türkçe küçük harfe çevirme
+                
+                if (ABBREVIATION_DICT[lowerWord]) {
+                    // Sözlükte tam eşleşme varsa, tam halini döndür
+                    return ABBREVIATION_DICT[lowerWord];
+                }
+                
+                // Sözlükte yoksa, Proper Case yap
+                if (word.length > 0) {
+                    // Türkçe karakter uyumlu Proper Case
+                    const firstChar = word.charAt(0).toLocaleUpperCase('tr-TR');
+                    const restOfString = word.substring(1).toLocaleLowerCase('tr-TR');
+                    return firstChar + restOfString;
+                }
+                return word;
+            });
+            
+            // 3. Sonucu birleştir
+            cleanTitle = correctedWords.join(' ');
             
             titleInput.value = cleanTitle.trim() || 'PDF Başlığı';
+            
         } else {
+            // Dosya adı bulunamazsa
             titleInput.value = '';
-            titleInput.placeholder = "1. PDF Başlığını Girin (URL'den bulunamadı)";
+            titleInput.placeholder = "1. PDF Başlığını Girin (URL'den otomatik bulunamadı)";
         }
     }
     
@@ -887,10 +1031,10 @@
 
         let initials = '';
         if (firstName) {
-            initials += firstName.charAt(0).toUpperCase();
+            initials += firstName.charAt(0).toLocaleUpperCase('tr-TR');
         }
         if (lastName) {
-            initials += lastName.charAt(0).toUpperCase();
+            initials += lastName.charAt(0).toLocaleUpperCase('tr-TR');
         }
         
         if (!initials) {
@@ -1004,7 +1148,7 @@
 
                     adButton.disabled = false;
                     updateProgressModalUI();
-                    fetchPDFList(); // Kategori ve sıralamayı koruyarak listeyi güncelle
+                    fetchPDFList(); 
                     
                 })
                 .catch(e => {
@@ -1247,7 +1391,20 @@
     }
     
     // #############################
-    // ##### ANA SAYFA PDF SAYACINI GÜNCELLEME FONKSİYONU (YENİ) #####
+    // ##### HOST SERVİSİNİ BULMA FONKSİYONU (YENİ) #####
+    // #############################
+    function getHostIconHtml(url) {
+        if (url.includes('dropbox.com')) {
+            return `<span class="host-icon host-dropbox">DB</span>`;
+        }
+        if (url.includes('drive.google.com') || url.includes('docs.google.com')) {
+            return `<span class="host-icon host-google">G</span>`;
+        }
+        return `<span class="host-icon host-other">?</span>`;
+    }
+
+    // #############################
+    // ##### ANA SAYFA PDF SAYACINI GÜNCELLEME FONKSİYONU #####
     // #############################
     window.updatePDFCountUI = function(pdfsData) {
         if (!pdfsData) {
@@ -1261,7 +1418,7 @@
     }
 
     // #############################
-    // ##### ANA PDF LİSTE ÇEKME FONKSİYONU (GÜNCELLENDİ) #####
+    // ##### ANA PDF LİSTE ÇEKME FONKSİYONU #####
     // #############################
 
     window.fetchPDFList = function() {
@@ -1270,7 +1427,7 @@
         db.ref('pdfs').once('value').then(pdfsSnapshot => {
             allPdfsData = pdfsSnapshot.val() || {};
             
-            // PDF sayısını güncellemek için yeni fonksiyonu çağırıyoruz
+            // PDF sayacını güncelle
             updatePDFCountUI(allPdfsData); 
             
             // Kategorileri oluştur ve ilk listelemeyi yap
@@ -1283,7 +1440,7 @@
     }
 
     // #############################
-    // ##### FİLTRELEME VE SIRALAMA LOGİĞİ (YENİ) #####
+    // ##### FİLTRELEME VE SIRALAMA LOGİĞİ #####
     // #############################
 
     window.filterAndSortPDFs = function() {
@@ -1300,7 +1457,6 @@
             // Kategori filtresi: PDF'in başlığı veya tagleri kategori anahtarını içeriyorsa
             pdfsArray = pdfsArray.filter(pdf => {
                 const titleMatch = pdf.title && pdf.title.toLowerCase().includes(currentCategory);
-                // Tags alanı string veya array olabilir
                 let tagsMatch = false;
                 if (pdf.tags) {
                     if (Array.isArray(pdf.tags)) {
@@ -1327,8 +1483,8 @@
             } else if (currentSort === 'oldest') {
                 return (a.created_at || 0) - (b.created_at || 0); // En Eski (Küçükten Büyüğe)
             } else if (currentSort === 'name') {
-                const titleA = (a.title || '').toUpperCase();
-                const titleB = (b.title || '').toUpperCase();
+                const titleA = (a.title || '').toLocaleUpperCase('tr-TR');
+                const titleB = (b.title || '').toLocaleUpperCase('tr-TR');
                 return titleA.localeCompare(titleB, 'tr', { sensitivity: 'base' });
             }
             return 0;
@@ -1361,12 +1517,10 @@
                 const progressPercent = requiredAdsInt > 0 ? (watchedAds / requiredAdsInt) * 100 : 100;
                 
                 let metaText = '';
-                let iconBgColor = '#5856D6'; 
                 let downloadIcon = 'file_download';
 
                 if (remainingAds <= 0) {
                     metaText = `<span style="color: #34C759; font-weight: 700;">İndirmeye Hazır</span>`;
-                    iconBgColor = '#34C759';
                     downloadIcon = 'check_circle';
                 } else if (requiredAdsInt > 0) {
                     metaText = `Kalan: ${remainingAds} Reklam`;
@@ -1374,14 +1528,19 @@
                     metaText = 'Ücretsiz İndir';
                 }
                 
+                const hostIconHtml = getHostIconHtml(url); // YENİ: Host İkonunu al
+
                 const item = document.createElement('div');
                 item.classList.add('list-item');
                 item.setAttribute('onclick', `handlePDFDownloadClick('${key}', '${safeTitle}', '${safeUrl}', ${requiredAdsInt})`);
 
                 item.innerHTML = `
-                    <div class="list-icon" style="background-color: ${iconBgColor};"><span class="material-symbols-rounded">${downloadIcon}</span></div>
+                    <div class="list-icon pdf-icon-bg"><span class="material-symbols-rounded">${downloadIcon}</span></div>
                     <div class="list-info" style="flex-grow: 1;">
-                        <div class="list-name">${title}</div>
+                        <div class="list-name-container">
+                            <div class="list-name">${title}</div>
+                            ${hostIconHtml} 
+                        </div>
                         <div class="list-detail">${metaText} - İndirme: ${downloads || 0}</div>
                         ${requiredAdsInt > 0 ? 
                             `<div class="progress-bar">
@@ -1519,11 +1678,15 @@
                     item.style.flexWrap = 'wrap';
 
                     const adsText = pdf.required_ads > 0 ? `(${pdf.required_ads} Reklam)` : '(Ücretsiz)';
+                    const hostIconHtml = getHostIconHtml(pdf.url);
 
                     item.innerHTML = `
-                        <div class="list-icon" style="background-color: #5856D6;"><span class="material-symbols-rounded">description</span></div>
+                        <div class="list-icon pdf-icon-bg"><span class="material-symbols-rounded">picture_as_pdf</span></div>
                         <div class="list-info" style="flex-grow: 1; max-width: calc(100% - 150px);">
-                            <div class="list-name">${pdf.title} ${adsText}</div>
+                            <div class="list-name-container">
+                                <div class="list-name">${pdf.title} ${adsText}</div>
+                                ${hostIconHtml}
+                            </div>
                             <div class="list-detail">İndirme: ${pdf.downloads || 0} - Eklenme: ${pdf.created_at ? new Date(pdf.created_at).toLocaleDateString() : 'Bilinmiyor'}</div>
                         </div>
                         <div class="list-meta" style="flex-shrink: 0; margin-left: auto;">
@@ -1689,7 +1852,7 @@
                     showInitialAd();
                     
                     // ÖNEMLİ: PDF listesini hemen çekmeye başla ki veri yüklenirken ana sayfa açılsın
-                    fetchPDFList(); // Düzeltme burada yapıldı.
+                    fetchPDFList(); 
                     
                     document.getElementById('splashScreen').classList.add('hidden');
                     
