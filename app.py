@@ -9,7 +9,7 @@ from telegram.error import TelegramError, Unauthorized # Telegram Hata sınıfı
 # -------------------------------------------------------------
 
 # BOT_TOKEN'i Render Environment'tan güvenli şekilde çekin.
-BOT_TOKEN = os.environ.get('BOT_TOKEN')
+BOT_TOKEN = os.environ.get('8086964160:AAEvy02LNcs1zOh5bW9REqrHfg2h2hkiXD8')
 
 # Eğer BOT_TOKEN yoksa, uygulama hiç başlamamalıdır.
 if not BOT_TOKEN:
