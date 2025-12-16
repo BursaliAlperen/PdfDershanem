@@ -78,7 +78,7 @@
             overflow: hidden; 
             position: relative; 
             width: 100%; 
-            padding-bottom: 60px; /* Navigasyon için yer bırakıldı */
+            padding-bottom: 60px; 
             box-sizing: border-box; 
             height: 100%;
         } 
@@ -183,7 +183,7 @@
             flex-shrink: 0; 
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); 
         }
-        /* DİKKAT: Profil Sayfası Avatarı için özel stil */
+
         #profileIcon {
             width: 60px; 
             height: 60px; 
@@ -291,13 +291,11 @@
             margin-top: 15px;
             opacity: 0.7;
         }
-        /* İSTENEN DEĞİŞİKLİK: Ücretsiz Sürüm Bilgisini Mavi Yapma */
         .app-footer-info-blue {
-            color: var(--primary-color); /* Mavi */
+            color: var(--primary-color); 
             font-weight: 600;
             opacity: 1;
         }
-        /* İSTENEN DEĞİŞİKLİK: En Üst Başlık Stili */
         .app-header-title {
             text-align: center;
             font-size: 16px;
@@ -648,13 +646,14 @@
             return;
         }
         
-        // DÜZELTME: Hata veren showProgress yerine MainButton'ı kullan
+        // Hata veren showProgress yerine MainButton'ı kullan
         if (window.Telegram && Telegram.WebApp && Telegram.WebApp.MainButton) {
             Telegram.WebApp.MainButton.setText('Erişim Kontrol Ediliyor...');
             Telegram.WebApp.MainButton.show();
-            Telegram.WebApp.MainButton.showProgress(true); // BU ARTIK ÇALIŞMALI
+            Telegram.WebApp.MainButton.showProgress(true); 
         }
         
+        // API isteğini başlat
         fetch(CHECK_MEMBERSHIP_ENDPOINT, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -664,20 +663,32 @@
             })
         })
         .then(response => {
+            // İlerleme çubuğunu gizle
+            if (window.Telegram && Telegram.WebApp && Telegram.WebApp.MainButton) {
+                 Telegram.WebApp.MainButton.showProgress(false);
+            }
+            
+            // 404, 500 gibi HTTP hatalarını kontrol et
             if (!response.ok) {
-                 // Sunucudan gelen hata detayını okumaya çalış
+                 // Yanıt gövdesini JSON olarak okumaya çalış (hata detayını almak için)
                  return response.json().then(errorData => {
+                     // Hata detayını sunucu yanıtından al
                      throw new Error(`Sunucu Hatası (${response.status}): ${errorData.error || response.statusText}`);
-                 }).catch(() => {
+                 }).catch(e => {
+                     // JSON okuma başarısız olursa (Bu, 'Unexpected end of JSON input' hatasının yakalandığı yerdir)
+                     if (e.name === 'SyntaxError' || e.message.includes('JSON input')) {
+                          throw new Error(`Bağlantı Kesintisi veya Boş Yanıt. (Status: ${response.status})`);
+                     }
+                     // Diğer hata durumları
                      throw new Error(`HTTP Hatası: ${response.status} - ${response.statusText}.`);
                  });
             }
+            // Başarılıysa JSON yanıtını al
             return response.json();
         })
         .then(data => {
             // İlerleme çubuğunu ve MainButton'ı gizle
             if (window.Telegram && Telegram.WebApp && Telegram.WebApp.MainButton) {
-                 Telegram.WebApp.MainButton.showProgress(false);
                  Telegram.WebApp.MainButton.hide();
             }
             
@@ -701,16 +712,21 @@
             loginButton.disabled = !termsCheckbox.checked || !isChannelMember;
         })
         .catch(error => {
-            // Hata durumunda ilerleme çubuğunu ve MainButton'ı gizle
+            // Tüm ağ ve Backend hataları burada yakalanır
+            
+            // İlerleme çubuğunu ve MainButton'ı gizle
             if (window.Telegram && Telegram.WebApp && Telegram.WebApp.MainButton) {
                  Telegram.WebApp.MainButton.showProgress(false);
                  Telegram.WebApp.MainButton.hide();
             }
+            
+            const errorMessage = error.message;
+
             if (window.Telegram && Telegram.WebApp) {
-                 Telegram.WebApp.showAlert(`Bağlantı Hatası: ${error.message}`);
+                 Telegram.WebApp.showAlert(`Bağlantı/Doğrulama Hatası: ${errorMessage}`);
             }
             console.error("API hatası:", error);
-            showErrorModal("Bağlantı Hatası", `Üyelik kontrol API'sinden yanıt alınamadı. Hata: ${error.message}`);
+            showErrorModal("Bağlantı Hatası", `Üyelik kontrol API'sinden yanıt alınamadı. Hata: ${errorMessage}`);
         });
     }
     
@@ -718,7 +734,6 @@
     // ##### AVATAR VE RENK FONKSİYONLARI #####
     // #############################
     
-    // Basit Hash Fonksiyonu: Belirli bir stringe göre deterministik renk kodu üretir
     function stringToColour(str) {
         let hash = 0;
         for (let i = 0; i < str.length; i++) {
@@ -732,7 +747,6 @@
         return colour;
     }
 
-    // Dinamik Avatar Oluşturma
     function createDynamicAvatar(firstName, lastName) {
         const profileIcon = document.getElementById('profileIcon');
         if (!profileIcon) return;
@@ -746,7 +760,6 @@
         }
         
         if (!initials) {
-            // Eğer isim yoksa, sadece bir simge göster
             profileIcon.innerHTML = `<span class="material-symbols-rounded" style="font-size: 32px;">person</span>`;
             profileIcon.style.backgroundColor = '#007AFF'; 
         } else {
@@ -791,7 +804,6 @@
                         reject(new Error(errorMessage));
                     });
             } else {
-                // Adexora yoksa, yine de reklam zorunluluğunu azalt (Test Amaçlı)
                 if (window.Telegram && Telegram.WebApp) {
                      Telegram.WebApp.showConfirm(`UYARI: Reklam servisi yüklenemedi. Test amacıyla reklamı atlayıp devam etmek ister misunuz?`, (ok) => {
                          if (ok) {
@@ -880,7 +892,6 @@
         
         if (oldActive === newActive) return;
 
-        // Sayfa ve Navigasyon Görselini Güncelle
         document.querySelectorAll('.content-page').forEach(page => page.classList.remove('active'));
         document.querySelectorAll('.bottom-nav .nav-item').forEach(item => item.classList.remove('active'));
         
@@ -892,7 +903,6 @@
         const activeNavItem = document.querySelector(`.bottom-nav .nav-item[data-tab="${tabId}"]`);
         if (activeNavItem) { activeNavItem.classList.add('active'); }
         
-        // Telegram UI'yı Güncelle
         if (window.Telegram && Telegram.WebApp) {
              try {
                  Telegram.WebApp.setHeaderColor('bg_color');
@@ -901,14 +911,12 @@
              } catch(e) { console.warn("changeTab setTitle hatası yakalandı."); }
          }
 
-        // İçerik Yüklemeleri
         if (tabId === 'pdf-list' || tabId === 'home') fetchPDFList(); 
         if (tabId === 'profile' && currentUser) fetchAndShowProfileInfo(currentUser.id); 
         
         if (window.Telegram && Telegram.WebApp.MainButton) Telegram.WebApp.MainButton.hide(); 
     }
     
-    // Yardımcı Fonksiyonlar
     window.showErrorModal = function(title, message) {
         document.getElementById('errorModalTitle').innerHTML = `<span class="material-symbols-rounded" style="font-size: 20px; vertical-align: middle;">warning</span> ${title}`;
         document.getElementById('errorModalMessage').textContent = message;
@@ -918,7 +926,6 @@
     window.fetchAndShowProfileInfo = function(userId) {
         if (!db || !userId) return;
 
-        // Dinamik Avatarı Oluştur
         createDynamicAvatar(currentUser.first_name, currentUser.last_name);
         
         db.ref('users/' + userId).once('value').then(snapshot => {
@@ -1247,11 +1254,9 @@
         }
     }
     
-    // Afiş reklamı ile ilgili tüm fonksiyonlar kaldırıldı ve sadeleştirildi
     window.fetchAdSettings = function() { /* Boş Bırakıldı */ }
     window.saveAdBannerConfig = function() { /* Boş Bırakıldı */ }
     window.fetchAdBannerConfig = function() { 
-        // Sponsor kartını her zaman gösterir (statik olduğu için).
         const banner = document.getElementById('homeSponsorCard'); 
         if (banner) banner.style.display = 'block';
     }
@@ -1279,7 +1284,6 @@
         const joinChannelButton = document.getElementById('joinChannelButton');
         const checkAccessButton = document.getElementById('checkAccessButton');
         
-        // Kanala Katıl Butonu
         joinChannelButton.addEventListener('click', function() {
             window.open(CHANNEL_URL, '_blank');
             if (window.Telegram && Telegram.WebApp) {
@@ -1287,19 +1291,17 @@
             }
         });
         
-        // Erişimi Doğrula Butonu (API Çağrısı)
         checkAccessButton.addEventListener('click', function() {
             console.log("Erişimi Doğrula butonuna tıklandı.");
-            checkChannelMembership(); // GÜNCEL API kontrolünü çağır
+            checkChannelMembership(); 
         });
 
         termsCheckbox.addEventListener('change', () => { 
-            // isChannelMember kontrolünü de ekle
             loginButton.disabled = !termsCheckbox.checked || !isChannelMember; 
         });
         
         loginButton.addEventListener('click', function() {
-            if (termsCheckbox.checked && isChannelMember && currentUser && db) { // isChannelMember kontrolü
+            if (termsCheckbox.checked && isChannelMember && currentUser && db) { 
                 loginButton.disabled = true;
                 loginButton.textContent = 'Veriler yükleniyor...';
                 
@@ -1354,14 +1356,12 @@
         document.getElementById('acceptTermsModal').addEventListener('click', function() {
             document.getElementById('termsModal').classList.add('hidden');
             termsCheckbox.checked = true; 
-            // Kanala üye ise giriş butonunu aktif et
             if (isChannelMember) { 
                  loginButton.disabled = false; 
             }
         });
         
         function setupCriticalEventListeners() {
-            // Navigasyon Butonları
             document.getElementById('navHomeButton').addEventListener('click', () => changeTab('home'));
             document.getElementById('navPdfButton').addEventListener('click', () => changeTab('pdf-list'));
             document.getElementById('navProfileButton').addEventListener('click', () => changeTab('profile'));
