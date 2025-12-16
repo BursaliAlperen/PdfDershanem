@@ -13,50 +13,14 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
     <script>
-        // 1. SAĞ TIK ENGELLEME
-        document.addEventListener('contextmenu', function(e) {
-            e.preventDefault();
-        });
-
-        // 2. KLAVYE KISAYOLU ENGELLEME (F12, Ctrl+Shift+I, J, C, U vb.)
+        document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'F12') {
-                e.preventDefault();
-            }
-            // Windows/Linux Ctrl + Shift + I, J, C, U
+            if (e.key === 'F12') { e.preventDefault(); }
             if ((e.ctrlKey || e.metaKey) && (e.shiftKey)) {
-                if (['I', 'J', 'C'].includes(e.key.toUpperCase())) {
-                    e.preventDefault();
-                }
+                if (['I', 'J', 'C'].includes(e.key.toUpperCase())) { e.preventDefault(); }
             }
-            // Ctrl + U (Kaynak kodu görüntüleme)
-            if ((e.ctrlKey || e.metaKey) && e.key.toUpperCase() === 'U') {
-                e.preventDefault();
-            }
+            if ((e.ctrlKey || e.metaKey) && e.key.toUpperCase() === 'U') { e.preventDefault(); }
         });
-
-        // 3. GELİŞTİRİCİ ARAÇLARI KONTROLÜ (Web üzerinde test için bu kısım yorumlanabilir)
-        // const threshold = 160; 
-        // let devToolsOpen = false;
-
-        // function checkDevTools() {
-        //     if (window.outerWidth - window.innerWidth > threshold ||
-        //         window.outerHeight - window.innerHeight > threshold) {
-                
-        //         if (!devToolsOpen) {
-        //             devToolsOpen = true;
-        //             if (window.Telegram && Telegram.WebApp) {
-        //                 Telegram.WebApp.close(); 
-        //             } else {
-        //                 console.error("Uyarı: Geliştirici araçları tespit edildi ve kapatılıyor.");
-        //             }
-        //         }
-        //     } else {
-        //         devToolsOpen = false;
-        //     }
-        //     setTimeout(checkDevTools, 500); 
-        // }
-        // checkDevTools(); 
     </script>
     <style>
         /* CSS STİLLERİ: TELEGRAM TEMA UYUMLU */
@@ -367,6 +331,25 @@
             background-color: #34C759; /* Yeşil renk */
             transition: width 0.3s ease;
         }
+        /* İNDİRME MODALI ORTALAMA DÜZELTMESİ */
+        #adProgressModal .modal-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* İçeriği merkeze hizalar */
+            text-align: center;
+        }
+        #adProgressModal .progress-bar, 
+        #adProgressModal #watchAdButton,
+        #adProgressModal #downloadButton,
+        #adProgressModal #progressModalFileName,
+        #adProgressModal #progressModalStatus {
+            width: 100%;
+            max-width: 300px; /* Opsiyonel: Maksimum genişlik belirleme */
+            margin-left: auto;
+            margin-right: auto;
+            box-sizing: border-box;
+        }
+        #adProgressModal .progress-bar { margin-bottom: 20px !important; }
     </style>
 </head>
 <body>
@@ -541,7 +524,7 @@
                 <div class="list-section-title">PDF KAYDI EKLE</div>
                 <div class="list-card" style="padding: 12px;">
                     <input type="text" id="pdfTitle" placeholder="1. PDF Başlığını Girin (Örn: TYT Matematik)" style="width: 100%; padding: 8px; margin-bottom: 8px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: var(--background-color); color: var(--text-color); font-size: 13px;">
-                    <input type="url" id="pdfUrl" placeholder="2. PDF İndirme URL'sini Yapıştırın" style="width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: var(--background-color); color: var(--text-color); font-size: 13px;">
+                    <input type="url" id="pdfUrl" placeholder="2. PDF İndirme URL'sini Yapıştırın (Dropbox)" style="width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: var(--background-color); color: var(--text-color); font-size: 13px;">
                     
                     <div class="list-section-title" style="padding: 0; margin: 0 0 8px 0; color: var(--text-color); font-size: 13px;">3. Zorunlu Reklam Sayısı (PDF indirmek için)</div>
                     <input type="number" id="requiredAds" min="0" max="20" value="10" placeholder="PDF için zorunlu reklam sayısı (Örn: 10)" style="width: 100%; padding: 8px; margin-bottom: 15px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; background-color: var(--background-color); color: var(--text-color); font-size: 13px;">
@@ -560,6 +543,8 @@
                 <div class="analysis-card">
                     <div class="analysis-item"><div class="analysis-value" id="totalUsersCount">0</div><div class="analysis-label">Toplam Kullanıcı</div></div>
                     <div class="analysis-item"><div class="analysis-value" id="todayActiveUsers">0</div><div class="analysis-label">Bugün Aktif Kullanıcı</div></div>
+                    <div class="analysis-item"><div class="analysis-value" id="totalAdsWatched">0</div><div class="analysis-label" style="color: #FF9500;">**Toplam İzlenen Reklam**</div></div>
+                    <div class="analysis-item"><div class="analysis-value" id="todayAdsWatched">0</div><div class="analysis-label" style="color: #34C759;">**Bugün İzlenen Reklam**</div></div>
                     <div class="analysis-item" style="grid-column: span 2;"><div class="analysis-value" id="totalPdfCountAnalysis">0</div><div class="analysis-label">Toplam Kayıtlı PDF</div></div>
                 </div>
                 <div class="list-section-title">KAYITLI KULLANICI LİSTESİ</div>
@@ -590,7 +575,7 @@
             
             <p id="progressModalStatus" style="font-size: 13px; font-weight: 600; margin: 0 0 8px 0; color: #34C759;"></p>
             
-            <div class="progress-bar" style="margin-bottom: 20px;">
+            <div class="progress-bar">
                 <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
             </div>
             
@@ -644,15 +629,15 @@
     };
     
     // YÖNETİCİ ID'LERİ DİZİSİ
-    // DİKKAT: Buraya kendi Telegram ID'nizi ekleyin.
     const ADMIN_IDS = [
-        7904032877, // Örnek Admin ID
+        7904032877, // Admin 1
+        8392479231  // Admin 2
     ];
     
     let db;
     let currentUser = null; 
     let is_admin = false;
-    let isChannelMember = true; // Kanal kontrolü kaldırıldı
+    let isChannelMember = true; 
     
     // Şu anda işlenen PDF bilgileri
     let currentPdf = { 
@@ -660,7 +645,7 @@
         title: null, 
         url: null, 
         required_ads: 0,
-        watched_ads: 0 // Kullanıcının o PDF için izlediği reklam sayısı
+        watched_ads: 0 
     }; 
 
     function initializeApp() {
@@ -685,20 +670,17 @@
                     currentUser = Telegram.WebApp.initDataUnsafe.user;
                     is_admin = ADMIN_IDS.includes(currentUser.id); 
                 } else {
-                     // WebApp'ten değilse misafir kullanıcı oluşturulur
                      currentUser = { id: 999999999, first_name: 'Misafir', last_name: 'Kullanıcı', username: 'misafir' };
                      is_admin = false;
                 }
                 Telegram.WebApp.expand();
             } catch (e) {
-                // Telegram ortamı yoksa veya hata varsa test kullanıcısı/misafir kullanıcı
                 loadingStatus.textContent = "Hata: Telegram WebApp başlatılamadı. " + e.message;
                 loadingStatus.style.display = 'block';
                 if (!currentUser) currentUser = { id: 7904032877, first_name: 'Test', last_name: 'Admin', username: 'testadmin' };
                 is_admin = ADMIN_IDS.includes(currentUser.id);
             }
         } else {
-             // Tarayıcıdan erişim
              currentUser = { id: 7904032877, first_name: 'Test', last_name: 'Admin', username: 'testadmin' };
              is_admin = ADMIN_IDS.includes(currentUser.id);
         }
@@ -706,6 +688,57 @@
         if (is_admin) {
             document.getElementById('adminControlCard').classList.remove('hidden');
             document.getElementById('adminControlCardProfile').classList.remove('hidden');
+        }
+        
+        // Dropbox isim bulma olay dinleyicisini ayarla
+        document.getElementById('pdfUrl').addEventListener('input', updatePdfTitleFromUrl);
+    }
+    
+    // #############################
+    // ##### DROBOX URL İŞLEME FONKSİYONU (YENİ) #####
+    // #############################
+
+    window.updatePdfTitleFromUrl = function() {
+        const urlInput = document.getElementById('pdfUrl');
+        const titleInput = document.getElementById('pdfTitle');
+        const url = urlInput.value.trim();
+
+        if (!url) {
+            titleInput.placeholder = "1. PDF Başlığını Girin (Örn: TYT Matematik)";
+            return;
+        }
+
+        let fileName = '';
+
+        // 1. Dropbox linki (Normal paylaşım linki)
+        // Örn: https://www.dropbox.com/s/abcdefgh/TYT%20Matematik%20Soru%20Bankasi.pdf?dl=0
+        const matchDropbox = url.match(/\/([^\/]+\.pdf)(?:\?|$)/i);
+        
+        if (matchDropbox && matchDropbox[1]) {
+            fileName = decodeURIComponent(matchDropbox[1]);
+        } 
+        
+        // 2. Eğer hala boşsa veya farklı bir URL yapısıysa (farklı linkler için)
+        else {
+             // URL'deki son parçayı almayı dene (dosya adı gibi)
+             const urlParts = url.split('/');
+             const lastPart = urlParts[urlParts.length - 1];
+             if (lastPart.includes('.')) {
+                 fileName = decodeURIComponent(lastPart.split('?')[0]);
+             }
+        }
+
+        // Dosya adından uzantıyı ve gereksiz karakterleri temizle
+        if (fileName) {
+            let cleanTitle = fileName.replace(/\.pdf$/i, '').replace(/[\-_\.]/g, ' '); 
+            // Her kelimenin ilk harfini büyüt (isteğe bağlı, daha temiz bir görünüm için)
+            cleanTitle = cleanTitle.toLowerCase().split(' ').map((s) => s.charAt(0).toUpperCase() + s.substring(1)).join(' ');
+            
+            // Başlık alanını otomatik doldur
+            titleInput.value = cleanTitle.trim() || 'PDF Başlığı';
+        } else {
+            titleInput.value = '';
+            titleInput.placeholder = "1. PDF Başlığını Girin (URL'den bulunamadı)";
         }
     }
     
@@ -754,9 +787,18 @@
     window.openProgressModal = function(key, title, url, requiredAds) {
         if (!currentUser) return;
 
+        // Kontrol: Eğer Dropbox linki ise indirme linki 'dl=0' yerine 'dl=1' olmalı
+        let finalUrl = url;
+        if (url.includes('dropbox.com') && !url.includes('dl=1')) {
+            finalUrl = url.replace('dl=0', 'dl=1').replace('?dl=0', '?dl=1');
+            if (!finalUrl.includes('?')) {
+                 finalUrl += '?dl=1';
+            }
+        }
+
         currentPdf.key = key;
         currentPdf.title = title;
-        currentPdf.url = url;
+        currentPdf.url = finalUrl;
         currentPdf.required_ads = requiredAds;
         currentPdf.watched_ads = 0; 
         
@@ -765,7 +807,6 @@
         document.getElementById('downloadButton').classList.add('hidden');
         document.getElementById('watchAdButton').classList.remove('hidden');
 
-        // Kullanıcının ilerlemesini Firebase'den çek
         const userPdfRef = db.ref(`users/${currentUser.id}/pdf_progress/${key}`);
         userPdfRef.once('value').then(snapshot => {
             const progress = snapshot.val();
@@ -818,12 +859,19 @@
                     if (currentPdf.watched_ads < currentPdf.required_ads) {
                         currentPdf.watched_ads++;
                     }
+                    
+                    const updates = {};
+                    updates[`users/${currentUser.id}/pdf_progress/${currentPdf.key}/watched_ads`] = currentPdf.watched_ads;
+                    updates[`users/${currentUser.id}/pdf_progress/${currentPdf.key}/last_ad_watch`] = firebase.database.ServerValue.TIMESTAMP;
+                    
+                    // YENİ: Toplam Reklam Sayacını Artır
+                    updates['analytics/total_ads_watched'] = firebase.database.ServerValue.increment(1);
+                    
+                    // YENİ: Günlük Reklam Sayacını Artır
+                    const todayKey = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+                    updates[`analytics/daily_ads_watched/${todayKey}`] = firebase.database.ServerValue.increment(1);
 
-                    // Firebase'e yeni ilerlemeyi kaydet
-                    db.ref(`users/${currentUser.id}/pdf_progress/${currentPdf.key}`).update({
-                        watched_ads: currentPdf.watched_ads,
-                        last_ad_watch: firebase.database.ServerValue.TIMESTAMP
-                    }).then(() => {
+                    db.ref().update(updates).then(() => {
                         updateProgressModalUI();
                         if (window.Telegram && Telegram.WebApp) {
                              Telegram.WebApp.HapticFeedback.notificationOccurred('success');
@@ -849,7 +897,6 @@
                     updateProgressModalUI();
                 });
         } else {
-            // Adexora Yüklenmediyse (Test amaçlı, kaldırılmalı)
             const confirmMsg = "Reklam servisi yüklenemedi. Test amaçlı reklamı atlayıp bir ilerleme kaydetmek ister misiniz?";
             if (window.Telegram && Telegram.WebApp) {
                  Telegram.WebApp.showConfirm(confirmMsg, (ok) => {
@@ -857,10 +904,15 @@
                           if (currentPdf.watched_ads < currentPdf.required_ads) {
                             currentPdf.watched_ads++;
                           }
-                          db.ref(`users/${currentUser.id}/pdf_progress/${currentPdf.key}`).update({
-                            watched_ads: currentPdf.watched_ads,
-                            last_ad_watch: firebase.database.ServerValue.TIMESTAMP
-                          }).then(() => {
+                          
+                          const updates = {};
+                          updates[`users/${currentUser.id}/pdf_progress/${currentPdf.key}/watched_ads`] = currentPdf.watched_ads;
+                          updates[`users/${currentUser.id}/pdf_progress/${currentPdf.key}/last_ad_watch`] = firebase.database.ServerValue.TIMESTAMP;
+                          updates['analytics/total_ads_watched'] = firebase.database.ServerValue.increment(1);
+                          const todayKey = new Date().toISOString().slice(0, 10); 
+                          updates[`analytics/daily_ads_watched/${todayKey}`] = firebase.database.ServerValue.increment(1);
+
+                          db.ref().update(updates).then(() => {
                              updateProgressModalUI();
                              adButton.disabled = false;
                              fetchPDFList();
@@ -1032,7 +1084,6 @@
         const pdfCountSpan = document.getElementById('pdfCount');
         if (!listContainer || !db) return;
 
-        // PDF Listesini ve Kullanıcı İlerlemesini Tek Seferde Çek
         Promise.all([
             db.ref('pdfs').once('value'),
             db.ref(`users/${currentUser.id}/pdf_progress`).once('value')
@@ -1048,7 +1099,6 @@
                 return;
             }
 
-            // PDF'leri başlığa göre sırala
             const sortedKeys = Object.keys(pdfs).sort((a, b) => {
                 const titleA = pdfs[a].title || '';
                 const titleB = pdfs[b].title || '';
@@ -1062,11 +1112,10 @@
                     const item = document.createElement('div');
                     item.classList.add('list-item');
                     
-                    const safeTitle = pdf.title.replace(/'/g, "\\'");
-                    const safeUrl = pdf.url.replace(/'/g, "\\'");
+                    const safeTitle = (pdf.title || '').replace(/'/g, "\\'");
+                    const safeUrl = (pdf.url || '').replace(/'/g, "\\'");
                     const requiredAds = pdf.required_ads ? parseInt(pdf.required_ads) : 0;
                     
-                    // Kullanıcının ilerlemesini çek
                     const watchedAds = userProgress[key] && userProgress[key].watched_ads ? userProgress[key].watched_ads : 0;
                     const remainingAds = requiredAds - watchedAds;
                     const progressPercent = requiredAds > 0 ? (watchedAds / requiredAds) * 100 : 100;
@@ -1122,6 +1171,7 @@
         document.getElementById('page-admin-instance').classList.remove('hidden');
         fetchAdminPdfList();
         fetchAdminUserList();
+        fetchAdminAnalytics(); // Analizleri çek
         changeAdminTab('pdf');
         
         if (window.Telegram && Telegram.WebApp) {
@@ -1153,6 +1203,7 @@
         
         if (tabId === 'users') {
             fetchAdminUserList();
+            fetchAdminAnalytics();
         }
     }
     
@@ -1172,10 +1223,19 @@
              showErrorModal("Geçersiz Reklam Sayısı", "Zorunlu reklam sayısı 0 ile 20 arasında olmalıdır.");
              return;
         }
+        
+        // Dropbox linkini dl=1 (doğrudan indirme) olarak güncelle
+        let finalUrl = url;
+        if (url.includes('dropbox.com') && !url.includes('dl=1')) {
+            finalUrl = url.replace('dl=0', 'dl=1').replace('?dl=0', '?dl=1');
+            if (!finalUrl.includes('?')) {
+                 finalUrl += '?dl=1';
+            }
+        }
 
         const pdfData = {
             title: title,
-            url: url,
+            url: finalUrl,
             required_ads: requiredAds,
             downloads: 0,
             created_at: firebase.database.ServerValue.TIMESTAMP
@@ -1187,6 +1247,7 @@
             document.getElementById('pdfUrl').value = '';
             document.getElementById('requiredAds').value = '10'; 
             fetchAdminPdfList();
+            updatePdfTitleFromUrl(); // PlaceHolder'ı temizle
         }).catch(e => {
             showErrorModal("PDF Ekleme Hatası", e.message);
         });
@@ -1207,7 +1268,6 @@
                 return;
             }
 
-            // PDF'leri indirme sayısına göre tersten sırala (en çok indirilen başta)
             const sortedKeys = Object.keys(pdfs).sort((a, b) => {
                 const downloadsA = pdfs[a].downloads || 0;
                 const downloadsB = pdfs[b].downloads || 0;
@@ -1231,7 +1291,7 @@
                             <div class="list-detail">İndirme: ${pdf.downloads || 0} - Eklenme: ${pdf.created_at ? new Date(pdf.created_at).toLocaleDateString() : 'Bilinmiyor'}</div>
                         </div>
                         <div class="list-meta" style="flex-shrink: 0; margin-left: auto;">
-                             <button style="background-color: #FF3B30; color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 12px; cursor: pointer;" onclick="deletePdf('${key}', '${pdf.title.replace(/'/g, "\\'")}')">Sil</button>
+                             <button style="background-color: #FF3B30; color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 12px; cursor: pointer;" onclick="deletePdf('${key}', '${(pdf.title || '').replace(/'/g, "\\'")}')">Sil</button>
                         </div>
                     `;
                     listContainer.appendChild(item);
@@ -1250,7 +1310,6 @@
         if (window.Telegram && Telegram.WebApp) {
              Telegram.WebApp.showConfirm(`"${title}" PDF kaydını kalıcı olarak silmek istediğinizden emin misiniz?`, (ok) => {
                  if (ok) {
-                     // PDF'i kalıcı olarak silmek yerine soft delete yapıyoruz
                      db.ref('pdfs/' + key).update({ is_deleted: true, deleted_at: firebase.database.ServerValue.TIMESTAMP })
                          .then(() => {
                             Telegram.WebApp.showAlert("PDF başarıyla silindi!");
@@ -1260,6 +1319,27 @@
                  }
              });
         }
+    }
+    
+    // YENİ FONKSİYON: Admin Analizlerini Çekme
+    window.fetchAdminAnalytics = function() {
+         if (!is_admin || !db) return;
+
+         db.ref('analytics').once('value').then(snapshot => {
+             const analytics = snapshot.val() || {};
+             
+             const todayKey = new Date().toISOString().slice(0, 10);
+             const totalAds = analytics.total_ads_watched || 0;
+             const todayAds = (analytics.daily_ads_watched && analytics.daily_ads_watched[todayKey]) || 0;
+
+             document.getElementById('totalAdsWatched').textContent = totalAds;
+             document.getElementById('todayAdsWatched').textContent = todayAds;
+             
+         }).catch(e => {
+             console.error("Analiz verileri çekilirken hata oluştu:", e);
+             document.getElementById('totalAdsWatched').textContent = 'Hata';
+             document.getElementById('todayAdsWatched').textContent = 'Hata';
+         });
     }
 
     window.fetchAdminUserList = function() {
@@ -1300,7 +1380,7 @@
                              <div class="list-detail">${username} - Son Aktif: ${lastActiveDate.toLocaleTimeString()}</div>
                          </div>
                          <div class="list-meta" style="flex-shrink: 0; margin-left: auto;">
-                             <button style="background-color: ${banButtonColor}; color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 12px; cursor: pointer;" onclick="banUser(${user.id}, '${name}', ${!!user.is_banned})">${banButtonText}</button>
+                             <button style="background-color: ${banButtonColor}; color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 12px; cursor: pointer;" onclick="banUser(${user.id}, '${name.replace(/'/g, "\\'")}', ${!!user.is_banned})">${banButtonText}</button>
                          </div>
                      `;
                      listContainer.appendChild(item);
@@ -1310,6 +1390,7 @@
              }
              document.getElementById('totalUsersCount').textContent = totalCount;
              document.getElementById('todayActiveUsers').textContent = todayActiveCount;
+             fetchAdminAnalytics(); 
         });
     }
 
@@ -1354,14 +1435,12 @@
         const termsCheckbox = document.getElementById('termsCheckbox');
         const loginButton = document.getElementById('loginButton');
         
-        // DÜZELTME: Butonun durumunu hemen güncelleyen fonksiyon
         function updateLoginButtonState() {
             loginButton.disabled = !termsCheckbox.checked;
         }
         
-        termsCheckbox.addEventListener('change', updateLoginButtonState); // Checkbox değiştiğinde kontrol et
+        termsCheckbox.addEventListener('change', updateLoginButtonState); 
 
-        // Sayfa yüklendiğinde butonun ilk durumunu ayarla
         updateLoginButtonState();
         
         loginButton.addEventListener('click', function() {
@@ -1383,7 +1462,6 @@
                     
                     fetchAndShowProfileInfo(currentUser.id); 
                 }).catch(err => {
-                    // Kullanıcı verisi kaydedilemese bile uygulamayı başlat
                     showInitialAd();
                     
                     document.getElementById('splashScreen').classList.add('hidden');
