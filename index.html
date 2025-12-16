@@ -12,6 +12,57 @@
     
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
+    <script>
+        // 1. SAĞ TIK ENGELLEME
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+
+        // 2. KLAVYE KISAYOLU ENGELLEME (F12, Ctrl+Shift+I, J, C, U vb.)
+        document.addEventListener('keydown', function(e) {
+            // F12
+            if (e.key === 'F12') {
+                e.preventDefault();
+            }
+            
+            // Ctrl+Shift+I, J, C
+            if ((e.ctrlKey || e.metaKey) && (e.shiftKey)) {
+                if (['I', 'J', 'C'].includes(e.key.toUpperCase())) {
+                    e.preventDefault();
+                }
+            }
+            
+            // Ctrl+U (Sayfa Kaynağını Görüntüle)
+            if ((e.ctrlKey || e.metaKey) && e.key.toUpperCase() === 'U') {
+                e.preventDefault();
+            }
+        });
+
+        // 3. GELİŞTİRİCİ ARAÇLARI KONTROLÜ (Baypas Engellemeye Karşı Caydırma)
+        const threshold = 160; 
+        let devToolsOpen = false;
+
+        function checkDevTools() {
+            if (window.outerWidth - window.innerWidth > threshold ||
+                window.outerHeight - window.innerHeight > threshold) {
+                
+                if (!devToolsOpen) {
+                    devToolsOpen = true;
+                    // Konsol açıldığında Telegram Web App'ten geri dönmeye zorla
+                    if (window.Telegram && Telegram.WebApp) {
+                        Telegram.WebApp.close(); 
+                    } else {
+                        // Tarayıcıda test ediliyorsa uyarı ver
+                        console.error("Uyarı: Geliştirici araçları tespit edildi ve kapatılıyor.");
+                    }
+                }
+            } else {
+                devToolsOpen = false;
+            }
+            setTimeout(checkDevTools, 500); 
+        }
+        checkDevTools(); 
+    </script>
     <style>
         /* CSS STİLLERİ: TELEGRAM TEMA UYUMLU */
         :root {
@@ -556,7 +607,7 @@
     
     // YAPILANDIRMA
     const firebaseConfig = {
-      apiKey: "AIzaSyArNeaPYGiPg-K7O19Xg4btYhqfnzvyCtw", 
+      apiKey: "AIzaSyArNeaPYGiPg-K7O19Xg4btYhqfnzvyCtw", // GÜVENLİK RİSKİ: Bu key Frontend'de görünür
       authDomain: "pdfdershanem.firebaseapp.com",
       databaseURL: "https://pdfdershanem-default-rtdb.firebaseio.com", 
       projectId: "pdfdershanem",
@@ -568,7 +619,7 @@
     
     // YÖNETİCİ ID'LERİ DİZİSİ
     const ADMIN_IDS = [
-        7904032877, // Ana Admin ID
+        7904032877, // Ana Admin ID - GÜVENLİK RİSKİ: Bu ID Frontend'de görünür
     ];
     
     // ZORUNLU KANAL BİLGİSİ
@@ -608,6 +659,7 @@
                     currentUser = Telegram.WebApp.initDataUnsafe.user;
                     is_admin = ADMIN_IDS.includes(currentUser.id); 
                 } else {
+                     // Misafir kullanıcı veya başlatma verisi yoksa
                      currentUser = { id: 999999999, first_name: 'Misafir', last_name: 'Kullanıcı', username: 'misafir' };
                      is_admin = false;
                 }
@@ -636,7 +688,7 @@
     }
     
     // #############################
-    // ##### GÜNCELLENMİŞ ÜYELİK KONTROL LOGİĞİ (HATA DÜZELTMELİ) #####
+    // ##### GÜNCELLENMİŞ ÜYELİK KONTROL LOGİĞİ (HATA VE KESİNTİ DÜZELTMELİ) #####
     // #############################
     
     window.checkChannelMembership = function() {
@@ -677,7 +729,8 @@
                  }).catch(e => {
                      // JSON okuma başarısız olursa (Bu, 'Unexpected end of JSON input' hatasının yakalandığı yerdir)
                      if (e.name === 'SyntaxError' || e.message.includes('JSON input')) {
-                          throw new Error(`Bağlantı Kesintisi veya Boş Yanıt. (Status: ${response.status})`);
+                          // Render'ın uyku modu veya ağ kesintisi hatası için özel mesaj
+                          throw new Error(`Bağlantı Kesintisi (RENDER UYKU MODU). Lütfen 15 saniye bekleyip tekrar deneyin.`);
                      }
                      // Diğer hata durumları
                      throw new Error(`HTTP Hatası: ${response.status} - ${response.statusText}.`);
@@ -1254,6 +1307,9 @@
         }
     }
     
+    // #############################
+    // ##### BOŞ BIRAKILAN REKLAM AYARLARI FONKSİYONLARI #####
+    // #############################
     window.fetchAdSettings = function() { /* Boş Bırakıldı */ }
     window.saveAdBannerConfig = function() { /* Boş Bırakıldı */ }
     window.fetchAdBannerConfig = function() { 
