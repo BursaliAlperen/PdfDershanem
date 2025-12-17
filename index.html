@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>@Pdf_DershanemBot - PDF Kütüphanesi</title>
     
+    <!-- YENİ CHALPUS REKLAM KODLARI -->
+    <script src='//libtl.com/sdk.js' data-zone='10340134' data-sdk='show_10340134'></script>
+    
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
@@ -515,8 +518,6 @@
         <button id="acceptTermsModal" class="action-button" style="margin-top: 8px; font-size: 13px; padding: 8px 16px;">Okudum ve Kabul Ediyorum</button>
     </div>
 </div>
-
-<script src="https://adexora.com/cdn/ads.js?id=1326"></script>
 
 <div class="telegram-app" id="app">
     
@@ -1076,7 +1077,7 @@
     }
     
     // #############################
-    // ##### REKLAM İZLEME VE İNDİRME SİSTEMİ #####
+    // ##### REKLAM İZLEME VE İNDİRME SİSTEMİ (CHALPUS GÜNCELLEMESİ) #####
     // #############################
     
     window.openProgressModal = function(key, title, url, requiredAds) {
@@ -1145,84 +1146,57 @@
         adButton.disabled = true;
         adButton.textContent = "Reklam Yükleniyor...";
         
-        if (window.showAdexora) {
-            window.showAdexora()
-                .then(() => {
-                    // ✅ Reklam Başarıyla İzlenirse
-                    adButton.textContent = "İlerleme Kaydediliyor...";
+        // YENİ CHALPUS REKLAM SİSTEMİ
+        if (typeof show_10340134 !== 'undefined') {
+            // Rewarded interstitial reklamı göster
+            show_10340134().then(() => {
+                // ✅ Reklam Başarıyla İzlenirse
+                adButton.textContent = "İlerleme Kaydediliyor...";
 
-                    if (currentPdf.watched_ads < currentPdf.required_ads) {
-                        currentPdf.watched_ads++;
-                    }
-                    
-                    const updates = {};
-                    updates[`users/${currentUser.id}/pdf_progress/${currentPdf.key}/watched_ads`] = currentPdf.watched_ads;
-                    updates[`users/${currentUser.id}/pdf_progress/${currentPdf.key}/last_ad_watch`] = firebase.database.ServerValue.TIMESTAMP;
-                    
-                    // YENİ: Toplam Reklam Sayacını Artır
-                    updates['analytics/total_ads_watched'] = firebase.database.ServerValue.increment(1);
-                    
-                    // YENİ: Günlük Reklam Sayacını Artır
-                    const todayKey = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-                    updates[`analytics/daily_ads_watched/${todayKey}`] = firebase.database.ServerValue.increment(1);
+                if (currentPdf.watched_ads < currentPdf.required_ads) {
+                    currentPdf.watched_ads++;
+                }
+                
+                const updates = {};
+                updates[`users/${currentUser.id}/pdf_progress/${currentPdf.key}/watched_ads`] = currentPdf.watched_ads;
+                updates[`users/${currentUser.id}/pdf_progress/${currentPdf.key}/last_ad_watch`] = firebase.database.ServerValue.TIMESTAMP;
+                
+                // Toplam Reklam Sayacını Artır
+                updates['analytics/total_ads_watched'] = firebase.database.ServerValue.increment(1);
+                
+                // Günlük Reklam Sayacını Artır
+                const todayKey = new Date().toISOString().slice(0, 10);
+                updates[`analytics/daily_ads_watched/${todayKey}`] = firebase.database.ServerValue.increment(1);
 
-                    db.ref().update(updates).then(() => {
-                        updateProgressModalUI();
-                        if (window.Telegram && Telegram.WebApp) {
-                             Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-                        }
-                    }).catch(e => {
-                         showErrorModal("Veri Kayıt Hatası", "İzlenen reklam sayısı kaydedilemedi. " + e.message);
-                    });
-
-                    adButton.disabled = false;
+                db.ref().update(updates).then(() => {
                     updateProgressModalUI();
-                    fetchPDFList(); 
-                    
-                })
-                .catch(e => {
-                    // ❌ Hata Durumu (Reklam Atlandı/Yüklenemedi)
-                    console.error("Adexora Reklam Hatası:", e);
                     if (window.Telegram && Telegram.WebApp) {
-                         Telegram.WebApp.showAlert("Hata: Reklam izlenemedi veya atlandı. Lütfen tekrar deneyin.");
-                    } else {
-                         showErrorModal("Reklam Hatası", "Reklam yüklenirken bir sorun oluştu. Lütfen bağlantınızı kontrol edin.");
+                        Telegram.WebApp.HapticFeedback.notificationOccurred('success');
                     }
-                    adButton.disabled = false;
-                    updateProgressModalUI();
+                }).catch(e => {
+                    showErrorModal("Veri Kayıt Hatası", "İzlenen reklam sayısı kaydedilemedi. " + e.message);
                 });
-        } else {
-            // Reklam servisi yüklenemediği test veya fallback durumu
-            const confirmMsg = "Reklam servisi yüklenemedi. Test amaçlı reklamı atlayıp bir ilerleme kaydetmek ister misiniz?";
-            if (window.Telegram && Telegram.WebApp) {
-                 Telegram.WebApp.showConfirm(confirmMsg, (ok) => {
-                     if (ok) {
-                          if (currentPdf.watched_ads < currentPdf.required_ads) {
-                            currentPdf.watched_ads++;
-                          }
-                          
-                          const updates = {};
-                          updates[`users/${currentUser.id}/pdf_progress/${currentPdf.key}/watched_ads`] = currentPdf.watched_ads;
-                          updates[`users/${currentUser.id}/pdf_progress/${currentPdf.key}/last_ad_watch`] = firebase.database.ServerValue.TIMESTAMP;
-                          updates['analytics/total_ads_watched'] = firebase.database.ServerValue.increment(1);
-                          const todayKey = new Date().toISOString().slice(0, 10); 
-                          updates[`analytics/daily_ads_watched/${todayKey}`] = firebase.database.ServerValue.increment(1);
 
-                          db.ref().update(updates).then(() => {
-                             updateProgressModalUI();
-                             adButton.disabled = false;
-                             fetchPDFList();
-                          });
-                     } else {
-                        adButton.disabled = false;
-                        adButton.textContent = "Reklam İzle ve İlerle";
-                     }
-                 });
-            } else {
-                 showErrorModal("Sistem Hatası", "Reklam servisi kullanılamıyor. Tarayıcıda veya bot arayüzünde deneyin.");
-                 adButton.disabled = false;
-                 adButton.textContent = "Reklam İzle ve İlerle";
-            }
+                adButton.disabled = false;
+                updateProgressModalUI();
+                fetchPDFList();
+                
+            }).catch(e => {
+                // ❌ Hata Durumu
+                console.error("Chalpus Reklam Hatası:", e);
+                if (window.Telegram && Telegram.WebApp) {
+                    Telegram.WebApp.showAlert("Hata: Reklam izlenemedi veya atlandı. Lütfen tekrar deneyin.");
+                } else {
+                    showErrorModal("Reklam Hatası", "Reklam yüklenirken bir sorun oluştu. Lütfen bağlantınızı kontrol edin.");
+                }
+                adButton.disabled = false;
+                updateProgressModalUI();
+            });
+        } else {
+            // Fallback durumu
+            showErrorModal("Reklam Sistemi Hatası", "Reklam servisi yüklenemedi. Lütfen sayfayı yenileyin.");
+            adButton.disabled = false;
+            adButton.textContent = "Reklam İzle ve İlerle";
         }
     }
 
@@ -1603,7 +1577,7 @@
 
     
     // #############################
-    // ##### ADMIN PANEL FONKSİYONLARI #####
+    // ##### ADMIN PANEL FONKSİYONLARI (100.000 KULLANICI GÜNCELLEMESİ) #####
     // #############################
 
     window.openAdminModal = function() {
@@ -1845,7 +1819,8 @@
         const listContainer = document.getElementById('adminUserList');
         if (!listContainer || !db) return;
 
-        db.ref('users').orderByChild('last_active').limitToLast(50).on('value', (snapshot) => {
+        // DEĞİŞİKLİK: limitToLast(50) yerine limitToLast(100000) - 100.000 KULLANICI
+        db.ref('users').orderByChild('last_active').limitToLast(100000).on('value', (snapshot) => {
              listContainer.innerHTML = '';
              const users = snapshot.val();
              let totalCount = 0;
@@ -1856,7 +1831,10 @@
                  const userArray = Object.keys(users).map(key => ({ id: key, ...users[key] }));
                  userArray.sort((a, b) => b.last_active - a.last_active);
 
-                 userArray.forEach(user => {
+                 // Performans için sadece ilk 100 kullanıcıyı göster
+                 const displayUsers = userArray.slice(0, 100);
+                 
+                 displayUsers.forEach(user => {
                      totalCount++;
                      const lastActiveDate = new Date(user.last_active);
                      if (lastActiveDate.toDateString() === today) {
@@ -1884,6 +1862,13 @@
                      `;
                      listContainer.appendChild(item);
                  });
+                 
+                 // Toplam kullanıcı sayısını göster
+                 const totalUsers = userArray.length;
+                 listContainer.innerHTML += `<div style="padding: 15px; text-align: center; color: var(--primary-color); font-size: 13px; border-top: 1px solid var(--border-color);">
+                     <strong>Toplam ${totalUsers} kayıtlı kullanıcı</strong> (ilk 100 görüntüleniyor)
+                 </div>`;
+                 
              } else {
                  listContainer.innerHTML = `<div style="padding: 15px; text-align: center; color: var(--hint-color); font-size: 13px;">Kayıtlı kullanıcı bulunmamaktadır.</div>`;
              }
@@ -1919,13 +1904,23 @@
     // #############################
     
     window.showInitialAd = function() {
-         if (window.showAdexora) {
-              window.showAdexora().then(() => {
-                 console.log("Giriş reklamı başarıyla izlendi.");
-              }).catch(e => {
-                 console.warn("Giriş reklamı atlandı veya hata verdi:", e.message);
-              });
-         }
+        if (typeof show_10340134 !== 'undefined') {
+            // In-App Interstitial reklamı göster
+            show_10340134({
+                type: 'inApp',
+                inAppSettings: {
+                    frequency: 2,
+                    capping: 0.1,
+                    interval: 30,
+                    timeout: 5,
+                    everyPage: false
+                }
+            }).then(() => {
+                console.log("Giriş reklamı başarıyla izlendi.");
+            }).catch(e => {
+                console.warn("Giriş reklamı atlandı veya hata verdi:", e.message);
+            });
+        }
     }
     
     document.addEventListener('DOMContentLoaded', function() {
