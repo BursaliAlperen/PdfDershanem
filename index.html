@@ -24,7 +24,7 @@
     </script>
     
     <style>
-        /* CSS STİLLERİ: TELEGRAM TEMA UYUMLU (ÖNCEKİ KODDAKİ TÜM STİLLER AYNI KALMIŞTIR) */
+        /* CSS STİLLERİ: TELEGRAM TEMA UYUMLU */
         :root {
             --primary-color: var(--tg-theme-link-color, #007AFF);
             --secondary-color: var(--tg-theme-secondary-bg-color, #FFFFFF);
@@ -495,7 +495,7 @@
         <div id="termsAndLoginContainer">
             <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px; margin-top: 12px;">
                 <input type="checkbox" id="termsCheckbox" style="width: 18px; height: 18px; margin-right: 8px; accent-color: var(--primary-color);">
-                <label for="termsCheckbox" style="font-size: 13px; margin-top: 0; font-weight: 400;">Kuralları yenile okudum kabul ediyorum. (<a href="#" id="readTermsLink" style="color: var(--primary-color);">Oku</a>)</label>
+                <label for="termsCheckbox" style="font-size: 13px; margin-top: 0; font-weight: 400;">Kuralları okudum kabul ediyorum. (<a href="#" id="readTermsLink" style="color: var(--primary-color);">Oku</a>)</label>
             </div>
             <button id="loginButton" class="action-button" disabled>Bota Giriş Yap</button>
         </div>
@@ -504,13 +504,13 @@
     </div>
 </div>
 
+<!-- GÜNCELLENMİŞ KULLANIM KURALLARI MODALI (SADECE 1 MADDE) -->
 <div class="modal-overlay hidden" id="termsModal">
      <div class="modal-content" style="max-width: 90%; padding: 18px; background-color: var(--secondary-color); border-radius: var(--card-radius); box-shadow: var(--shadow-modern);">
-        <h3 style="font-size: 18px;">Hizmet Şartları ve Gizlilik Politikası</h3>
-        <p style="font-size: 13px; color: var(--text-color); margin-bottom: 10px;">**1. Veri Toplama:** Bu bot, yalnızca Telegram ID'nizi, adınızı, soyadınızı ve kullanıcı adınızı kaydeder. </p>
-        <p style="font-size: 13px; color: var(--text-color); margin-bottom: 10px;">**2. Kullanım Kısıtlamaları:** Kullanıcılar, yasa dışı içerik paylaşamaz, spam yapamaz ve diğer kullanıcıları rahatsız edemez. </p>
-        <p style="font-size: 13px; color: var(--text-color); margin-bottom: 10px;">**3. Sorumluluk:** Kullanıcılar, kendi paylaştıkları içeriklerden sorumludur. Yöneticiler, uygunsuz içerikleri kaldırma hakkını saklı tutar.</p>
-        <p style="font-size: 13px; color: var(--text-color); margin-bottom: 15px;">**4. İletişim:** Bu uygulama sohbet özelliği içermez. Sorun veya şikayetleriniz için lütfen @Pdf_DershanemBot üzerinden yazınız.</p>
+        <h3 style="font-size: 18px;">Kullanım Kuralları</h3>
+        <p style="font-size: 13px; color: var(--text-color); margin-bottom: 15px;">
+            **1. Bot İşlevi:** Bu uygulama bir PDF kütüphanesidir. PDF'leri indirmek için belirtilen sayıda reklam izlemeniz gerekmektedir. PDF'ler ücretsiz sunulur ve yalnızca kütüphane hizmeti sağlanır.
+        </p>
         <button id="closeTermsModal" class="action-button" style="margin-top: 8px; background-color: var(--tg-theme-hint-color); font-size: 13px; padding: 8px 16px;">Kapat ve Reddet</button>
         <button id="acceptTermsModal" class="action-button" style="margin-top: 8px; font-size: 13px; padding: 8px 16px;">Okudum ve Kabul Ediyorum</button>
     </div>
@@ -2010,4 +2010,4 @@
     });
 </script>
 </body>
-                </html>
+    </html>
