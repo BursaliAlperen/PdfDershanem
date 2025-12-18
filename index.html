@@ -40,6 +40,8 @@
             --card-shadow-hover: 0 8px 24px rgba(0, 136, 204, 0.2);
             --transition-smooth: all 0.3s ease;
             --border-radius: 12px;
+            --indicator-color: #9C27B0;
+            --indicator-gradient: linear-gradient(135deg, #9C27B0 0%, #673AB7 100%);
         }
         
         /* GLOBAL RESET - UPDATED */
@@ -183,17 +185,36 @@
             background: var(--secondary-color);
             margin: 16px;
             border-radius: var(--border-radius);
-            /* REMOVED: overflow: hidden; */
             box-shadow: var(--card-shadow);
             transition: var(--transition-smooth);
             opacity: 0;
             animation: slideInUp 0.6s ease-out forwards;
             border: 1px solid rgba(0, 136, 204, 0.1);
+            position: relative;
         }
         
         .list-card:hover {
             transform: translateY(-2px);
             box-shadow: var(--card-shadow-hover);
+        }
+        
+        /* INDICATOR FOR PINNED PDFs */
+        .pinned-indicator {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 24px;
+            height: 24px;
+            background: var(--indicator-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            z-index: 10;
+            box-shadow: 0 2px 8px rgba(156, 39, 176, 0.3);
+            animation: pulse 2s infinite;
         }
         
         /* LIST ITEM - FLEXIBLE HEIGHT */
@@ -205,7 +226,7 @@
             cursor: pointer;
             transition: var(--transition-smooth);
             position: relative;
-            min-height: auto; /* Allow natural height */
+            min-height: auto;
         }
         
         .list-item:last-child {
@@ -231,7 +252,7 @@
             z-index: 2;
             flex-shrink: 0;
             background: var(--primary-gradient);
-            overflow: visible; /* Changed from hidden */
+            overflow: visible;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             transform-origin: center;
         }
@@ -247,8 +268,10 @@
         .icon-info { background: var(--success-gradient); }
         .icon-admin { background: var(--warning-gradient); }
         .icon-sponsor { background: linear-gradient(135deg, #0088cc 0%, #00aced 100%); }
-        .icon-featured { background: linear-gradient(135deg, #9C27B0 0%, #673AB7 100%); }
+        .icon-featured { background: var(--indicator-gradient); }
         .icon-popular { background: linear-gradient(135deg, #FF5722 0%, #FF9800 100%); }
+        .icon-downloaded { background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%); }
+        .icon-pinned { background: linear-gradient(135deg, #9C27B0 0%, #673AB7 100%); }
         
         /* ANIMASYONLU NAV IKONLARI */
         .nav-icon {
@@ -310,7 +333,7 @@
             background: var(--primary-gradient);
             color: white;
             border: none;
-            padding: 14px 20px; /* Reduced padding for better mobile */
+            padding: 14px 20px;
             border-radius: 12px;
             font-size: 16px;
             font-weight: 600;
@@ -319,7 +342,7 @@
             margin: 12px 0;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
-            overflow: visible; /* Changed from hidden */
+            overflow: visible;
             box-shadow: 0 4px 12px rgba(0, 136, 204, 0.2);
             display: flex;
             align-items: center;
@@ -328,7 +351,7 @@
             word-wrap: break-word;
             line-height: 1.4;
             transform-origin: center;
-            min-height: auto; /* Allow natural height */
+            min-height: auto;
         }
         
         .action-button:hover {
@@ -358,11 +381,10 @@
             justify-content: space-around;
             align-items: center;
             z-index: 999;
-            padding: 12px 0 16px; /* Added bottom padding for safe area */
+            padding: 12px 0 16px;
             box-shadow: 0 -2px 10px rgba(0, 136, 204, 0.1);
-            min-height: 60px; /* Flexible height */
+            min-height: 60px;
             backdrop-filter: blur(10px);
-            /* Safe area for notches */
             padding-bottom: max(16px, env(safe-area-inset-bottom));
         }
         
@@ -383,7 +405,7 @@
             outline: none;
             gap: 4px;
             margin: 0 4px;
-            min-height: auto; /* Flexible height */
+            min-height: auto;
         }
         
         .nav-item.active {
@@ -761,7 +783,7 @@
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             border: 1px solid rgba(0, 136, 204, 0.1);
             position: relative;
-            overflow: visible; /* Changed from hidden */
+            overflow: visible;
         }
         
         .featured-section::before {
@@ -824,7 +846,6 @@
             max-height: 300px;
             overflow-y: auto;
             padding-right: 10px;
-            /* Ensure rounded corners work with overflow */
             border-radius: 0 0 var(--border-radius) var(--border-radius);
             -webkit-overflow-scrolling: touch;
         }
@@ -860,9 +881,27 @@
             position: relative;
             border: 1px solid rgba(0, 136, 204, 0.1);
             z-index: 20002;
-            /* Ensure rounded corners are visible */
             overflow: visible;
             -webkit-overflow-scrolling: touch;
+        }
+        
+        /* EDIT MODAL SPECIFIC STYLES */
+        .edit-modal-content {
+            max-width: 450px;
+        }
+        
+        .edit-checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .edit-checkbox {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--telegram-blue);
+            cursor: pointer;
         }
         
         /* PROGRESS BAR */
@@ -917,7 +956,7 @@
             font-size: 16px;
         }
         
-        /* CATEGORY NAV - FIXED FOR MOBILE */
+        /* CATEGORY NAV - SCROLLABLE */
         .category-nav-scroll {
             display: flex;
             overflow-x: auto;
@@ -926,10 +965,26 @@
             -webkit-overflow-scrolling: touch;
             background: var(--secondary-color);
             border-bottom: 1px solid rgba(0, 136, 204, 0.1);
-            /* Prevent clipping */
-            overflow: visible;
-            position: relative;
-            z-index: 1;
+            scrollbar-width: thin;
+            scrollbar-color: var(--telegram-blue) rgba(0, 136, 204, 0.1);
+            position: sticky;
+            top: 60px;
+            z-index: 90;
+            margin: 0;
+        }
+        
+        .category-nav-scroll::-webkit-scrollbar {
+            height: 4px;
+        }
+        
+        .category-nav-scroll::-webkit-scrollbar-track {
+            background: rgba(0, 136, 204, 0.1);
+            border-radius: 2px;
+        }
+        
+        .category-nav-scroll::-webkit-scrollbar-thumb {
+            background: var(--telegram-blue);
+            border-radius: 2px;
         }
         
         .category-item {
@@ -944,7 +999,6 @@
             cursor: pointer;
             transition: var(--transition-smooth);
             flex-shrink: 0;
-            /* Ensure full visibility */
             position: relative;
             z-index: 2;
         }
@@ -961,7 +1015,7 @@
             display: flex;
             gap: 10px;
             margin: 0 20px 20px;
-            flex-wrap: wrap; /* Allow wrapping on small screens */
+            flex-wrap: wrap;
         }
         
         .sort-button {
@@ -979,8 +1033,8 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
-            min-height: auto; /* Flexible height */
-            min-width: 100px; /* Minimum width */
+            min-height: auto;
+            min-width: 100px;
         }
         
         .sort-button.active {
@@ -1038,6 +1092,131 @@
             align-items: center;
             gap: 3px;
             white-space: nowrap;
+        }
+        
+        .download-tag {
+            background: rgba(40, 167, 69, 0.1);
+            color: var(--success-color);
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+        
+        .pin-tag {
+            background: rgba(156, 39, 176, 0.1);
+            color: var(--indicator-color);
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+        
+        /* DOWNLOADED PDFS SECTION */
+        .downloaded-section {
+            position: relative;
+            margin: 20px;
+        }
+        
+        .downloaded-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .downloaded-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .downloaded-count {
+            background: var(--success-gradient);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .downloaded-items {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        
+        .downloaded-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            background: var(--secondary-color);
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(0, 136, 204, 0.1);
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+        
+        .downloaded-item:hover {
+            transform: translateX(5px);
+            box-shadow: var(--card-shadow);
+        }
+        
+        .downloaded-item-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: var(--success-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        
+        .downloaded-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .downloaded-item-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .downloaded-item-detail {
+            font-size: 11px;
+            color: var(--hint-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .empty-downloads {
+            text-align: center;
+            padding: 30px 20px;
+            color: var(--hint-color);
+            background: var(--secondary-color);
+            border-radius: var(--border-radius);
+            border: 2px dashed rgba(0, 136, 204, 0.2);
         }
         
         /* FOOTER NOTE */
@@ -1099,6 +1278,11 @@
             100% { transform: scale(1); }
         }
         
+        @keyframes slideInLeft {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
         /* RESPONSIVE FIXES */
         @media (max-width: 768px) {
             .featured-grid {
@@ -1121,6 +1305,11 @@
                 min-width: 100px;
                 padding: 10px 12px;
                 font-size: 13px;
+            }
+            
+            .category-nav-scroll {
+                top: 56px;
+                padding: 12px 10px;
             }
         }
         
@@ -1146,7 +1335,7 @@
             
             .list-item {
                 padding: 16px;
-                flex-wrap: wrap; /* Allow wrapping on small screens */
+                flex-wrap: wrap;
             }
             
             .list-icon {
@@ -1157,7 +1346,7 @@
             }
             
             .list-info {
-                flex: 1 1 200px; /* Flexible width */
+                flex: 1 1 200px;
                 min-width: 0;
             }
             
@@ -1201,6 +1390,12 @@
                 padding: 8px 14px;
                 font-size: 12px;
             }
+            
+            .featured-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 22px;
+            }
         }
         
         @media (max-width: 360px) {
@@ -1234,6 +1429,16 @@
             
             .nav-text {
                 font-size: 10px;
+            }
+            
+            .downloaded-item {
+                padding: 10px 12px;
+            }
+            
+            .downloaded-item-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 12px;
             }
         }
         
@@ -1287,6 +1492,16 @@
             .action-button {
                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             }
+            
+            .downloaded-item {
+                background: #2d333b;
+                border-color: rgba(255, 255, 255, 0.1);
+            }
+            
+            .empty-downloads {
+                background: #2d333b;
+                border-color: rgba(255, 255, 255, 0.1);
+            }
         }
         
         /* FIX FOR IOS SAFARI VIEWPORT */
@@ -1302,6 +1517,10 @@
             .bottom-nav {
                 padding-bottom: max(16px, env(safe-area-inset-bottom));
             }
+            
+            .category-nav-scroll {
+                -webkit-overflow-scrolling: touch;
+            }
         }
         
         /* Z-INDEX DÜZENLEMESİ */
@@ -1313,7 +1532,9 @@
         .modal-content { z-index: 20002; }
         .bottom-nav { z-index: 999; }
         .app-header { z-index: 100; }
+        .category-nav-scroll { z-index: 90; }
         .admin-frame { z-index: 2000; }
+        .pinned-indicator { z-index: 10; }
     </style>
 </head>
 <body>
@@ -1371,6 +1592,67 @@
             <button id="acceptTermsModal" class="action-button" style="background: var(--success-gradient); flex: 1;">
                 <i class="fas fa-check" style="margin-right: 8px;"></i>
                 Kabul Et
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- EDIT PDF MODAL -->
+<div class="modal-overlay hidden" id="editPdfModal">
+    <div class="modal-content edit-modal-content">
+        <h3 style="margin: 0 0 20px 0; font-size: 20px; color: var(--telegram-blue); display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-edit"></i>
+            PDF Düzenle
+        </h3>
+        
+        <div class="form-group">
+            <label class="form-label">PDF Başlığı</label>
+            <input type="text" class="form-input" id="editPdfTitle" placeholder="PDF başlığını girin">
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">Dropbox Linki</label>
+            <input type="text" class="form-input" id="editPdfUrl" placeholder="https://www.dropbox.com/...">
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">Gerekli Reklam Sayısı</label>
+            <input type="number" class="form-input" id="editPdfRequiredAds" min="1" max="99" value="5">
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">Kategori</label>
+            <select class="form-input" id="editPdfCategory">
+                <option value="tyt">TYT</option>
+                <option value="ayt">AYT</option>
+                <option value="lgs">LGS</option>
+                <option value="denemeler">Denemeler</option>
+                <option value="notlar">Özet Notlar</option>
+                <option value="diger">Diğer</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">Açıklama</label>
+            <textarea class="form-textarea" id="editPdfDescription" placeholder="PDF açıklaması..."></textarea>
+        </div>
+        
+        <div class="edit-checkbox-group">
+            <input type="checkbox" id="editPdfPinned" class="edit-checkbox">
+            <label for="editPdfPinned" style="font-size: 14px; cursor: pointer;">
+                <i class="fas fa-thumbtack" style="color: var(--indicator-color); margin-right: 5px;"></i>
+                Bu PDF'i sabitle (ana sayfada öne çıkar)
+            </label>
+        </div>
+        
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button onclick="closeModal('editPdfModal')" class="action-button" style="background: var(--warning-gradient); flex: 1;">
+                <i class="fas fa-times" style="margin-right: 8px;"></i>
+                İptal
+            </button>
+            <button onclick="savePdfChanges()" class="action-button" style="background: var(--success-gradient); flex: 1;">
+                <i class="fas fa-save" style="margin-right: 8px;"></i>
+                Kaydet
             </button>
         </div>
     </div>
@@ -1536,8 +1818,8 @@
                 </h3>
                 
                 <div class="form-group">
-                    <label class="form-label">PDF Başlığı (Otomatik Tamamlama)</label>
-                    <input type="text" class="form-input" id="pdfTitleInput" placeholder="PDF başlığını yazın..." oninput="autoCompletePdfTitle()">
+                    <label class="form-label">PDF Başlığı (Otomatik Tamamlama ve Kategori Tanıma)</label>
+                    <input type="text" class="form-input" id="pdfTitleInput" placeholder="PDF başlığını yazın..." oninput="handleTitleInput()">
                     <div id="pdfTitleSuggestions" style="margin-top: 5px;"></div>
                 </div>
                 
@@ -1555,7 +1837,7 @@
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label">Kategori</label>
+                    <label class="form-label">Kategori (Otomatik olarak başlıktan belirlendi)</label>
                     <select class="form-input" id="pdfCategory">
                         <option value="tyt">TYT</option>
                         <option value="ayt">AYT</option>
@@ -1571,7 +1853,15 @@
                     <textarea class="form-textarea" id="pdfDescription" placeholder="PDF açıklaması..."></textarea>
                 </div>
                 
-                <button class="action-button" onclick="addNewPdf()" style="background: var(--success-gradient);">
+                <div class="edit-checkbox-group">
+                    <input type="checkbox" id="pdfPinned" class="edit-checkbox">
+                    <label for="pdfPinned" style="font-size: 14px; cursor: pointer;">
+                        <i class="fas fa-thumbtack" style="color: var(--indicator-color); margin-right: 5px;"></i>
+                        Bu PDF'i sabitle (ana sayfada öne çıkar)
+                    </label>
+                </div>
+                
+                <button class="action-button" onclick="addNewPdf()" style="background: var(--success-gradient); margin-top: 15px;">
                     <i class="fas fa-save" style="margin-right: 10px;"></i>
                     PDF'i Kaydet
                 </button>
@@ -1720,6 +2010,61 @@
             </h1>
         </div>
         
+        <!-- İNDİRİLENLERİM BÖLÜMÜ -->
+        <div class="downloaded-section" id="downloadedSection">
+            <div class="downloaded-header">
+                <div class="downloaded-title">
+                    <i class="fas fa-download" style="color: var(--success-color);"></i>
+                    İndirilenlerim
+                    <span class="downloaded-count" id="downloadedCount">0</span>
+                </div>
+                <div style="font-size: 12px; color: var(--hint-color);">
+                    <i class="fas fa-history"></i>
+                    Son 10
+                </div>
+            </div>
+            
+            <div class="downloaded-items" id="downloadedItems">
+                <div class="empty-downloads">
+                    <i class="fas fa-inbox" style="font-size: 30px; margin-bottom: 10px; opacity: 0.5;"></i>
+                    <p style="margin-bottom: 5px;">Henüz indirilmiş PDF yok</p>
+                    <p style="font-size: 11px;">PDF'ler bölümünden indirmeye başlayabilirsiniz</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- POPÜLER PDF'LER BÖLÜMÜ -->
+        <div class="downloaded-section" id="popularSection">
+            <div class="downloaded-header">
+                <div class="downloaded-title">
+                    <i class="fas fa-fire" style="color: var(--warning-color);"></i>
+                    Popüler PDF'ler
+                </div>
+                <button class="action-button" onclick="openAdminFrame()" style="width: auto; padding: 8px 12px; font-size: 12px; margin: 0;">
+                    <i class="fas fa-rocket" style="margin-right: 5px;"></i>
+                    Tümünü Gör
+                </button>
+            </div>
+            
+            <div class="downloaded-items" id="homePopularPdfs">
+                <div class="downloaded-item" onclick="openAdminFrame()">
+                    <div class="downloaded-item-icon" style="background: linear-gradient(135deg, #FF5722 0%, #FF9800 100%);">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                    <div class="downloaded-item-info">
+                        <div class="downloaded-item-name">En Popüler PDF'leri Gör</div>
+                        <div class="downloaded-item-detail">
+                            <span><i class="fas fa-eye"></i> En çok indirilenler</span>
+                            <span><i class="fas fa-bolt"></i> Yeni eklenenler</span>
+                        </div>
+                    </div>
+                    <div style="color: var(--hint-color);">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <!-- SPONSOR CARD -->
         <div class="list-card sponsor-card" onclick="window.open('https://t.me/KrallarPDF', '_blank')">
             <div class="list-item">
@@ -1736,19 +2081,17 @@
             </div>
         </div>
         
-        <!-- ÖNE ÇIKAN İÇERİKLER BUTONU - HERKES GÖREBİLİR -->
-        <div class="list-card" onclick="openAdminFrame()">
-            <div class="list-item">
-                <div class="list-icon icon-featured">
-                    <i class="fas fa-star"></i>
+        <!-- SABİTLENMİŞ PDF'LER -->
+        <div id="pinnedPdfsContainer" class="hidden">
+            <div style="padding: 20px 20px 10px;">
+                <div style="font-size: 12px; color: var(--hint-color); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                    <i class="fas fa-thumbtack" style="color: var(--indicator-color); margin-right: 6px;"></i>
+                    SABİTLENMİŞ PDF'LER
                 </div>
-                <div class="list-info">
-                    <div class="list-name">Popüler PDF'ler</div>
-                    <div class="list-detail">En çok indirilen ve yeni eklenen PDF'leri görüntüle</div>
-                </div>
-                <div class="list-meta" style="color: #9C27B0;">
-                    <i class="fas fa-rocket"></i>
-                </div>
+            </div>
+            
+            <div id="pinnedPdfsList" class="list-card">
+                <!-- Pinned PDFs will be loaded here -->
             </div>
         </div>
         
@@ -1839,6 +2182,9 @@
             <div class="footer-note">
                 <i class="fas fa-exclamation-circle" style="color: var(--telegram-blue); margin-right: 6px;"></i>
                 <strong>ÜCRETSİZ SÜRÜM:</strong> PDF'leri indirmek için reklam izlemeniz gerekmektedir.
+                <br><br>
+                <i class="fas fa-link" style="color: var(--success-color); margin-right: 6px;"></i>
+                <strong>YENİ:</strong> PDF'leri indirdikten sonra tarayıcınızda açabilir veya kaydedebilirsiniz.
             </div>
         </div>
     </div>
@@ -1873,7 +2219,7 @@
             </button>
         </div>
         
-        <!-- CATEGORIES -->
+        <!-- CATEGORIES - SCROLLABLE -->
         <div class="category-nav-scroll" id="categoryNav">
             <!-- Categories will be added here -->
         </div>
@@ -1949,7 +2295,7 @@
             <!-- STATISTICS -->
             <div class="list-card">
                 <div class="list-item">
-                    <div class="list-icon" style="background: linear-gradient(135deg, #9C27B0 0%, #673AB7 100%);">
+                    <div class="list-icon" style="background: var(--indicator-gradient);">
                         <i class="fas fa-chart-bar"></i>
                     </div>
                     <div class="list-info">
@@ -1977,20 +2323,31 @@
                         <div class="list-detail">Sayı: <span id="user-completed-pdfs" style="color: var(--telegram-blue); font-weight: 600;">0</span></div>
                     </div>
                 </div>
-            </div>
-            
-            <!-- ÖNE ÇIKAN İÇERİKLER BUTONU - HERKES GÖREBİLİR -->
-            <div class="list-card" onclick="openAdminFrame()">
+                
                 <div class="list-item">
-                    <div class="list-icon icon-featured">
-                        <i class="fas fa-star"></i>
+                    <div class="list-icon" style="background: linear-gradient(135deg, #9C27B0 0%, #673AB7 100%);">
+                        <i class="fas fa-thumbtack"></i>
                     </div>
                     <div class="list-info">
-                        <div class="list-name">Popüler PDF'ler</div>
-                        <div class="list-detail">En çok indirilen ve yeni eklenen PDF'ler</div>
+                        <div class="list-name">Sabitlenmiş PDF'ler</div>
+                        <div class="list-detail">Sayı: <span id="user-pinned-pdfs" style="color: var(--indicator-color); font-weight: 600;">0</span></div>
                     </div>
-                    <div class="list-meta" style="color: #9C27B0;">
-                        <i class="fas fa-rocket"></i>
+                </div>
+            </div>
+            
+            <!-- İNDİRİLENLER BÖLÜMÜ -->
+            <div class="downloaded-section">
+                <div class="downloaded-header">
+                    <div class="downloaded-title">
+                        <i class="fas fa-history" style="color: var(--accent-color);"></i>
+                        Son İndirilenler
+                    </div>
+                </div>
+                
+                <div class="downloaded-items" id="profileDownloads">
+                    <div class="empty-downloads">
+                        <i class="fas fa-inbox" style="font-size: 24px; margin-bottom: 10px; opacity: 0.5;"></i>
+                        <p>Henüz indirme yapılmadı</p>
                     </div>
                 </div>
             </div>
@@ -2029,7 +2386,7 @@
     </div>
 </div>
 
-<!-- AD MODAL -->
+<!-- AD MODAL - GÜNCELLENMİŞ -->
 <div class="modal-overlay hidden" id="adProgressModal">
     <div class="modal-content" style="max-width: 400px; text-align: center;">
         <h3 id="progressModalTitle" style="margin: 0 0 12px 0; font-size: 20px; color: var(--telegram-blue); display: flex; align-items: center; justify-content: center; gap: 10px;">
@@ -2050,14 +2407,21 @@
         </button>
         
         <button id="downloadButton" class="action-button hidden" onclick="finalizeDownload()" style="margin-top: 12px; font-size: 15px; background: var(--success-gradient);">
-            <i class="fas fa-download" style="margin-right: 10px;"></i>
-            PDF'i İndir
+            <i class="fas fa-external-link-alt" style="margin-right: 10px;"></i>
+            Dosyayı Aç
         </button>
         
         <button onclick="closeProgressModal()" class="action-button" style="background: var(--warning-gradient); margin-top: 12px; font-size: 14px;">
             <i class="fas fa-times" style="margin-right: 8px;"></i>
             İptal
         </button>
+        
+        <div style="margin-top: 15px; padding: 10px; background: rgba(0,136,204,0.05); border-radius: 8px; border: 1px solid rgba(0,136,204,0.1);">
+            <p style="font-size: 12px; color: var(--hint-color); margin: 0;">
+                <i class="fas fa-info-circle" style="margin-right: 5px;"></i>
+                Dosya tarayıcınızda açılacaktır. Kaydetmek için sağ tıklayıp "Farklı kaydet" seçeneğini kullanın.
+            </p>
+        </div>
     </div>
 </div>
 
@@ -2128,6 +2492,8 @@
     let currentSort = 'popular';
     let pendingAction = null;
     let pendingActionData = null;
+    let editingPdfKey = null;
+    let userDownloads = [];
     
     const PDF_CATEGORIES = {
         'all': 'Tümü',
@@ -2155,7 +2521,10 @@
         "Paragraf Soruları",
         "İngilizce Kelime Listesi",
         "Matematik Formül Kitabı",
-        "Fizik Deneyleri PDF"
+        "Fizik Deneyleri PDF",
+        "TYT Türkçe Denemesi",
+        "AYT Matematik Soru Bankası",
+        "LGS Fen Bilimleri Denemesi"
     ];
     
     // SES EFEKTİ FONKSİYONU
@@ -2163,6 +2532,29 @@
         if (window.Telegram && Telegram.WebApp) {
             Telegram.WebApp.HapticFeedback.selectionChanged();
         }
+    }
+    
+    // OTOMATİK KATEGORİ TANIMA
+    function detectCategoryFromTitle(title) {
+        const lowerTitle = title.toLowerCase();
+        
+        if (lowerTitle.includes('tyt') || lowerTitle.includes('temel yeterlilik')) {
+            return 'tyt';
+        }
+        if (lowerTitle.includes('ayt') || lowerTitle.includes('alan yeterlilik')) {
+            return 'ayt';
+        }
+        if (lowerTitle.includes('lgs') || lowerTitle.includes('liselere geçiş')) {
+            return 'lgs';
+        }
+        if (lowerTitle.includes('deneme') || lowerTitle.includes('test')) {
+            return 'denemeler';
+        }
+        if (lowerTitle.includes('not') || lowerTitle.includes('özet') || lowerTitle.includes('formül')) {
+            return 'notlar';
+        }
+        
+        return 'diger';
     }
     
     // UYGULAMA BAŞLATMA
@@ -2212,25 +2604,16 @@
             Telegram.WebApp.HapticFeedback.impactOccurred('medium');
         }
         
-        // Admin frame'i göster (sadece popüler PDF'ler - herkes görebilir)
         document.getElementById('adminFrame').classList.remove('hidden');
-        
-        // Admin başlığını değiştir
         document.querySelector('.admin-frame-title').innerHTML = `
             <i class="fas fa-star" style="color: #9C27B0;"></i>
             Popüler PDF'ler
         `;
         
-        // Diğer içeriği gizle
         document.getElementById('app').classList.add('hidden');
-        
-        // Admin tabs'ı gizle (herkes için sadece istatistikler gözüksün)
         document.querySelector('.admin-tabs').classList.add('hidden');
         
-        // Sadece istatistikler tab'ını göster
         switchAdminTab('stats');
-        
-        // Verileri yükle
         loadStatistics();
         loadPopularPdfs();
         loadNewPdfs();
@@ -2247,25 +2630,15 @@
             Telegram.WebApp.HapticFeedback.impactOccurred('heavy');
         }
         
-        // Admin frame'i göster
         document.getElementById('adminFrame').classList.remove('hidden');
-        
-        // Admin başlığını ayarla
         document.querySelector('.admin-frame-title').innerHTML = `
             <i class="fas fa-crown" style="color: #FFD700;"></i>
             Admin Panel
         `;
         
-        // Diğer içeriği gizle
         document.getElementById('app').classList.add('hidden');
-        
-        // Admin tabs'ı göster
         document.querySelector('.admin-tabs').classList.remove('hidden');
-        
-        // İstatistikler tab'ını aç
         switchAdminTab('stats');
-        
-        // Tüm verileri yükle
         loadStatistics();
         loadPopularPdfs();
         loadNewPdfs();
@@ -2275,7 +2648,6 @@
     
     window.closeAdminFrame = function() {
         playButtonSound();
-        
         document.getElementById('adminFrame').classList.add('hidden');
         document.getElementById('app').classList.remove('hidden');
     };
@@ -2284,17 +2656,14 @@
     window.switchAdminTab = function(tabName) {
         playButtonSound();
         
-        // Tüm tab'ları deaktif et
         document.querySelectorAll('.admin-tab').forEach(tab => {
             tab.classList.remove('active');
         });
         
-        // Tüm section'ları gizle
         document.querySelectorAll('.admin-section').forEach(section => {
             section.classList.remove('active');
         });
         
-        // Seçilen tab'ı aktif et
         document.querySelectorAll('.admin-tab').forEach(tab => {
             if (tab.textContent.includes(tabName === 'stats' ? 'İstatistikler' : 
                                         tabName === 'users' ? 'Kullanıcılar' :
@@ -2304,12 +2673,10 @@
             }
         });
         
-        // Seçilen section'ı göster
         const section = document.getElementById(`admin${tabName.charAt(0).toUpperCase() + tabName.slice(1)}Tab`);
         if (section) {
             section.classList.add('active');
             
-            // Verileri yükle
             switch(tabName) {
                 case 'stats':
                     loadStatistics();
@@ -2334,22 +2701,18 @@
         if (!db) return;
         
         try {
-            // Tüm kullanıcıları al
             const usersSnapshot = await db.ref('users').once('value');
             const allUsers = usersSnapshot.val() || {};
             const usersArray = Object.values(allUsers);
             
-            // Toplam kullanıcı
             document.getElementById('totalUsersStat').textContent = usersArray.length;
             
-            // Aktif kullanıcılar (son 7 gün)
             const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
             const activeUsers = usersArray.filter(user => 
                 user.last_active && user.last_active > sevenDaysAgo
             ).length;
             document.getElementById('activeUsersStat').textContent = activeUsers;
             
-            // Bugün kayıtlı kullanıcılar
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             const todayUsers = usersArray.filter(user => 
@@ -2357,18 +2720,15 @@
             ).length;
             document.getElementById('todayUsersStat').textContent = todayUsers;
             
-            // PDF istatistikleri
             const pdfsSnapshot = await db.ref('pdfs').once('value');
             const allPdfs = pdfsSnapshot.val() || {};
             const pdfsArray = Object.values(allPdfs).filter(pdf => !pdf.is_deleted);
             
             document.getElementById('totalPdfsStat').textContent = pdfsArray.length;
             
-            // Toplam indirme sayısı
             const totalDownloads = pdfsArray.reduce((sum, pdf) => sum + (pdf.downloads || 0), 0);
             document.getElementById('totalDownloadsStat').textContent = totalDownloads;
             
-            // Toplam reklam sayısı
             const analyticsSnapshot = await db.ref('analytics/total_ads_watched').once('value');
             const totalAds = analyticsSnapshot.val() || 0;
             document.getElementById('totalAdsStat').textContent = totalAds;
@@ -2453,6 +2813,7 @@
                         <div class="list-detail" style="font-size: 11px;">
                             <i class="fas fa-download" style="margin-right: 3px;"></i>${pdf.downloads || 0} indirme
                             ${pdf.required_ads ? ` • <i class="fas fa-ad" style="margin: 0 3px;"></i>${pdf.required_ads} reklam` : ''}
+                            ${pdf.pinned ? ` • <span class="pin-tag"><i class="fas fa-thumbtack"></i> Sabitli</span>` : ''}
                         </div>
                         ${pdf.required_ads > 0 ? `
                             <div class="progress-bar" style="margin-top: 6px; height: 4px;">
@@ -2571,7 +2932,6 @@
     };
     
     function exportUsersConfirm() {
-        // Bu fonksiyon gerçek implementasyonda doldurulacak
         showError("Bu özellik yakında eklenecektir");
     }
     
@@ -2617,16 +2977,20 @@
             html += `
                 <div class="admin-pdf-item" style="animation: slideInUp 0.5s ease-out ${index * 0.05}s both;">
                     <div class="admin-pdf-info">
-                        <div class="admin-pdf-name">${pdf.title}</div>
+                        <div class="admin-pdf-name">
+                            ${pdf.title}
+                            ${pdf.pinned ? ' <i class="fas fa-thumbtack" style="color: var(--indicator-color); font-size: 12px;"></i>' : ''}
+                        </div>
                         <div class="admin-pdf-details">
                             <span><i class="fas fa-download"></i> ${pdf.downloads || 0} indirme</span>
                             <span><i class="fas fa-ad"></i> ${pdf.required_ads || 0} reklam</span>
                             <span><i class="far fa-calendar"></i> ${createdDate}</span>
                             <span><i class="fas fa-folder"></i> ${PDF_CATEGORIES[pdf.category] || 'Diğer'}</span>
+                            ${pdf.pinned ? '<span class="pin-tag"><i class="fas fa-thumbtack"></i> Sabitli</span>' : ''}
                         </div>
                     </div>
                     <div class="admin-pdf-actions">
-                        <button class="admin-action-btn" onclick="editPdf('${pdf.key}')" title="Düzenle">
+                        <button class="admin-action-btn" onclick="openEditPdfModal('${pdf.key}')" title="Düzenle">
                             <i class="fas fa-edit"></i>
                         </button>
                         <button class="admin-action-btn delete" onclick="deletePdf('${pdf.key}', '${pdf.title.replace(/'/g, "\\'")}')" title="Sil">
@@ -2639,6 +3003,97 @@
         
         container.innerHTML = html;
     }
+    
+    // PDF DÜZENLEME MODALINI AÇ
+    window.openEditPdfModal = async function(pdfKey) {
+        editingPdfKey = pdfKey;
+        
+        try {
+            const pdfSnapshot = await db.ref(`pdfs/${pdfKey}`).once('value');
+            const pdf = pdfSnapshot.val();
+            
+            if (!pdf) {
+                showError("PDF bulunamadı");
+                return;
+            }
+            
+            document.getElementById('editPdfTitle').value = pdf.title || '';
+            document.getElementById('editPdfUrl').value = pdf.url || '';
+            document.getElementById('editPdfRequiredAds').value = pdf.required_ads || 5;
+            document.getElementById('editPdfCategory').value = pdf.category || 'diger';
+            document.getElementById('editPdfDescription').value = pdf.description || '';
+            document.getElementById('editPdfPinned').checked = pdf.pinned || false;
+            
+            document.getElementById('editPdfModal').classList.remove('hidden');
+            
+        } catch (error) {
+            console.error("PDF yükleme hatası:", error);
+            showError("PDF yüklenirken bir hata oluştu");
+        }
+    };
+    
+    // PDF DEĞİŞİKLİKLERİNİ KAYDET
+    window.savePdfChanges = async function() {
+        if (!db || !is_admin || !editingPdfKey) {
+            showError("Bu işlem için yetkiniz yok");
+            return;
+        }
+        
+        const title = document.getElementById('editPdfTitle').value.trim();
+        const url = document.getElementById('editPdfUrl').value.trim();
+        const requiredAds = parseInt(document.getElementById('editPdfRequiredAds').value) || 5;
+        const category = document.getElementById('editPdfCategory').value;
+        const description = document.getElementById('editPdfDescription').value.trim();
+        const pinned = document.getElementById('editPdfPinned').checked;
+        
+        if (!title) {
+            showError("PDF başlığı gereklidir");
+            return;
+        }
+        
+        if (!url || !url.includes('dropbox.com')) {
+            showError("Geçerli bir Dropbox linki gereklidir");
+            return;
+        }
+        
+        if (requiredAds < 1 || requiredAds > 99) {
+            showError("Reklam sayısı 1-99 arasında olmalıdır");
+            return;
+        }
+        
+        playButtonSound();
+        
+        try {
+            const updates = {
+                title: title,
+                url: url,
+                required_ads: requiredAds,
+                category: category,
+                description: description || '',
+                pinned: pinned,
+                updated_at: firebase.database.ServerValue.TIMESTAMP
+            };
+            
+            await db.ref(`pdfs/${editingPdfKey}`).update(updates);
+            
+            closeModal('editPdfModal');
+            loadAdminPdfs();
+            fetchPDFList();
+            loadPinnedPdfs();
+            
+            showError("PDF başarıyla güncellendi!", false);
+            
+        } catch (error) {
+            console.error("PDF güncelleme hatası:", error);
+            showError("PDF güncellenirken bir hata oluştu");
+        }
+    };
+    
+    // PDF BAŞLIĞI İŞLEME
+    window.handleTitleInput = function() {
+        autoCompletePdfTitle();
+        autoDetectCategory();
+    };
     
     // PDF BAŞLIĞI OTOMATİK TAMAMLAMA
     window.autoCompletePdfTitle = function() {
@@ -2676,9 +3131,19 @@
         suggestions.innerHTML = html;
     };
     
+    // OTOMATİK KATEGORİ TANIMA
+    window.autoDetectCategory = function() {
+        const title = document.getElementById('pdfTitleInput').value;
+        if (!title.trim()) return;
+        
+        const detectedCategory = detectCategoryFromTitle(title);
+        document.getElementById('pdfCategory').value = detectedCategory;
+    };
+    
     window.selectPdfTitle = function(title) {
         document.getElementById('pdfTitleInput').value = title;
         document.getElementById('pdfTitleSuggestions').innerHTML = '';
+        autoDetectCategory();
     };
     
     // DROPBOX LINK OTOMATİK DÜZELTME
@@ -2711,6 +3176,7 @@
         const requiredAds = parseInt(document.getElementById('pdfRequiredAds').value) || 5;
         const category = document.getElementById('pdfCategory').value;
         const description = document.getElementById('pdfDescription').value.trim();
+        const pinned = document.getElementById('pdfPinned').checked;
         
         if (!title) {
             showError("PDF başlığı gereklidir");
@@ -2738,20 +3204,21 @@
                 category: category,
                 description: description || '',
                 downloads: 0,
+                pinned: pinned,
                 created_at: firebase.database.ServerValue.TIMESTAMP,
                 is_deleted: false
             };
             
             await newPdfRef.set(pdfData);
             
-            // Formu temizle
             document.getElementById('pdfTitleInput').value = '';
             document.getElementById('pdfDropboxLink').value = '';
             document.getElementById('pdfDescription').value = '';
+            document.getElementById('pdfPinned').checked = false;
             
-            // PDF listesini yenile
             loadAdminPdfs();
             fetchPDFList();
+            loadPinnedPdfs();
             
             showError("PDF başarıyla eklendi!", false);
             
@@ -2759,11 +3226,6 @@
             console.error("PDF ekleme hatası:", error);
             showError("PDF eklenirken bir hata oluştu");
         }
-    };
-    
-    // PDF DÜZENLE
-    window.editPdf = function(pdfKey) {
-        showError("Düzenleme özelliği yakında eklenecektir");
     };
     
     // PDF SİL
@@ -2789,6 +3251,7 @@
             
             loadAdminPdfs();
             fetchPDFList();
+            loadPinnedPdfs();
             
             showError(`"${pdfTitle}" başarıyla silindi`, false);
             
@@ -2904,7 +3367,6 @@
     };
     
     function pinAdScreenConfirm() {
-        // Bu fonksiyon gerçek implementasyonda doldurulacak
         showError("Bu özellik yakında eklenecektir");
     }
     
@@ -2926,10 +3388,7 @@
     
     function pinScreenConfirm() {
         if (!pendingActionData) return;
-        
         const { screen } = pendingActionData;
-        
-        // Bu fonksiyon gerçek implementasyonda doldurulacak
         showError(`${screen} ekranı sabitlendi (demo)`, false);
     }
     
@@ -3008,6 +3467,9 @@
     
     function closeModal(modalId) {
         document.getElementById(modalId).classList.add('hidden');
+        if (modalId === 'editPdfModal') {
+            editingPdfKey = null;
+        }
     }
     
     // ONAY MODALI
@@ -3089,7 +3551,6 @@
         
         playButtonSound();
         
-        // Dropbox linkini düzelt
         let finalUrl = url;
         if (url.includes('dropbox.com')) {
             if (url.includes('dl=0')) {
@@ -3109,10 +3570,8 @@
             watched_ads: 0
         };
         
-        // HEMEN MODAL AÇ
         openProgressModal();
         
-        // Kullanıcı ilerlemesini kontrol et
         if (db) {
             db.ref(`users/${currentUser.id}/pdf_progress/${key}`).once('value').then(snapshot => {
                 const progress = snapshot.val();
@@ -3258,8 +3717,8 @@
         }
     }
     
-    // PDF İNDİRME
-    window.finalizeDownload = function() {
+    // PDF İNDİRME - YENİ: LİNKE YÖNLENDİRME
+    window.finalizeDownload = async function() {
         playButtonSound();
         
         if (!currentPdf) {
@@ -3276,28 +3735,45 @@
         
         // İndirme sayacını artır
         if (db) {
-            db.ref('pdfs/' + key).child('downloads').transaction(current => {
+            await db.ref('pdfs/' + key).child('downloads').transaction(current => {
                 return (current || 0) + 1;
             });
             
-            // Kullanıcı istatistiklerini güncelle
-            db.ref(`users/${currentUser.id}/total_downloads`).transaction(current => {
+            await db.ref(`users/${currentUser.id}/total_downloads`).transaction(current => {
                 return (current || 0) + 1;
             });
+            
+            // İndirilenler listesine ekle
+            const downloadData = {
+                pdf_key: key,
+                pdf_title: title,
+                downloaded_at: firebase.database.ServerValue.TIMESTAMP,
+                url: url
+            };
+            
+            await db.ref(`users/${currentUser.id}/downloads/${key}`).set(downloadData);
+            
+            // Yerel listeye ekle
+            userDownloads.unshift({
+                key: key,
+                title: title,
+                url: url,
+                downloaded_at: Date.now()
+            });
+            
+            // Sadece son 10'u sakla
+            userDownloads = userDownloads.slice(0, 10);
+            
+            // İndirilenleri göster
+            updateDownloadedList();
         }
         
-        // Linki aç
+        // Linki yeni sekmede aç
         setTimeout(() => {
             if (window.Telegram && Telegram.WebApp) {
                 Telegram.WebApp.openLink(url);
             } else {
-                const link = document.createElement('a');
-                link.href = url;
-                link.target = '_blank';
-                link.rel = 'noopener noreferrer';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+                window.open(url, '_blank', 'noopener,noreferrer');
             }
             
             closeProgressModal();
@@ -3313,6 +3789,242 @@
             }, 500);
         }, 100);
     };
+    
+    // İNDİRİLENLER LİSTESİNİ GÜNCELLE
+    async function updateDownloadedList() {
+        if (!currentUser || userDownloads.length === 0) {
+            const downloadedItems = document.getElementById('downloadedItems');
+            if (downloadedItems) {
+                downloadedItems.innerHTML = `
+                    <div class="empty-downloads">
+                        <i class="fas fa-inbox" style="font-size: 30px; margin-bottom: 10px; opacity: 0.5;"></i>
+                        <p style="margin-bottom: 5px;">Henüz indirilmiş PDF yok</p>
+                        <p style="font-size: 11px;">PDF'ler bölümünden indirmeye başlayabilirsiniz</p>
+                    </div>
+                `;
+            }
+            document.getElementById('downloadedCount').textContent = '0';
+            return;
+        }
+        
+        const downloadedItems = document.getElementById('downloadedItems');
+        if (!downloadedItems) return;
+        
+        let html = '';
+        userDownloads.forEach((item, index) => {
+            const timeAgo = formatTimeAgo(item.downloaded_at);
+            
+            html += `
+                <div class="downloaded-item" onclick="openDownloadedPdf('${item.key}', '${item.title.replace(/'/g, "\\'")}', '${item.url}')">
+                    <div class="downloaded-item-icon">
+                        <i class="fas fa-file-pdf"></i>
+                    </div>
+                    <div class="downloaded-item-info">
+                        <div class="downloaded-item-name">${item.title}</div>
+                        <div class="downloaded-item-detail">
+                            <span><i class="far fa-clock"></i> ${timeAgo}</span>
+                            <span class="download-tag"><i class="fas fa-check"></i> İndirildi</span>
+                        </div>
+                    </div>
+                    <div style="color: var(--hint-color);">
+                        <i class="fas fa-external-link-alt"></i>
+                    </div>
+                </div>
+            `;
+        });
+        
+        downloadedItems.innerHTML = html;
+        document.getElementById('downloadedCount').textContent = userDownloads.length;
+    }
+    
+    // İNDİRİLEN PDF'İ AÇ
+    window.openDownloadedPdf = function(key, title, url) {
+        playButtonSound();
+        
+        if (window.Telegram && Telegram.WebApp) {
+            Telegram.WebApp.openLink(url);
+        } else {
+            window.open(url, '_blank', 'noopener,noreferrer');
+        }
+    };
+    
+    // PROFİL SAYFASI İNDİRİLENLERİ
+    async function updateProfileDownloads() {
+        if (!currentUser || !db) return;
+        
+        try {
+            const downloadsSnapshot = await db.ref(`users/${currentUser.id}/downloads`).once('value');
+            const downloads = downloadsSnapshot.val() || {};
+            
+            const downloadsArray = Object.values(downloads)
+                .sort((a, b) => b.downloaded_at - a.downloaded_at)
+                .slice(0, 5);
+            
+            const container = document.getElementById('profileDownloads');
+            if (!container) return;
+            
+            if (downloadsArray.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-downloads">
+                        <i class="fas fa-inbox" style="font-size: 24px; margin-bottom: 10px; opacity: 0.5;"></i>
+                        <p>Henüz indirme yapılmadı</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            downloadsArray.forEach(item => {
+                const timeAgo = formatTimeAgo(item.downloaded_at);
+                
+                html += `
+                    <div class="downloaded-item" onclick="openDownloadedPdf('${item.pdf_key}', '${item.pdf_title.replace(/'/g, "\\'")}', '${item.url}')">
+                        <div class="downloaded-item-icon">
+                            <i class="fas fa-file-pdf"></i>
+                        </div>
+                        <div class="downloaded-item-info">
+                            <div class="downloaded-item-name">${item.pdf_title}</div>
+                            <div class="downloaded-item-detail">
+                                <span><i class="far fa-clock"></i> ${timeAgo}</span>
+                            </div>
+                        </div>
+                        <div style="color: var(--hint-color);">
+                            <i class="fas fa-external-link-alt"></i>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+            
+        } catch (error) {
+            console.error("Profile downloads loading error:", error);
+        }
+    }
+    
+    // SABİTLENMİŞ PDF'LERİ YÜKLE
+    async function loadPinnedPdfs() {
+        if (!db) return;
+        
+        try {
+            const pdfsSnapshot = await db.ref('pdfs').once('value');
+            const allPdfs = pdfsSnapshot.val() || {};
+            
+            const pinnedPdfs = Object.entries(allPdfs)
+                .map(([key, pdf]) => ({ key, ...pdf }))
+                .filter(pdf => !pdf.is_deleted && pdf.pinned)
+                .slice(0, 5);
+            
+            const container = document.getElementById('pinnedPdfsList');
+            const pinnedContainer = document.getElementById('pinnedPdfsContainer');
+            
+            if (!container || !pinnedContainer) return;
+            
+            if (pinnedPdfs.length === 0) {
+                pinnedContainer.classList.add('hidden');
+                return;
+            }
+            
+            pinnedContainer.classList.remove('hidden');
+            
+            let html = '';
+            pinnedPdfs.forEach((pdf, index) => {
+                const progress = currentUser ? 
+                    (currentUser.pdf_progress && currentUser.pdf_progress[pdf.key] ? 
+                     currentUser.pdf_progress[pdf.key].watched_ads || 0 : 0) : 0;
+                
+                const progressPercent = pdf.required_ads > 0 ? 
+                    Math.min(100, (progress / pdf.required_ads) * 100) : 100;
+                
+                html += `
+                    <div class="list-item" onclick="handlePDFDownloadClick('${pdf.key}', '${pdf.title.replace(/'/g, "\\'")}', '${pdf.url}', ${pdf.required_ads || 0})">
+                        <div class="pinned-indicator">
+                            <i class="fas fa-thumbtack"></i>
+                        </div>
+                        <div class="list-icon icon-pinned">
+                            <i class="fas fa-file-pdf"></i>
+                        </div>
+                        <div class="list-info">
+                            <div class="list-name">${pdf.title}</div>
+                            <div class="list-detail">
+                                <span class="pin-tag"><i class="fas fa-thumbtack"></i> Sabitli</span>
+                                ${pdf.downloads ? ` • <i class="fas fa-download" style="margin-right: 3px;"></i>${pdf.downloads}` : ''}
+                                ${pdf.required_ads ? ` • <i class="fas fa-ad" style="margin: 0 3px;"></i>${pdf.required_ads} reklam` : ''}
+                            </div>
+                            ${pdf.required_ads > 0 ? `
+                                <div class="progress-bar" style="margin-top: 8px;">
+                                    <div class="progress-fill" style="width: ${progressPercent}%; background: ${progressPercent === 100 ? 'var(--success-gradient)' : 'var(--indicator-gradient)'};"></div>
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="list-meta">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+            
+        } catch (error) {
+            console.error("Pinned PDFs loading error:", error);
+        }
+    }
+    
+    // ANA SAYFA POPÜLER PDF'LER
+    async function loadHomePopularPdfs() {
+        if (!db) return;
+        
+        try {
+            const pdfsSnapshot = await db.ref('pdfs').once('value');
+            const allPdfs = pdfsSnapshot.val() || {};
+            
+            const popularPdfs = Object.entries(allPdfs)
+                .map(([key, pdf]) => ({ key, ...pdf }))
+                .filter(pdf => !pdf.is_deleted)
+                .sort((a, b) => (b.downloads || 0) - (a.downloads || 0))
+                .slice(0, 3);
+            
+            const container = document.getElementById('homePopularPdfs');
+            if (!container) return;
+            
+            if (popularPdfs.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-downloads" style="padding: 15px;">
+                        <i class="fas fa-fire" style="font-size: 20px; margin-bottom: 5px; opacity: 0.5;"></i>
+                        <p style="font-size: 12px;">Henüz popüler PDF yok</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            popularPdfs.forEach(pdf => {
+                html += `
+                    <div class="downloaded-item" onclick="handlePDFDownloadClick('${pdf.key}', '${pdf.title.replace(/'/g, "\\'")}', '${pdf.url}', ${pdf.required_ads || 0})">
+                        <div class="downloaded-item-icon" style="background: linear-gradient(135deg, #FF5722 0%, #FF9800 100%);">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div class="downloaded-item-info">
+                            <div class="downloaded-item-name">${pdf.title}</div>
+                            <div class="downloaded-item-detail">
+                                <span><i class="fas fa-download"></i> ${pdf.downloads || 0} indirme</span>
+                                ${pdf.pinned ? '<span class="pin-tag"><i class="fas fa-thumbtack"></i> Sabitli</span>' : ''}
+                            </div>
+                        </div>
+                        <div style="color: var(--hint-color);">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+            
+        } catch (error) {
+            console.error("Home popular PDFs loading error:", error);
+        }
+    }
     
     // SAYFA GEÇİŞLERİ
     window.changeTab = function(tabId) {
@@ -3334,12 +4046,21 @@
             if (tabId === 'profile') {
                 setTimeout(() => {
                     fetchAndShowProfileInfo(currentUser?.id);
+                    updateProfileDownloads();
                 }, 10);
             }
             
             if (tabId === 'pdf-list') {
                 setTimeout(() => {
                     fetchPDFList();
+                }, 10);
+            }
+            
+            if (tabId === 'home') {
+                setTimeout(() => {
+                    updateDownloadedList();
+                    loadPinnedPdfs();
+                    loadHomePopularPdfs();
                 }, 10);
             }
         }
@@ -3357,7 +4078,7 @@
     };
     
     // PROFİL BİLGİSİ
-    window.fetchAndShowProfileInfo = function(userId) {
+    window.fetchAndShowProfileInfo = async function(userId) {
         if (!db || !userId) return;
         
         const profileIcon = document.getElementById('profileIcon');
@@ -3396,8 +4117,10 @@
             }
         }
         
-        db.ref('users/' + userId).once('value').then(snapshot => {
-            const userData = snapshot.val();
+        try {
+            const userSnapshot = await db.ref('users/' + userId).once('value');
+            const userData = userSnapshot.val();
+            
             if (userData?.created_at) {
                 const createdElement = document.getElementById('profile-created');
                 if (createdElement) {
@@ -3406,7 +4129,6 @@
                 }
             }
             
-            // Kullanıcı istatistiklerini yükle
             if (userData?.total_downloads) {
                 document.getElementById('user-total-downloads').textContent = userData.total_downloads;
             }
@@ -3415,14 +4137,37 @@
                 document.getElementById('user-total-ads').textContent = userData.total_ads_watched;
             }
             
-            // Tamamlanan PDF'leri hesapla
             if (userData?.pdf_progress) {
                 const completedPdfs = Object.values(userData.pdf_progress).filter(
                     progress => progress.watched_ads >= progress.required_ads
                 ).length;
                 document.getElementById('user-completed-pdfs').textContent = completedPdfs;
             }
-        });
+            
+            // Sabitlenmiş PDF sayısı
+            const pdfsSnapshot = await db.ref('pdfs').once('value');
+            const allPdfs = pdfsSnapshot.val() || {};
+            const pinnedPdfsCount = Object.values(allPdfs).filter(pdf => pdf.pinned && !pdf.is_deleted).length;
+            document.getElementById('user-pinned-pdfs').textContent = pinnedPdfsCount;
+            
+            // İndirilenleri yükle
+            if (userData?.downloads) {
+                const downloadsArray = Object.values(userData.downloads)
+                    .sort((a, b) => b.downloaded_at - a.downloaded_at);
+                
+                userDownloads = downloadsArray.map(item => ({
+                    key: item.pdf_key,
+                    title: item.pdf_title,
+                    url: item.url,
+                    downloaded_at: item.downloaded_at
+                })).slice(0, 10);
+                
+                updateDownloadedList();
+            }
+            
+        } catch (error) {
+            console.error("Profile info loading error:", error);
+        }
     };
     
     // PDF LİSTESİ
@@ -3531,7 +4276,7 @@
         let html = '<div class="list-card">';
         
         pdfsArray.forEach((pdf, index) => {
-            const { key, title, url, required_ads, downloads, category } = pdf;
+            const { key, title, url, required_ads, downloads, category, pinned } = pdf;
             const safeTitle = (title || '').replace(/'/g, "&#39;");
             const safeUrl = (url || '').replace(/'/g, "&#39;");
             const requiredAds = parseInt(required_ads) || 0;
@@ -3564,11 +4309,15 @@
             
             html += `
                 <div class="list-item" onclick="handlePDFDownloadClick('${key}', '${safeTitle}', '${safeUrl}', ${requiredAds})" style="animation-delay: ${index * 0.05}s">
-                    <div class="list-icon icon-pdf">
+                    ${pinned ? '<div class="pinned-indicator"><i class="fas fa-thumbtack"></i></div>' : ''}
+                    <div class="list-icon ${pinned ? 'icon-pinned' : 'icon-pdf'}">
                         <i class="fas fa-file-pdf"></i>
                     </div>
                     <div class="list-info">
-                        <div class="list-name">${title}</div>
+                        <div class="list-name">
+                            ${title}
+                            ${pinned ? ' <i class="fas fa-thumbtack" style="color: var(--indicator-color); font-size: 12px;"></i>' : ''}
+                        </div>
                         <div class="list-detail">
                             <span style="color: ${statusColor}; font-weight: 600;">
                                 <i class="fas fa-${statusIcon}" style="margin-right: 5px;"></i>
@@ -3580,10 +4329,11 @@
                                 <i class="fab fa-${hostIcon}" style="margin-right: 3px;"></i>
                                 ${hostIcon === 'dropbox' ? 'Dropbox' : hostIcon === 'google-drive' ? 'Drive' : 'Cloud'}
                             </span>
+                            ${pinned ? '<span class="pin-tag"><i class="fas fa-thumbtack"></i> Sabitli</span>' : ''}
                         </div>
                         ${requiredAds > 0 ? `
                             <div class="progress-bar" style="margin-top: 8px;">
-                                <div class="progress-fill" style="width: ${progressPercent}%; background: ${progressPercent === 100 ? 'var(--success-gradient)' : 'var(--primary-gradient)'};"></div>
+                                <div class="progress-fill" style="width: ${progressPercent}%; background: ${progressPercent === 100 ? 'var(--success-gradient)' : (pinned ? 'var(--indicator-gradient)' : 'var(--primary-gradient)')};"></div>
                             </div>
                         ` : ''}
                     </div>
@@ -3643,7 +4393,8 @@
                 e.target.closest('.sort-button') ||
                 e.target.closest('.category-item') ||
                 e.target.closest('.admin-tab') ||
-                e.target.closest('.admin-action-btn')) {
+                e.target.closest('.admin-action-btn') ||
+                e.target.closest('.downloaded-item')) {
                 playButtonSound();
             }
         });
@@ -3732,6 +4483,9 @@
                         
                         fetchPDFList();
                         fetchAndShowProfileInfo(currentUser.id);
+                        updateDownloadedList();
+                        loadPinnedPdfs();
+                        loadHomePopularPdfs();
                         
                         if (window.Telegram && Telegram.WebApp) {
                             Telegram.WebApp.HapticFeedback.notificationOccurred('success');
@@ -3796,4 +4550,4 @@
     });
 </script>
 </body>
-    </html>
+</html>
