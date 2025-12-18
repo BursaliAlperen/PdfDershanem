@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
     <title>@Pdf_DershanemBot - PDF Kütüphanesi</title>
     
     <!-- CHALPUS REKLAM KODLARI -->
@@ -13,40 +13,45 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script> 
     
-    <!-- MATERIAL ICONS -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    
     <!-- FONT AWESOME -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- ANIMATE CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-    
     <style>
-        /* MODERN CSS STİLLERİ */
+        /* TELEGRAM BLUE THEME - DÜZELTİLMİŞ */
         :root {
-            --primary-color: #007AFF;
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --primary-color: #0088cc;
+            --primary-gradient: linear-gradient(135deg, #0088cc 0%, #006699 100%);
             --secondary-color: #FFFFFF;
-            --background-color: #F5F7FA;
-            --text-color: #2C3E50;
-            --hint-color: #7F8C8D;
-            --success-color: #2ECC71;
-            --success-gradient: linear-gradient(135deg, #2ECC71 0%, #27AE60 100%);
-            --warning-color: #FF9500;
-            --warning-gradient: linear-gradient(135deg, #FF9500 0%, #FF6B35 100%);
-            --danger-color: #FF3B30;
-            --danger-gradient: linear-gradient(135deg, #FF3B30 0%, #FF6B6B 100%);
-            --accent-color: #5D9CEC;
-            --accent-gradient: linear-gradient(135deg, #5D9CEC 0%, #4A90E2 100%);
-            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-            --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.12);
-            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            --border-radius: 16px;
+            --background-color: #f8f9fa;
+            --text-color: #212529;
+            --hint-color: #6c757d;
+            --success-color: #28a745;
+            --success-gradient: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+            --warning-color: #ffc107;
+            --warning-gradient: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+            --danger-color: #dc3545;
+            --danger-gradient: linear-gradient(135deg, #dc3545 0%, #bd2130 100%);
+            --accent-color: #17a2b8;
+            --accent-gradient: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            --telegram-blue: #0088cc;
+            --telegram-dark-blue: #006699;
+            --telegram-light-blue: #e6f7ff;
+            --card-shadow: 0 2px 12px rgba(0, 136, 204, 0.15);
+            --card-shadow-hover: 0 8px 24px rgba(0, 136, 204, 0.2);
+            --transition-smooth: all 0.3s ease;
+            --border-radius: 12px;
         }
         
-        /* === GLOBAL DÜZELTMELER === */
+        /* GLOBAL RESET */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-user-drag: none;
+            user-select: none;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+        
         html, body {
             -webkit-touch-callout: none;
             -webkit-tap-highlight-color: transparent;
@@ -54,107 +59,17 @@
             height: 100%;
             width: 100%;
             overflow-x: hidden;
-            position: relative;
-            margin: 0;
-            padding: 0;
-        }
-        
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-user-drag: none;
-            user-select: none;
+            background: var(--background-color);
         }
         
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--background-color);
             color: var(--text-color);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow-x: hidden;
         }
         
-        /* ANIMASYONLAR */
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        
-        @keyframes pulse-glow {
-            0%, 100% { box-shadow: 0 0 10px rgba(0, 122, 255, 0.3); }
-            50% { box-shadow: 0 0 20px rgba(0, 122, 255, 0.6); }
-        }
-        
-        @keyframes slideInUp {
-            from { transform: translateY(30px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        @keyframes scaleIn {
-            from { transform: scale(0.9); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-        
-        @keyframes shimmer {
-            0% { background-position: -200% center; }
-            100% { background-position: 200% center; }
-        }
-        
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        
-        /* ANIMASYON SINIFLARI */
-        .animate-float {
-            animation: float 3s ease-in-out infinite;
-        }
-        
-        .animate-pulse-glow {
-            animation: pulse-glow 2s ease-in-out infinite;
-        }
-        
-        .animate-slide-in-up {
-            animation: slideInUp 0.6s ease-out forwards;
-        }
-        
-        .animate-fade-in {
-            animation: fadeIn 0.5s ease-out forwards;
-        }
-        
-        .animate-scale-in {
-            animation: scaleIn 0.4s ease-out forwards;
-        }
-        
-        .animate-shimmer {
-            background: linear-gradient(90deg, 
-                rgba(255,255,255,0) 0%, 
-                rgba(255,255,255,0.8) 50%, 
-                rgba(255,255,255,0) 100%);
-            background-size: 200% auto;
-            animation: shimmer 2s infinite linear;
-        }
-        
-        .animate-rotate {
-            animation: rotate 1s linear infinite;
-        }
-        
-        /* DELAY SINIFLARI */
-        .delay-100 { animation-delay: 0.1s; }
-        .delay-200 { animation-delay: 0.2s; }
-        .delay-300 { animation-delay: 0.3s; }
-        .delay-400 { animation-delay: 0.4s; }
-        .delay-500 { animation-delay: 0.5s; }
-        
-        /* SPLASH SCREEN */
+        /* SPLASH SCREEN - DÜZELTİLMİŞ (KURALLAR SORUNU ÇÖZÜLDÜ) */
         .splash-screen {
             position: fixed;
             top: 0;
@@ -171,69 +86,46 @@
             overflow-y: auto;
         }
         
-        .splash-screen.hidden {
-            animation: fadeIn 0.5s ease-out reverse forwards;
-            pointer-events: none;
-        }
-        
         .splash-content {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 40px 30px;
-            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            padding: 35px 25px;
+            border-radius: 20px;
             text-align: center;
             max-width: 380px;
             width: 100%;
-            max-height: 90vh;
+            max-height: 85vh;
             overflow-y: auto;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
-            transition: var(--transition-bounce);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            margin: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 136, 204, 0.1);
+            position: relative;
+            z-index: 10001; /* ÜSTTE KALSIN */
         }
         
-        .splash-content:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
-        }
-        
-        .splash-icon {
-            font-size: 80px;
-            margin-bottom: 20px;
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            display: inline-block;
-        }
-        
-        .splash-title {
-            font-size: 28px;
-            font-weight: 800;
-            margin-bottom: 10px;
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        
-        .splash-subtitle {
-            font-size: 15px;
-            color: var(--hint-color);
-            margin-bottom: 30px;
-            line-height: 1.6;
-        }
-        
+        /* KURALLAR CONTAINER - TAM DÜZELTİLMİŞ */
         .terms-container {
-            background: rgba(0, 122, 255, 0.05);
+            background: rgba(0, 136, 204, 0.08);
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 25px;
             text-align: left;
-            border: 1px solid rgba(0, 122, 255, 0.1);
+            border: 1px solid rgba(0, 136, 204, 0.15);
+            width: 100%;
+            position: relative;
+            z-index: 10002; /* EN ÜSTTE */
         }
         
-        /* === TELEGRAM APP CONTAINER === */
+        .terms-container label {
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--text-color);
+            display: flex;
+            align-items: flex-start;
+            width: 100%;
+            cursor: pointer;
+        }
+        
+        /* TELEGRAM APP */
         .telegram-app {
             flex: 1;
             display: flex;
@@ -245,7 +137,7 @@
             animation: fadeIn 0.5s ease-out 0.3s forwards;
         }
         
-        /* === SAYFA YAPISI === */
+        /* CONTENT PAGES */
         .content-page {
             flex: 1;
             display: none;
@@ -255,61 +147,61 @@
             overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
             position: relative;
-            padding-bottom: 84px;
+            padding-bottom: 80px;
         }
         
         .content-page.active {
             display: flex;
         }
         
+        /* PROFİL SAYFASI - KAYDIRILABİLİR */
+        #page-profile {
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            -webkit-overflow-scrolling: touch !important;
+        }
+        
         /* APP HEADER */
         .app-header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+            background: var(--secondary-color);
             padding: 18px 20px;
             text-align: center;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            border-bottom: 1px solid rgba(0, 136, 204, 0.1);
             position: sticky;
             top: 0;
             z-index: 100;
             flex-shrink: 0;
             width: 100%;
+            box-shadow: 0 2px 8px rgba(0, 136, 204, 0.1);
         }
         
         .app-header-title {
             font-size: 20px;
-            font-weight: 800;
-            color: var(--primary-color);
+            font-weight: 700;
+            color: var(--telegram-blue);
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
         }
         
-        /* === KART SİSTEMİ - DÜZELTİLMİŞ === */
+        /* CARDS - KESİLME SORUNU DÜZELTİLDİ */
         .list-card {
             background: var(--secondary-color);
             margin: 16px;
             border-radius: var(--border-radius);
-            overflow: visible;
+            overflow: visible !important;
             box-shadow: var(--card-shadow);
             transition: var(--transition-smooth);
             opacity: 0;
             animation: slideInUp 0.6s ease-out forwards;
-            border: 1px solid rgba(0, 0, 0, 0.03);
-            min-height: auto;
+            border: 1px solid rgba(0, 136, 204, 0.1);
         }
         
         .list-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-2px);
             box-shadow: var(--card-shadow-hover);
         }
-        
-        .list-card:nth-child(1) { animation-delay: 0.1s; }
-        .list-card:nth-child(2) { animation-delay: 0.2s; }
-        .list-card:nth-child(3) { animation-delay: 0.3s; }
-        .list-card:nth-child(4) { animation-delay: 0.4s; }
-        .list-card:nth-child(5) { animation-delay: 0.5s; }
         
         .list-item {
             display: flex;
@@ -319,244 +211,128 @@
             cursor: pointer;
             transition: var(--transition-smooth);
             position: relative;
-            overflow: visible;
-            min-height: auto;
-            height: auto;
-        }
-        
-        .list-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--primary-gradient);
-            opacity: 0;
-            transition: var(--transition-smooth);
-            z-index: 0;
-        }
-        
-        .list-item:hover::before {
-            opacity: 0.03;
-        }
-        
-        .list-item:active {
-            transform: translateX(2px) scale(0.995);
-            background: rgba(0, 122, 255, 0.05);
+            min-height: 80px;
+            overflow: visible !important;
         }
         
         .list-item:last-child {
             border-bottom: none;
         }
         
-        /* === İKON SİSTEMİ - DÜZELTİLMİŞ === */
+        .list-item:active {
+            background: rgba(0, 136, 204, 0.05);
+        }
+        
+        /* ICONS */
         .list-icon {
-            width: 56px;
-            height: 56px;
-            border-radius: 14px;
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin-right: 16px;
             color: white;
-            font-size: 24px;
+            font-size: 22px;
             position: relative;
             z-index: 2;
-            overflow: visible;
-            transition: var(--transition-bounce);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
             flex-shrink: 0;
-        }
-        
-        .list-icon::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: inherit;
-            opacity: 0.9;
-            z-index: -1;
-        }
-        
-        .list-icon::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 70%);
-            opacity: 0;
-            transition: var(--transition-smooth);
-        }
-        
-        .list-item:hover .list-icon {
-            transform: scale(1.1) rotate(5deg);
-            transform-origin: center;
-        }
-        
-        .icon-pdf {
-            background: var(--danger-gradient);
-        }
-        
-        .icon-home {
             background: var(--primary-gradient);
+            overflow: visible !important;
         }
         
-        .icon-profile {
-            background: var(--accent-gradient);
-        }
+        .icon-pdf { background: var(--danger-gradient); }
+        .icon-home { background: var(--primary-gradient); }
+        .icon-profile { background: var(--accent-gradient); }
+        .icon-info { background: var(--success-gradient); }
+        .icon-admin { background: var(--warning-gradient); }
+        .icon-sponsor { background: linear-gradient(135deg, #0088cc 0%, #00aced 100%); }
         
-        .icon-info {
-            background: var(--success-gradient);
-        }
-        
-        .icon-admin {
-            background: var(--warning-gradient);
-        }
-        
-        .icon-sponsor {
-            background: linear-gradient(135deg, #FF6B6B 0%, #FFD93D 100%);
-        }
-        
-        /* LIST CONTENT */
+        /* LIST INFO */
         .list-info {
             flex: 1;
-            position: relative;
-            z-index: 1;
             min-width: 0;
-            overflow: visible;
+            padding-right: 10px;
+            overflow: visible !important;
         }
         
         .list-name {
-            font-weight: 700;
+            font-weight: 600;
             font-size: 16px;
             margin-bottom: 6px;
             color: var(--text-color);
-            transition: var(--transition-smooth);
-            white-space: normal;
-            overflow: visible;
-            text-overflow: clip;
-            word-wrap: break-word;
+            line-height: 1.4;
+            word-break: break-word;
             overflow-wrap: break-word;
-            hyphens: auto;
+            overflow: visible !important;
         }
         
         .list-detail {
             font-size: 13px;
             color: var(--hint-color);
             line-height: 1.4;
-            transition: var(--transition-smooth);
             display: flex;
             align-items: center;
             flex-wrap: wrap;
             gap: 5px;
-            word-wrap: break-word;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            overflow: visible !important;
         }
         
-        .list-meta {
-            color: var(--primary-color);
-            font-weight: 700;
-            font-size: 14px;
-            transition: var(--transition-smooth);
-            position: relative;
-            z-index: 1;
-            flex-shrink: 0;
-        }
-        
-        /* === BUTTON SİSTEMİ - DÜZELTİLMİŞ === */
+        /* BUTTONS - OTOMATİK YÜKSEKLİK */
         .action-button {
             background: var(--primary-gradient);
             color: white;
             border: none;
             padding: 16px 24px;
-            border-radius: 14px;
+            border-radius: 12px;
             font-size: 16px;
-            font-weight: 700;
+            font-weight: 600;
             cursor: pointer;
             width: 100%;
             margin: 12px 0;
-            transition: var(--transition-bounce);
+            transition: var(--transition-smooth);
             position: relative;
-            overflow: visible;
-            box-shadow: 0 10px 25px rgba(0, 122, 255, 0.3);
-            letter-spacing: 0.3px;
+            overflow: visible !important;
+            box-shadow: 0 4px 12px rgba(0, 136, 204, 0.2);
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 56px;
-            height: auto;
+            height: auto !important;
             white-space: normal;
             word-wrap: break-word;
             line-height: 1.4;
         }
         
-        .action-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            transition: left 0.6s ease;
-        }
-        
         .action-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(0, 122, 255, 0.4);
-        }
-        
-        .action-button:hover::before {
-            left: 100%;
-        }
-        
-        .action-button:active {
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 136, 204, 0.3);
         }
         
         .action-button:disabled {
             opacity: 0.6;
             cursor: not-allowed;
             transform: none !important;
-            box-shadow: none !important;
         }
         
-        .action-button.success {
-            background: var(--success-gradient);
-            box-shadow: 0 10px 25px rgba(46, 204, 113, 0.3);
-        }
-        
-        .action-button.warning {
-            background: var(--warning-gradient);
-            box-shadow: 0 10px 25px rgba(255, 149, 0, 0.3);
-        }
-        
-        .action-button.danger {
-            background: var(--danger-gradient);
-            box-shadow: 0 10px 25px rgba(255, 59, 48, 0.3);
-        }
-        
-        /* === NAVİGASYON - TAMAMEN DÜZELTİLMİŞ === */
+        /* BOTTOM NAV */
         .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(0, 0, 0, 0.08);
+            background: var(--secondary-color);
+            border-top: 1px solid rgba(0, 136, 204, 0.1);
             display: flex;
             justify-content: space-around;
             align-items: center;
             z-index: 1000;
             padding: 12px 0;
-            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.08);
-            height: auto;
-            min-height: 84px;
+            box-shadow: 0 -2px 10px rgba(0, 136, 204, 0.1);
+            height: 80px;
+            backdrop-filter: blur(10px);
         }
         
         .nav-item {
@@ -566,76 +342,48 @@
             align-items: center;
             justify-content: center;
             padding: 8px 4px;
-            color: #8E8E93;
+            color: #6c757d;
             font-size: 12px;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
-            border-radius: 12px;
+            border-radius: 8px;
             transition: var(--transition-smooth);
-            position: relative;
-            text-decoration: none;
-            border: none;
             background: transparent;
             outline: none;
-            -webkit-tap-highlight-color: transparent;
             gap: 4px;
-            height: auto;
-            min-height: 60px;
+            min-height: 56px;
             margin: 0 4px;
+            height: auto !important;
         }
         
         .nav-item.active {
-            color: var(--primary-color);
-            background: rgba(0, 122, 255, 0.08);
-        }
-        
-        .nav-item.active::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: var(--primary-gradient);
-            border-radius: 0 0 3px 3px;
-        }
-        
-        .nav-icon {
-            font-size: 24px;
-            width: 28px;
-            height: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            transition: var(--transition-smooth);
-            color: #8E8E93;
-            margin: 0;
+            color: var(--telegram-blue);
         }
         
         .nav-item.active .nav-icon {
-            color: var(--primary-color);
-            transform: translateY(-2px);
+            background: rgba(0, 136, 204, 0.1);
+            color: var(--telegram-blue);
+        }
+        
+        .nav-icon {
+            font-size: 22px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            transition: var(--transition-smooth);
+            color: #6c757d;
         }
         
         .nav-text {
             font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.3px;
+            font-weight: 500;
             margin-top: 2px;
-            white-space: nowrap;
         }
         
-        .nav-item:active {
-            background: rgba(0, 122, 255, 0.05);
-            transform: scale(0.98);
-        }
-        
-        .nav-item:hover:not(.active) {
-            background: rgba(0, 0, 0, 0.02);
-        }
-        
-        /* === MODALLAR - DÜZELTİLMİŞ === */
+        /* MODALS - KURALLAR MODALI DÜZELTİLDİ */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -643,47 +391,41 @@
             right: 0;
             bottom: 0;
             background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(5px);
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 2000;
+            z-index: 20000; /* EN ÜST SEVİYE */
             padding: 20px;
-            animation: fadeIn 0.3s ease-out;
-            overflow-y: auto;
+            animation: fadeIn 0.2s ease-out !important;
+        }
+        
+        #termsModal {
+            z-index: 20001 !important; /* KURALLAR EN ÜSTTE */
         }
         
         .modal-content {
             background: var(--secondary-color);
-            border-radius: 20px;
-            padding: 30px;
-            max-width: 420px;
+            border-radius: 16px;
+            padding: 25px;
+            max-width: 400px;
             width: 100%;
-            max-height: 90vh;
+            max-height: 85vh;
             overflow-y: auto;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
-            animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            animation: scaleIn 0.2s ease-out !important;
             position: relative;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 136, 204, 0.1);
+            z-index: 20002;
         }
         
-        .modal-content::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--primary-gradient);
-        }
-        
-        /* === PROGRESS BAR - DÜZELTİLMİŞ === */
+        /* PROGRESS BAR */
         .progress-bar {
-            height: 8px;
-            background: rgba(0, 0, 0, 0.05);
+            height: 6px;
+            background: rgba(0, 136, 204, 0.1);
             border-radius: 10px;
-            overflow: visible;
-            margin: 20px 0;
+            overflow: hidden;
+            margin: 15px 0;
             position: relative;
             width: 100%;
         }
@@ -692,150 +434,110 @@
             height: 100%;
             background: var(--success-gradient);
             border-radius: 10px;
-            transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: width 0.6s ease;
             position: relative;
-            overflow: visible;
         }
         
-        .progress-fill::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
-            animation: shimmer 2s infinite linear;
-        }
-        
-        /* ARAMA */
+        /* SEARCH */
         .search-container {
             position: relative;
-            margin-bottom: 20px;
+            margin: 20px;
         }
         
         #pdfSearchInput {
             width: 100%;
-            padding: 18px 20px 18px 50px;
-            border: 2px solid rgba(0, 0, 0, 0.05);
-            border-radius: 14px;
+            padding: 16px 20px 16px 48px;
+            border: 1px solid rgba(0, 136, 204, 0.2);
+            border-radius: 12px;
             font-size: 15px;
             background: var(--secondary-color);
             color: var(--text-color);
             transition: var(--transition-smooth);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
-            min-height: 56px;
-            height: auto;
+            box-shadow: 0 2px 8px rgba(0, 136, 204, 0.05);
         }
         
         #pdfSearchInput:focus {
             outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 10px 25px rgba(0, 122, 255, 0.1);
-            transform: translateY(-2px);
+            border-color: var(--telegram-blue);
+            box-shadow: 0 4px 12px rgba(0, 136, 204, 0.1);
         }
         
         .search-icon {
             position: absolute;
-            left: 20px;
+            left: 18px;
             top: 50%;
             transform: translateY(-50%);
             color: var(--hint-color);
-            font-size: 18px;
+            font-size: 16px;
         }
         
-        /* === KATEGORİLER - DÜZELTİLMİŞ === */
+        /* CATEGORIES */
         .category-nav-scroll {
             display: flex;
             overflow-x: auto;
             padding: 16px;
-            gap: 10px;
+            gap: 8px;
             -webkit-overflow-scrolling: touch;
-            flex-shrink: 0;
-            margin: 0;
-        }
-        
-        .category-nav-scroll::-webkit-scrollbar {
-            display: none;
+            background: var(--secondary-color);
+            border-bottom: 1px solid rgba(0, 136, 204, 0.1);
         }
         
         .category-item {
-            padding: 12px 22px;
-            border-radius: 50px;
-            background: var(--secondary-color);
-            border: 2px solid rgba(0, 0, 0, 0.05);
-            font-size: 14px;
-            font-weight: 600;
+            padding: 10px 18px;
+            border-radius: 20px;
+            background: rgba(0, 136, 204, 0.08);
+            border: 1px solid rgba(0, 136, 204, 0.15);
+            font-size: 13px;
+            font-weight: 500;
             color: var(--hint-color);
             white-space: nowrap;
             cursor: pointer;
-            transition: var(--transition-bounce);
+            transition: var(--transition-smooth);
             flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            min-height: 44px;
-            height: auto;
         }
         
         .category-item.active {
             background: var(--primary-gradient);
             color: white;
             border-color: transparent;
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(0, 122, 255, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 136, 204, 0.2);
         }
         
-        /* SIRALAMA */
+        /* SORT BUTTONS */
         .sort-buttons {
             display: flex;
             gap: 10px;
-            margin-bottom: 20px;
+            margin: 0 20px 20px;
         }
         
         .sort-button {
             flex: 1;
-            padding: 14px;
-            border: 2px solid rgba(0, 0, 0, 0.05);
-            border-radius: 12px;
+            padding: 12px;
+            border: 1px solid rgba(0, 136, 204, 0.2);
+            border-radius: 10px;
             background: var(--secondary-color);
             color: var(--hint-color);
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 13px;
+            font-weight: 500;
             cursor: pointer;
-            transition: var(--transition-bounce);
+            transition: var(--transition-smooth);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            min-height: 50px;
-            height: auto;
-            white-space: nowrap;
+            gap: 6px;
         }
         
         .sort-button.active {
             background: var(--primary-gradient);
             color: white;
             border-color: transparent;
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(0, 122, 255, 0.3);
         }
         
-        /* SPONSOR KARTI */
+        /* SPONSOR CARD */
         .sponsor-card {
-            background: linear-gradient(135deg, #6A11CB 0%, #2575FC 100%);
+            background: linear-gradient(135deg, #0088cc 0%, #00aced 100%);
             position: relative;
-            overflow: visible;
-        }
-        
-        .sponsor-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="%23ffffff10"/></svg>');
-            opacity: 0.3;
+            margin: 20px;
         }
         
         .sponsor-card .list-name,
@@ -848,234 +550,107 @@
             opacity: 0.9;
         }
         
-        /* === ANALİZ KARTI - DÜZELTİLMİŞ === */
+        /* ANALYSIS CARD */
         .analysis-card {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            padding: 25px;
+            gap: 12px;
+            padding: 20px;
             background: var(--primary-gradient);
             border-radius: var(--border-radius);
             margin: 20px;
-            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.2);
-            animation: slideInUp 0.6s ease-out;
-            overflow: visible;
+            box-shadow: 0 8px 24px rgba(0, 136, 204, 0.2);
         }
         
         .analysis-item {
             text-align: center;
-            padding: 20px 15px;
+            padding: 16px 12px;
             background: rgba(255, 255, 255, 0.95);
-            border-radius: 14px;
+            border-radius: 10px;
             transition: var(--transition-smooth);
-            cursor: pointer;
-            position: relative;
-            overflow: visible;
-            min-height: 100px;
-            height: auto;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-        
-        .analysis-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-        }
-        
-        .analysis-item::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: var(--primary-gradient);
-            opacity: 0;
-            transition: var(--transition-smooth);
-        }
-        
-        .analysis-item:hover::after {
-            opacity: 1;
         }
         
         .analysis-value {
-            font-size: 32px;
-            font-weight: 800;
+            font-size: 24px;
+            font-weight: 700;
             color: var(--primary-color);
-            margin-bottom: 8px;
-            line-height: 1;
+            margin-bottom: 6px;
         }
         
         .analysis-label {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--hint-color);
             text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 700;
+            letter-spacing: 0.5px;
+            font-weight: 600;
         }
         
-        /* === SCROLLBAR - DÜZELTİLMİŞ === */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.02);
-            border-radius: 10px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: var(--primary-color);
-            border-radius: 10px;
-            transition: var(--transition-smooth);
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--accent-color);
-        }
-        
-        /* TAG STİLLERİ */
+        /* TAG STYLES */
         .host-tag {
-            background: var(--accent-gradient);
-            color: white;
-            padding: 4px 10px;
-            border-radius: 12px;
+            background: rgba(0, 136, 204, 0.1);
+            color: var(--telegram-blue);
+            padding: 3px 8px;
+            border-radius: 10px;
             font-size: 10px;
-            font-weight: 800;
-            margin-left: 8px;
+            font-weight: 600;
             display: inline-flex;
             align-items: center;
             gap: 3px;
             white-space: nowrap;
-            flex-shrink: 0;
         }
         
-        /* BADGE */
-        .badge {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: var(--danger-gradient);
-            color: white;
-            font-size: 10px;
-            font-weight: 800;
-            padding: 4px 8px;
-            border-radius: 10px;
-            animation: pulse-glow 2s infinite;
-        }
-        
-        /* LOADING ANİMASYONU */
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 3px solid rgba(0, 122, 255, 0.1);
-            border-top-color: var(--primary-color);
-            border-radius: 50%;
-            animation: rotate 1s linear infinite;
-            margin: 30px auto;
-        }
-        
-        .hidden {
-            display: none !important;
-        }
-        
-        /* BUTON KONTEYNERI */
-        .button-container {
-            padding: 20px;
-            background: var(--secondary-color);
-            margin: 16px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--card-shadow);
-        }
-        
-        /* FOOTER DÜZELTMESİ */
+        /* FOOTER NOTE */
         .footer-note {
             font-size: 12px;
             color: var(--hint-color);
             line-height: 1.6;
-            background: rgba(0, 122, 255, 0.05);
-            padding: 20px;
-            border-radius: 14px;
-            border: 1px solid rgba(0, 122, 255, 0.1);
+            background: rgba(0, 136, 204, 0.05);
+            padding: 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 136, 204, 0.1);
             margin: 20px;
             word-wrap: break-word;
+            overflow-wrap: break-word;
         }
         
-        /* DARK MODE HAZIRLIK */
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --secondary-color: #1C1C1E;
-                --background-color: #000000;
-                --text-color: #FFFFFF;
-                --hint-color: #8E8E93;
-                --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-                --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.4);
-            }
-            
-            .bottom-nav {
-                background: rgba(28, 28, 30, 0.98);
-                border-top: 1px solid rgba(255, 255, 255, 0.08);
-            }
-            
-            #pdfSearchInput {
-                background: #2C2C2E;
-                border-color: rgba(255, 255, 255, 0.1);
-            }
-            
-            .category-item {
-                background: #2C2C2E;
-                border-color: rgba(255, 255, 255, 0.1);
-            }
-            
-            .app-header {
-                background: rgba(28, 28, 30, 0.95);
-            }
-            
-            .nav-item {
-                color: #8E8E93;
-            }
-            
-            .nav-item.active {
-                color: var(--primary-color);
-                background: rgba(0, 122, 255, 0.15);
-            }
-            
-            .nav-item:hover:not(.active) {
-                background: rgba(255, 255, 255, 0.05);
-            }
-            
-            .nav-icon {
-                color: #8E8E93;
-            }
+        /* HIDDEN CLASS */
+        .hidden {
+            display: none !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
         }
         
-        /* === RESPONSIVE FIXES === */
+        /* ANIMATIONS */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideInUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes scaleIn {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        /* RESPONSIVE */
         @media (max-width: 480px) {
             .content-page {
-                padding-bottom: 72px;
+                padding-bottom: 70px;
             }
             
             .bottom-nav {
-                padding: 10px 0;
-                min-height: 72px;
-            }
-            
-            .nav-item {
-                padding: 6px 3px;
-                min-height: 56px;
-                font-size: 11px;
+                height: 70px;
             }
             
             .nav-icon {
-                font-size: 22px;
-                width: 26px;
-                height: 26px;
-            }
-            
-            .nav-text {
-                font-size: 10px;
+                width: 36px;
+                height: 36px;
+                font-size: 20px;
             }
             
             .list-card {
@@ -1083,180 +658,164 @@
             }
             
             .list-item {
-                padding: 15px;
-                flex-wrap: wrap;
-            }
-            
-            .list-icon {
-                width: 48px;
-                height: 48px;
-                font-size: 20px;
-                margin-right: 12px;
-                margin-bottom: 8px;
-            }
-            
-            .action-button {
-                padding: 14px 20px;
-                font-size: 15px;
-                min-height: 50px;
-            }
-            
-            .modal-content {
-                padding: 25px;
-                margin: 10px;
-            }
-            
-            .splash-content {
-                padding: 30px 20px;
-                margin: 20px;
-            }
-            
-            .analysis-card {
-                margin: 12px;
-                padding: 20px;
-            }
-            
-            .analysis-value {
-                font-size: 28px;
-            }
-            
-            .progress-bar {
-                margin: 15px 0;
-            }
-            
-            .footer-note {
-                margin: 12px;
-                padding: 15px;
-            }
-        }
-        
-        @media (max-height: 700px) {
-            .bottom-nav {
-                min-height: 68px;
-            }
-            
-            .nav-item {
-                min-height: 52px;
-                padding: 5px 2px;
-            }
-            
-            .nav-icon {
-                font-size: 20px;
-                width: 24px;
-                height: 24px;
-            }
-            
-            .content-page {
-                padding-bottom: 68px;
-            }
-            
-            .list-item {
-                padding: 12px 15px;
+                padding: 16px;
             }
             
             .list-icon {
                 width: 44px;
                 height: 44px;
-                font-size: 18px;
+                font-size: 20px;
+                margin-right: 12px;
             }
             
             .action-button {
-                padding: 12px 18px;
-                min-height: 48px;
-                font-size: 15px;
+                padding: 14px 20px;
+                min-height: 52px;
+            }
+            
+            .modal-content {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .splash-content {
+                padding: 30px 20px;
+                max-height: 90vh;
+            }
+            
+            .terms-container {
+                padding: 16px;
             }
         }
         
-        /* === ADMIN PANEL FIX === */
-        #page-admin-instance {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--background-color);
-            z-index: 2000;
-            animation: slideInUp 0.5s ease-out;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
+        /* DARK MODE */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --secondary-color: #1a1d21;
+                --background-color: #0f1113;
+                --text-color: #ffffff;
+                --hint-color: #8b949e;
+                --telegram-light-blue: #0d2b3e;
+            }
+            
+            .bottom-nav {
+                background: #1a1d21;
+                border-top: 1px solid rgba(255, 255, 255, 0.05);
+            }
+            
+            #pdfSearchInput {
+                background: #2d333b;
+                border-color: rgba(255, 255, 255, 0.1);
+                color: white;
+            }
+            
+            .app-header {
+                background: #1a1d21;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            }
+            
+            .splash-content {
+                background: rgba(28, 28, 30, 0.98);
+            }
         }
+        
+        /* PROFİL SCROLL FIX */
+        .profile-scroll-container {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            width: 100%;
+        }
+        
+        /* REKLAM MODALI HIZLI */
+        #adProgressModal .modal-content {
+            animation: scaleIn 0.15s ease-out !important;
+        }
+        
+        /* Z-INDEX DÜZENLEMESİ */
+        .splash-screen { z-index: 10000; }
+        .splash-content { z-index: 10001; }
+        .terms-container { z-index: 10002; }
+        #termsModal { z-index: 20001 !important; }
+        .modal-overlay { z-index: 20000; }
+        .modal-content { z-index: 20002; }
+        .bottom-nav { z-index: 999; }
+        .app-header { z-index: 100; }
     </style>
 </head>
 <body>
 <!-- SPLASH SCREEN -->
 <div class="splash-screen" id="splashScreen">
-    <div class="splash-content animate-scale-in">
-        <div class="splash-icon animate-float">
+    <div class="splash-content">
+        <div style="width: 80px; height: 80px; background: var(--primary-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 40px; margin: 0 auto 20px;">
             <i class="fas fa-book-open"></i>
         </div>
-        <h1 class="splash-title animate-slide-in-up">@PdfDershanem_Bot</h1>
-        <h2 class="splash-subtitle animate-slide-in-up delay-100">PDF Kütüphanesi</h2>
+        <h1 style="margin: 0 0 10px 0; font-size: 24px; font-weight: 700; color: var(--telegram-blue);">
+            @PdfDershanem_Bot
+        </h1>
+        <p style="color: var(--hint-color); margin-bottom: 25px; font-size: 14px;">
+            PDF Kütüphanesi
+        </p>
         
-        <div class="terms-container animate-slide-in-up delay-200">
+        <div class="terms-container">
             <div style="display: flex; align-items: flex-start; margin-bottom: 15px;">
-                <input type="checkbox" id="termsCheckbox" style="width: 20px; height: 20px; margin-right: 12px; accent-color: var(--primary-color); cursor: pointer; margin-top: 2px;">
-                <label for="termsCheckbox" style="font-size: 14px; font-weight: 500; line-height: 1.5; cursor: pointer;">
+                <input type="checkbox" id="termsCheckbox" style="width: 20px; height: 20px; margin-right: 12px; accent-color: var(--telegram-blue); cursor: pointer; margin-top: 2px; flex-shrink: 0;">
+                <label for="termsCheckbox" style="font-size: 14px; line-height: 1.5; cursor: pointer; flex: 1;">
                     Kuralları okudum ve kabul ediyorum. 
-                    (<a href="#" id="readTermsLink" style="color: var(--primary-color); font-weight: 600; text-decoration: none;">Detaylar</a>)
+                    (<a href="#" id="readTermsLink" style="color: var(--telegram-blue); font-weight: 500; text-decoration: none;">Detaylar</a>)
                 </label>
             </div>
-            <button id="loginButton" class="action-button animate-slide-in-up delay-300" disabled>
+            <button id="loginButton" class="action-button" disabled>
                 <i class="fas fa-sign-in-alt" style="margin-right: 10px;"></i>
                 Bota Giriş Yap
             </button>
         </div>
-        
-        <p id="loadingStatus" style="color: var(--danger-color); margin-top: 20px; display: none; font-size: 13px; font-weight: 500;">
-            <i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i>
-            Veriler yükleniyor...
-        </p>
     </div>
 </div>
 
-<!-- TERMS MODAL -->
+<!-- TERMS MODAL - EN ÜSTTE -->
 <div class="modal-overlay hidden" id="termsModal">
     <div class="modal-content">
-        <h3 style="margin: 0 0 20px 0; font-size: 22px; color: var(--primary-color); display: flex; align-items: center; gap: 12px;">
+        <h3 style="margin: 0 0 20px 0; font-size: 20px; color: var(--telegram-blue); display: flex; align-items: center; gap: 10px;">
             <i class="fas fa-gavel"></i>
             Kullanım Kuralları
         </h3>
-        <div style="background: rgba(0, 122, 255, 0.05); padding: 20px; border-radius: 14px; margin-bottom: 25px; border: 1px solid rgba(0, 122, 255, 0.1);">
-            <p style="font-size: 14px; color: var(--text-color); line-height: 1.6; margin-bottom: 15px;">
-                <i class="fas fa-info-circle" style="color: var(--primary-color); margin-right: 8px;"></i>
+        <div style="background: rgba(0, 136, 204, 0.05); padding: 16px; border-radius: 10px; margin-bottom: 20px; border: 1px solid rgba(0, 136, 204, 0.1);">
+            <p style="font-size: 14px; color: var(--text-color); line-height: 1.6; margin-bottom: 10px;">
+                <i class="fas fa-info-circle" style="color: var(--telegram-blue); margin-right: 8px;"></i>
                 <strong>1. Bot İşlevi:</strong> Bu uygulama bir PDF kütüphanesidir. PDF'leri indirmek için belirtilen sayıda reklam izlemeniz gerekmektedir.
             </p>
             <p style="font-size: 14px; color: var(--text-color); line-height: 1.6;">
-                <i class="fas fa-ad" style="color: var(--primary-color); margin-right: 8px;"></i>
+                <i class="fas fa-ad" style="color: var(--telegram-blue); margin-right: 8px;"></i>
                 <strong>2. Reklam Sistemi:</strong> Her PDF indirme için belirli sayıda reklam izlemeniz gerekmektedir.
             </p>
         </div>
-        <div style="display: flex; gap: 12px; flex-direction: column;">
-            <button id="closeTermsModal" class="action-button warning">
-                <i class="fas fa-times" style="margin-right: 10px;"></i>
-                Kapat ve Reddet
+        <div style="display: flex; gap: 10px;">
+            <button id="closeTermsModal" class="action-button" style="background: var(--warning-gradient); flex: 1;">
+                <i class="fas fa-times" style="margin-right: 8px;"></i>
+                Kapat
             </button>
-            <button id="acceptTermsModal" class="action-button success">
-                <i class="fas fa-check-circle" style="margin-right: 10px;"></i>
-                Okudum ve Kabul Ediyorum
+            <button id="acceptTermsModal" class="action-button" style="background: var(--success-gradient); flex: 1;">
+                <i class="fas fa-check" style="margin-right: 8px;"></i>
+                Kabul Et
             </button>
         </div>
     </div>
 </div>
 
-<!-- ANA UYGULAMA -->
+<!-- MAIN APP -->
 <div class="telegram-app hidden" id="app">
-    <!-- ANA SAYFA -->
+    <!-- HOME PAGE -->
     <div class="content-page active" id="page-home">
         <div class="app-header">
             <h1 class="app-header-title">
-                <i class="fas fa-book-reader" style="color: var(--primary-color);"></i>
+                <i class="fas fa-book-reader"></i>
                 PDF Dershanem
             </h1>
         </div>
         
-        <!-- SPONSOR KARTI -->
-        <div class="list-card sponsor-card animate-pulse-glow" onclick="window.open('https://t.me/KrallarPDF', '_blank')">
+        <!-- SPONSOR CARD -->
+        <div class="list-card sponsor-card" onclick="window.open('https://t.me/KrallarPDF', '_blank')">
             <div class="list-item">
                 <div class="list-icon icon-sponsor">
                     <i class="fas fa-crown"></i>
@@ -1271,10 +830,10 @@
             </div>
         </div>
         
-        <!-- BOT BİLGİLERİ -->
-        <div style="padding: 20px 20px 10px 20px;">
-            <div style="font-size: 13px; color: var(--hint-color); margin-bottom: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">
-                <i class="fas fa-info-circle" style="margin-right: 8px;"></i>
+        <!-- BOT INFO -->
+        <div style="padding: 20px 20px 10px;">
+            <div style="font-size: 12px; color: var(--hint-color); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                <i class="fas fa-info-circle" style="margin-right: 6px;"></i>
                 BOT BİLGİLERİ
             </div>
         </div>
@@ -1291,10 +850,10 @@
             </div>
         </div>
         
-        <!-- PDF KÜTÜPHANESİ -->
-        <div style="padding: 20px 20px 10px 20px;">
-            <div style="font-size: 13px; color: var(--hint-color); margin-bottom: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">
-                <i class="fas fa-book" style="margin-right: 8px;"></i>
+        <!-- PDF LIBRARY -->
+        <div style="padding: 20px 20px 10px;">
+            <div style="font-size: 12px; color: var(--hint-color); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                <i class="fas fa-book" style="margin-right: 6px;"></i>
                 PDF KÜTÜPHANESİ
             </div>
         </div>
@@ -1306,7 +865,7 @@
                 </div>
                 <div class="list-info">
                     <div class="list-name">Tüm PDF Dosyaları</div>
-                    <div class="list-detail">Toplam Dosya: <span id="pdfCount" style="color: var(--primary-color); font-weight: 800;">0</span></div>
+                    <div class="list-detail">Toplam Dosya: <span id="pdfCount" style="color: var(--telegram-blue); font-weight: 600;">0</span></div>
                 </div>
                 <div class="list-meta">
                     <i class="fas fa-chevron-right"></i>
@@ -1314,7 +873,7 @@
             </div>
         </div>
         
-        <!-- ADMIN PANELİ -->
+        <!-- ADMIN PANEL -->
         <div class="list-card hidden" id="adminControlCard" onclick="openAdminModal()">
             <div class="list-item">
                 <div class="list-icon icon-admin">
@@ -1330,10 +889,10 @@
             </div>
         </div>
         
-        <!-- HESAP -->
-        <div style="padding: 20px 20px 10px 20px;">
-            <div style="font-size: 13px; color: var(--hint-color); margin-bottom: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">
-                <i class="fas fa-user" style="margin-right: 8px;"></i>
+        <!-- ACCOUNT -->
+        <div style="padding: 20px 20px 10px;">
+            <div style="font-size: 12px; color: var(--hint-color); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                <i class="fas fa-user" style="margin-right: 6px;"></i>
                 HESAP
             </div>
         </div>
@@ -1354,171 +913,163 @@
         </div>
         
         <!-- FOOTER -->
-        <div style="padding: 30px 20px; text-align: center;">
+        <div style="padding: 20px;">
             <div class="footer-note">
-                <i class="fas fa-exclamation-circle" style="color: var(--primary-color); margin-right: 8px;"></i>
+                <i class="fas fa-exclamation-circle" style="color: var(--telegram-blue); margin-right: 6px;"></i>
                 <strong>ÜCRETSİZ SÜRÜM:</strong> PDF'leri indirmek için reklam izlemeniz gerekmektedir.
             </div>
         </div>
     </div>
     
-    <!-- PDF LİSTESİ SAYFASI -->
+    <!-- PDF LIST PAGE -->
     <div class="content-page" id="page-pdf-list">
         <div class="app-header">
             <h1 class="app-header-title">
-                <i class="fas fa-book-open" style="color: var(--primary-color);"></i>
+                <i class="fas fa-book-open"></i>
                 PDF Kütüphanesi
             </h1>
         </div>
         
-        <!-- ARAMA VE SIRALAMA -->
-        <div style="padding: 20px;">
-            <div class="search-container">
-                <i class="fas fa-search search-icon"></i>
-                <input type="search" id="pdfSearchInput" placeholder="PDF adı veya konu ara..." oninput="filterAndSortPDFs()">
-            </div>
-            
-            <div style="font-size: 12px; color: var(--hint-color); margin-bottom: 10px; font-weight: 600;">
-                <i class="fas fa-sort-amount-down" style="margin-right: 8px;"></i>
-                SIRALAMA
-            </div>
-            <div class="sort-buttons">
-                <button class="sort-button active" onclick="setSort('newest')">
-                    <i class="fas fa-clock"></i>
-                    En Yeni
-                </button>
-                <button class="sort-button" onclick="setSort('oldest')">
-                    <i class="fas fa-history"></i>
-                    En Eski
-                </button>
-                <button class="sort-button" onclick="setSort('name')">
-                    <i class="fas fa-sort-alpha-down"></i>
-                    A-Z
-                </button>
-            </div>
+        <!-- SEARCH AND SORT -->
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="search" id="pdfSearchInput" placeholder="PDF adı veya konu ara..." oninput="filterAndSortPDFs()">
         </div>
         
-        <!-- KATEGORİLER -->
-        <div id="categoryNavContainer">
-            <div class="category-nav-scroll" id="categoryNav">
-                <!-- Kategoriler buraya eklenecek -->
-            </div>
+        <div class="sort-buttons">
+            <button class="sort-button active" onclick="setSort('newest')">
+                <i class="fas fa-clock"></i>
+                En Yeni
+            </button>
+            <button class="sort-button" onclick="setSort('oldest')">
+                <i class="fas fa-history"></i>
+                En Eski
+            </button>
+            <button class="sort-button" onclick="setSort('name')">
+                <i class="fas fa-sort-alpha-down"></i>
+                A-Z
+            </button>
         </div>
         
-        <!-- PDF LİSTESİ -->
+        <!-- CATEGORIES -->
+        <div class="category-nav-scroll" id="categoryNav">
+            <!-- Categories will be added here -->
+        </div>
+        
+        <!-- PDF LIST -->
         <div id="pdfDownloadList" style="flex: 1; overflow-y: auto; padding: 0 20px 20px;">
-            <!-- PDF'ler buraya gelecek -->
+            <!-- PDFs will be added here -->
         </div>
     </div>
     
-    <!-- PROFİL SAYFASI -->
+    <!-- PROFILE PAGE - KAYDIRILABİLİR -->
     <div class="content-page" id="page-profile">
         <div class="app-header">
             <h1 class="app-header-title">
-                <i class="fas fa-user-circle" style="color: var(--primary-color);"></i>
+                <i class="fas fa-user-circle"></i>
                 Profilim
             </h1>
         </div>
         
-        <!-- AVATAR VE BİLGİLER -->
-        <div class="list-card">
-            <div style="padding: 40px 20px; text-align: center;">
-                <div id="profileIcon" style="width: 90px; height: 90px; background: var(--primary-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 32px; font-weight: 800; margin: 0 auto 20px auto; box-shadow: 0 15px 35px rgba(0, 122, 255, 0.3);">
-                    <i class="fas fa-user"></i>
+        <div class="profile-scroll-container">
+            <!-- AVATAR AND INFO -->
+            <div class="list-card">
+                <div style="padding: 30px 20px; text-align: center;">
+                    <div id="profileIcon" style="width: 80px; height: 80px; background: var(--primary-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 28px; font-weight: 600; margin: 0 auto 15px auto;">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h3 id="profile-full-name" style="margin: 0 0 6px 0; font-size: 20px; font-weight: 600;">Yükleniyor...</h3>
+                    <p id="profile-status" style="color: var(--hint-color); margin: 0; font-size: 13px;"></p>
                 </div>
-                <h3 id="profile-full-name" style="margin: 0 0 8px 0; font-size: 24px; font-weight: 800;">Yükleniyor...</h3>
-                <p id="profile-status" style="color: var(--hint-color); margin: 0; font-size: 14px; font-weight: 500;"></p>
+                
+                <!-- INFO CARDS -->
+                <div class="list-item">
+                    <div class="list-icon" style="background: var(--primary-gradient);">
+                        <i class="fas fa-fingerprint"></i>
+                    </div>
+                    <div class="list-info">
+                        <div class="list-name">Telegram ID</div>
+                        <div class="list-detail" id="profile-id">-</div>
+                    </div>
+                </div>
+                
+                <div class="list-item">
+                    <div class="list-icon" style="background: var(--success-gradient);">
+                        <i class="fas fa-user-tag"></i>
+                    </div>
+                    <div class="list-info">
+                        <div class="list-name">Ad Soyad</div>
+                        <div class="list-detail" id="profile-name">-</div>
+                    </div>
+                </div>
+                
+                <div class="list-item">
+                    <div class="list-icon" style="background: var(--warning-gradient);">
+                        <i class="fas fa-at"></i>
+                    </div>
+                    <div class="list-info">
+                        <div class="list-name">Kullanıcı Adı</div>
+                        <div class="list-detail" id="profile-username">-</div>
+                    </div>
+                </div>
+                
+                <div class="list-item">
+                    <div class="list-icon" style="background: var(--accent-gradient);">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="list-info">
+                        <div class="list-name">Kayıt Tarihi</div>
+                        <div class="list-detail" id="profile-created">-</div>
+                    </div>
+                </div>
             </div>
             
-            <!-- BİLGİ KARTLARI -->
-            <div class="list-item">
-                <div class="list-icon" style="background: var(--primary-gradient);">
-                    <i class="fas fa-fingerprint"></i>
-                </div>
-                <div class="list-info">
-                    <div class="list-name">Telegram ID</div>
-                    <div class="list-detail" id="profile-id">-</div>
-                </div>
-            </div>
-            
-            <div class="list-item">
-                <div class="list-icon" style="background: var(--success-gradient);">
-                    <i class="fas fa-user-tag"></i>
-                </div>
-                <div class="list-info">
-                    <div class="list-name">Ad Soyad</div>
-                    <div class="list-detail" id="profile-name">-</div>
-                </div>
-            </div>
-            
-            <div class="list-item">
-                <div class="list-icon" style="background: var(--warning-gradient);">
-                    <i class="fas fa-at"></i>
-                </div>
-                <div class="list-info">
-                    <div class="list-name">Kullanıcı Adı</div>
-                    <div class="list-detail" id="profile-username">-</div>
-                </div>
-            </div>
-            
-            <div class="list-item">
-                <div class="list-icon" style="background: var(--accent-gradient);">
-                    <i class="fas fa-calendar-alt"></i>
-                </div>
-                <div class="list-info">
-                    <div class="list-name">Kayıt Tarihi</div>
-                    <div class="list-detail" id="profile-created">-</div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- ADMIN PANELİ BUTONU -->
-        <div class="list-card hidden" id="adminControlCardProfile" onclick="openAdminModal()">
-            <div class="list-item">
-                <div class="list-icon icon-admin">
-                    <i class="fas fa-shield-alt"></i>
-                </div>
-                <div class="list-info">
-                    <div class="list-name">Admin Yönetim Paneli</div>
-                    <div class="list-detail">Yönetim araçlarına erişin</div>
-                </div>
-                <div class="list-meta" style="color: var(--warning-color);">
-                    <i class="fas fa-lock-open"></i>
+            <!-- ADMIN PANEL BUTTON -->
+            <div class="list-card hidden" id="adminControlCardProfile" onclick="openAdminModal()">
+                <div class="list-item">
+                    <div class="list-icon icon-admin">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="list-info">
+                        <div class="list-name">Admin Yönetim Paneli</div>
+                        <div class="list-detail">Yönetim araçlarına erişin</div>
+                    </div>
+                    <div class="list-meta" style="color: var(--warning-color);">
+                        <i class="fas fa-lock-open"></i>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- ADMIN PANELİ -->
+<!-- ADMIN PANEL -->
 <div id="page-admin-instance" class="hidden">
-    <div style="background: var(--secondary-color); box-shadow: 0 5px 25px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100;">
+    <div style="background: var(--secondary-color); position: sticky; top: 0; z-index: 100;">
         <div style="padding: 20px; display: flex; justify-content: space-between; align-items: center;">
-            <h2 style="margin: 0; font-size: 22px; font-weight: 800; color: var(--text-color); display: flex; align-items: center; gap: 12px;">
+            <h2 style="margin: 0; font-size: 20px; font-weight: 600; color: var(--text-color); display: flex; align-items: center; gap: 10px;">
                 <i class="fas fa-shield-alt" style="color: var(--warning-color);"></i>
                 Admin Paneli
             </h2>
-            <button class="action-button warning" onclick="closeAdminModal()" style="width: auto; padding: 12px 20px; font-size: 14px;">
+            <button class="action-button" onclick="closeAdminModal()" style="width: auto; padding: 10px 16px; font-size: 14px; background: var(--warning-gradient);">
                 <i class="fas fa-arrow-left" style="margin-right: 8px;"></i>
                 Geri Dön
             </button>
         </div>
         
         <!-- ADMIN NAV -->
-        <div style="display: flex; padding: 0 20px 20px 20px; gap: 10px;">
+        <div style="display: flex; padding: 0 20px 20px; gap: 8px;">
             <div class="nav-item active" data-admin-tab="pdf" onclick="changeAdminTab('pdf')" style="flex: 1;">
                 <div class="nav-icon">
                     <i class="fas fa-file-pdf"></i>
                 </div>
                 PDF'ler
-                <div class="nav-indicator"></div>
             </div>
             <div class="nav-item" data-admin-tab="users" onclick="changeAdminTab('users')" style="flex: 1;">
                 <div class="nav-icon">
                     <i class="fas fa-users"></i>
                 </div>
                 Kullanıcılar
-                <div class="nav-indicator"></div>
             </div>
         </div>
     </div>
@@ -1526,28 +1077,28 @@
     <div style="overflow-y: auto; height: calc(100vh - 140px); padding-bottom: 20px;">
         <!-- PDF TAB -->
         <div id="admin-tab-pdf" style="padding: 20px;">
-            <div style="font-size: 13px; color: var(--hint-color); margin-bottom: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">
-                <i class="fas fa-plus-circle" style="margin-right: 8px;"></i>
+            <div style="font-size: 12px; color: var(--hint-color); margin-bottom: 10px; font-weight: 600; text-transform: uppercase;">
+                <i class="fas fa-plus-circle" style="margin-right: 6px;"></i>
                 YENİ PDF EKLE
             </div>
-            <div class="list-card" style="padding: 25px;">
-                <input type="text" id="pdfTitle" placeholder="📝 PDF Başlığı (Örn: TYT Matematik)" style="width: 100%; padding: 16px; margin-bottom: 15px; border: 2px solid rgba(0,0,0,0.05); border-radius: 12px; font-size: 15px; background: var(--secondary-color); color: var(--text-color); transition: var(--transition-smooth);">
-                <input type="url" id="pdfUrl" placeholder="🔗 PDF URL (Dropbox veya Drive)" style="width: 100%; padding: 16px; margin-bottom: 15px; border: 2px solid rgba(0,0,0,0.05); border-radius: 12px; font-size: 15px; background: var(--secondary-color); color: var(--text-color); transition: var(--transition-smooth);">
-                <input type="number" id="requiredAds" min="1" max="50" value="20" placeholder="📊 Zorunlu reklam sayısı (1-50)" style="width: 100%; padding: 16px; margin-bottom: 20px; border: 2px solid rgba(0,0,0,0.05); border-radius: 12px; font-size: 15px; background: var(--secondary-color); color: var(--text-color); transition: var(--transition-smooth);">
-                <button id="uploadPdfButton" class="action-button success animate-pulse-glow" onclick="uploadPDF()">
-                    <i class="fas fa-upload" style="margin-right: 10px;"></i>
-                    PDF Kaydını Ekle
+            <div class="list-card" style="padding: 20px;">
+                <input type="text" id="pdfTitle" placeholder="📝 PDF Başlığı" style="width: 100%; padding: 14px; margin-bottom: 12px; border: 1px solid rgba(0,136,204,0.2); border-radius: 10px; font-size: 14px; background: var(--secondary-color); color: var(--text-color);">
+                <input type="url" id="pdfUrl" placeholder="🔗 PDF URL" style="width: 100%; padding: 14px; margin-bottom: 12px; border: 1px solid rgba(0,136,204,0.2); border-radius: 10px; font-size: 14px; background: var(--secondary-color); color: var(--text-color);">
+                <input type="number" id="requiredAds" min="1" max="50" value="20" placeholder="📊 Reklam sayısı" style="width: 100%; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(0,136,204,0.2); border-radius: 10px; font-size: 14px; background: var(--secondary-color); color: var(--text-color);">
+                <button id="uploadPdfButton" class="action-button" onclick="uploadPDF()" style="background: var(--success-gradient);">
+                    <i class="fas fa-upload" style="margin-right: 8px;"></i>
+                    PDF Ekle
                 </button>
             </div>
             
-            <div style="font-size: 13px; color: var(--hint-color); margin: 30px 0 12px 0; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">
-                <i class="fas fa-list" style="margin-right: 8px;"></i>
+            <div style="font-size: 12px; color: var(--hint-color); margin: 25px 0 10px; font-weight: 600; text-transform: uppercase;">
+                <i class="fas fa-list" style="margin-right: 6px;"></i>
                 MEVCUT PDF LİSTESİ
             </div>
             <div class="list-card" id="adminPdfList">
-                <div style="padding: 40px 20px; text-align: center; color: var(--hint-color);">
-                    <div class="loading-spinner"></div>
-                    <div style="margin-top: 15px; font-weight: 500;">PDF'ler yükleniyor...</div>
+                <div style="padding: 30px 20px; text-align: center; color: var(--hint-color);">
+                    <div style="width: 30px; height: 30px; border: 3px solid rgba(0,136,204,0.1); border-top-color: var(--telegram-blue); border-radius: 50%; animation: rotate 1s linear infinite; margin: 0 auto 10px;"></div>
+                    PDF'ler yükleniyor...
                 </div>
             </div>
         </div>
@@ -1571,69 +1122,65 @@
                     <div class="analysis-value" id="todayAdsWatched">0</div>
                     <div class="analysis-label">Bugün Reklam</div>
                 </div>
-                <div class="analysis-item" style="grid-column: span 2;">
-                    <div class="analysis-value" id="totalPdfCountAnalysis">0</div>
-                    <div class="analysis-label">Toplam PDF</div>
-                </div>
             </div>
             
-            <div style="font-size: 13px; color: var(--hint-color); margin: 30px 0 12px 0; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">
-                <i class="fas fa-users-cog" style="margin-right: 8px;"></i>
+            <div style="font-size: 12px; color: var(--hint-color); margin: 25px 0 10px; font-weight: 600; text-transform: uppercase;">
+                <i class="fas fa-users-cog" style="margin-right: 6px;"></i>
                 KAYITLI KULLANICILAR
             </div>
             <div class="list-card" id="adminUserList">
-                <div style="padding: 40px 20px; text-align: center; color: var(--hint-color);">
-                    <div class="loading-spinner"></div>
-                    <div style="margin-top: 15px; font-weight: 500;">Kullanıcılar yükleniyor...</div>
+                <div style="padding: 30px 20px; text-align: center; color: var(--hint-color);">
+                    <div style="width: 30px; height: 30px; border: 3px solid rgba(0,136,204,0.1); border-top-color: var(--telegram-blue); border-radius: 50%; animation: rotate 1s linear infinite; margin: 0 auto 10px;"></div>
+                    Kullanıcılar yükleniyor...
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- HATA MODALI -->
+<!-- ERROR MODAL -->
 <div class="modal-overlay hidden" id="errorModal">
     <div class="modal-content">
-        <h3 style="color: var(--danger-color); margin: 0 0 20px 0; font-size: 22px; display: flex; align-items: center; gap: 12px;">
+        <h3 style="color: var(--danger-color); margin: 0 0 15px 0; font-size: 20px; display: flex; align-items: center; gap: 10px;">
             <i class="fas fa-exclamation-triangle"></i>
             Hata!
         </h3>
-        <p id="errorModalMessage" style="font-size: 15px; line-height: 1.6; margin-bottom: 25px;"></p>
-        <button onclick="closeModal('errorModal')" class="action-button warning">
-            <i class="fas fa-check" style="margin-right: 10px;"></i>
+        <p id="errorModalMessage" style="font-size: 14px; line-height: 1.6; margin-bottom: 20px;"></p>
+        <button onclick="closeModal('errorModal')" class="action-button" style="background: var(--warning-gradient);">
+            <i class="fas fa-check" style="margin-right: 8px;"></i>
             Tamam
         </button>
     </div>
 </div>
 
-<!-- REKLAM MODALI -->
+<!-- AD MODAL - HIZLI AÇILACAK -->
 <div class="modal-overlay hidden" id="adProgressModal">
-    <div class="modal-content" style="max-width: 450px; text-align: center;">
-        <h3 id="progressModalTitle" style="margin: 0 0 15px 0; font-size: 24px; color: var(--primary-color); display: flex; align-items: center; justify-content: center; gap: 12px;">
+    <div class="modal-content" style="max-width: 400px; text-align: center;">
+        <h3 id="progressModalTitle" style="margin: 0 0 12px 0; font-size: 20px; color: var(--telegram-blue); display: flex; align-items: center; justify-content: center; gap: 10px;">
             <i class="fas fa-download"></i>
-            İndirme Başlatılıyor
+            İndirme
         </h3>
-        <p id="progressModalFileName" style="font-weight: 700; margin-bottom: 15px; font-size: 16px; background: rgba(0, 122, 255, 0.05); padding: 15px; border-radius: 12px;"></p>
+        <p id="progressModalFileName" style="font-weight: 600; margin-bottom: 12px; font-size: 15px; background: rgba(0,136,204,0.05); padding: 12px; border-radius: 10px;"></p>
         
-        <p id="progressModalStatus" style="color: var(--success-color); font-weight: 800; margin: 0 0 20px 0; font-size: 15px;"></p>
+        <p id="progressModalStatus" style="color: var(--success-color); font-weight: 600; margin: 0 0 15px 0; font-size: 14px;"></p>
         
         <div class="progress-bar">
             <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
         </div>
         
-        <button id="watchAdButton" class="action-button animate-pulse-glow" onclick="handleWatchAdClick()" style="margin-top: 25px; font-size: 16px;">
-            <i class="fas fa-play-circle" style="margin-right: 12px;"></i>
-            Reklam İzle ve İlerle
+        <button id="watchAdButton" class="action-button" onclick="handleWatchAdClick()" style="margin-top: 20px; font-size: 15px;">
+            <i class="fas fa-play-circle" style="margin-right: 10px;"></i>
+            Reklam İzle
         </button>
         
-        <button id="downloadButton" class="action-button success hidden" onclick="finalizeDownload()" style="margin-top: 15px; font-size: 16px;">
-            <i class="fas fa-download" style="margin-right: 12px;"></i>
-            PDF'i İndir!
+        <button id="downloadButton" class="action-button hidden" onclick="finalizeDownload()" style="margin-top: 12px; font-size: 15px; background: var(--success-gradient);">
+            <i class="fas fa-download" style="margin-right: 10px;"></i>
+            PDF'i İndir
         </button>
         
-        <button onclick="closeProgressModal()" class="action-button" style="background: var(--warning-gradient); margin-top: 15px; font-size: 14px;">
-            <i class="fas fa-times" style="margin-right: 10px;"></i>
-            İptal Et ve Geri Dön
+        <button onclick="closeProgressModal()" class="action-button" style="background: var(--warning-gradient); margin-top: 12px; font-size: 14px;">
+            <i class="fas fa-times" style="margin-right: 8px;"></i>
+            İptal
         </button>
     </div>
 </div>
@@ -1661,11 +1208,7 @@
 </div>
 
 <script>
-    // #######################################################
-    // ##### JAVASCRIPT - TÜM DÜZELTMELERLE #####
-    // #######################################################
-    
-    // YAPILANDIRMA
+    // KONFİGÜRASYON
     const firebaseConfig = {
         apiKey: "AIzaSyArNeaPYGiPg-K7O19Xg4btYhqfnzvyCtw",
         authDomain: "pdfdershanem.firebaseapp.com",
@@ -1704,9 +1247,7 @@
                 firebase.initializeApp(firebaseConfig);
             }
             db = firebase.database();
-            console.log("✅ Firebase başlatıldı");
         } catch (e) {
-            console.error("❌ Firebase hatası:", e);
             showError("Firebase bağlantı hatası");
             return;
         }
@@ -1720,17 +1261,14 @@
                 if (Telegram.WebApp.initDataUnsafe?.user) {
                     currentUser = Telegram.WebApp.initDataUnsafe.user;
                     is_admin = ADMIN_IDS.includes(currentUser.id);
-                    console.log("👤 Kullanıcı:", currentUser.id);
                 } else {
                     currentUser = { id: 999999999, first_name: 'Misafir', username: 'misafir' };
                 }
             } catch (e) {
-                console.warn("⚠️ Telegram WebApp hatası:", e);
                 currentUser = { id: 7904032877, first_name: 'Test', username: 'testadmin' };
                 is_admin = ADMIN_IDS.includes(currentUser.id);
             }
         } else {
-            console.log("🌐 Tarayıcı test modu");
             currentUser = { id: 7904032877, first_name: 'Test', username: 'testadmin' };
             is_admin = ADMIN_IDS.includes(currentUser.id);
         }
@@ -1749,11 +1287,6 @@
         
         messageElement.textContent = message;
         modal.classList.remove('hidden');
-        
-        // Haptic feedback
-        if (window.Telegram && Telegram.WebApp) {
-            Telegram.WebApp.HapticFeedback.impactOccurred('heavy');
-        }
     }
     
     function closeModal(modalId) {
@@ -1775,12 +1308,11 @@
         };
         
         await userRef.update(updates);
-        console.log("✅ Kullanıcı kaydedildi:", user.id);
     }
     
-    // PDF İNDİRME SİSTEMİ
+    // PDF İNDİRME SİSTEMİ - HIZLI AÇILMA
     window.handlePDFDownloadClick = function(key, title, url, requiredAds) {
-        console.log("📥 PDF indirme başlatılıyor:", { key, title, url, requiredAds });
+        console.log("🚀 PDF indirme hemen başlatılıyor...");
         
         if (!currentUser) {
             showError("Lütfen önce giriş yapın");
@@ -1799,8 +1331,6 @@
             }
         }
         
-        console.log("🔗 Düzeltilmiş URL:", finalUrl);
-        
         currentPdf = {
             key: key,
             title: title,
@@ -1809,42 +1339,47 @@
             watched_ads: 0
         };
         
-        // Kullanıcının ilerlemesini kontrol et
-        const userPdfRef = db.ref(`users/${currentUser.id}/pdf_progress/${key}`);
-        userPdfRef.once('value').then(snapshot => {
-            const progress = snapshot.val();
-            if (progress && progress.watched_ads) {
-                currentPdf.watched_ads = progress.watched_ads;
-            }
-            
-            // Modal'ı aç
-            openProgressModal();
-        }).catch(e => {
-            console.error("❌ İlerleme kontrol hatası:", e);
-            openProgressModal();
-        });
-    }
+        // HEMEN MODAL AÇ (gecikme yok)
+        openProgressModal();
+        
+        // Kullanıcı ilerlemesini arka planda kontrol et
+        if (db) {
+            db.ref(`users/${currentUser.id}/pdf_progress/${key}`).once('value').then(snapshot => {
+                const progress = snapshot.val();
+                if (progress && progress.watched_ads) {
+                    currentPdf.watched_ads = progress.watched_ads;
+                    updateProgressBar();
+                    updateAdButton();
+                }
+            });
+        }
+    };
     
     function openProgressModal() {
+        if (!currentPdf) return;
+        
         const { title, required_ads, watched_ads } = currentPdf;
         const remainingAds = Math.max(0, required_ads - watched_ads);
         
-        document.getElementById('progressModalTitle').textContent = "İndirme Gereksinimleri";
-        document.getElementById('progressModalFileName').textContent = title;
-        
-        if (remainingAds <= 0) {
-            document.getElementById('progressModalStatus').textContent = "✅ İndirmeye hazır!";
-            document.getElementById('watchAdButton').classList.add('hidden');
-            document.getElementById('downloadButton').classList.remove('hidden');
-        } else {
-            document.getElementById('progressModalStatus').textContent = `📊 Kalan: ${remainingAds} reklam`;
-            document.getElementById('watchAdButton').textContent = `🎬 Reklam İzle (${remainingAds} kaldı)`;
-            document.getElementById('watchAdButton').classList.remove('hidden');
-            document.getElementById('downloadButton').classList.add('hidden');
-        }
-        
-        updateProgressBar();
-        document.getElementById('adProgressModal').classList.remove('hidden');
+        // DOM'u hızlı güncelle
+        requestAnimationFrame(() => {
+            document.getElementById('progressModalTitle').textContent = "İndirme Gereksinimleri";
+            document.getElementById('progressModalFileName').textContent = title;
+            
+            if (remainingAds <= 0) {
+                document.getElementById('progressModalStatus').textContent = "✅ İndirmeye hazır!";
+                document.getElementById('watchAdButton').classList.add('hidden');
+                document.getElementById('downloadButton').classList.remove('hidden');
+            } else {
+                document.getElementById('progressModalStatus').textContent = `📊 Kalan: ${remainingAds} reklam`;
+                document.getElementById('watchAdButton').textContent = `🎬 Reklam İzle (${remainingAds} kaldı)`;
+                document.getElementById('watchAdButton').classList.remove('hidden');
+                document.getElementById('downloadButton').classList.add('hidden');
+            }
+            
+            updateProgressBar();
+            document.getElementById('adProgressModal').classList.remove('hidden');
+        });
     }
     
     function updateProgressBar() {
@@ -1858,11 +1393,10 @@
     window.closeProgressModal = function() {
         document.getElementById('adProgressModal').classList.add('hidden');
         currentPdf = null;
-    }
+    };
     
     // REKLAM İZLEME
     window.handleWatchAdClick = async function() {
-        console.log("🎬 Reklam izleme başlatılıyor...");
         const adButton = document.getElementById('watchAdButton');
         
         if (!currentPdf) {
@@ -1874,45 +1408,32 @@
         adButton.innerHTML = `<i class="fas fa-spinner fa-spin" style="margin-right: 10px;"></i> Reklam yükleniyor...`;
         
         try {
-            // Chalpus reklamını göster
-            console.log("📺 Chalpus reklamı çağrılıyor...");
-            
-            // TEST: Eğer Chalpus API yüklenmediyse test modu
             if (typeof show_10340134 === 'undefined') {
-                console.warn("⚠️ Chalpus API yüklenmedi, test modu");
-                
-                // Kullanıcıya test seçeneği sun
+                // Test modu
                 setTimeout(() => {
                     if (confirm("Reklam servisi yüklenemedi. Test için ilerleme kaydetmek ister misiniz?")) {
                         handleTestAd();
                     } else {
                         adButton.disabled = false;
-                        adButton.innerHTML = `<i class="fas fa-play-circle" style="margin-right: 12px;"></i> Reklam İzle ve İlerle`;
+                        adButton.innerHTML = `<i class="fas fa-play-circle" style="margin-right: 12px;"></i> Reklam İzle`;
                     }
-                }, 500);
+                }, 100);
                 return;
             }
             
-            // Gerçek reklamı göster
             await show_10340134();
-            console.log("✅ Reklam başarıyla izlendi");
-            
-            // İlerlemeyi kaydet
             await handleAdSuccess();
             
         } catch (error) {
-            console.error("❌ Reklam hatası:", error);
-            
-            // Kullanıcıya seçenek sun
             setTimeout(() => {
                 if (confirm("Reklam izlenemedi. Test için ilerleme kaydetmek ister misiniz?")) {
                     handleTestAd();
                 } else {
                     adButton.disabled = false;
-                    adButton.innerHTML = `<i class="fas fa-play-circle" style="margin-right: 12px;"></i> Reklam İzle ve İlerle`;
-                    showError("Reklam izlenemedi: " + error.message);
+                    adButton.innerHTML = `<i class="fas fa-play-circle" style="margin-right: 12px;"></i> Reklam İzle`;
+                    showError("Reklam izlenemedi");
                 }
-            }, 500);
+            }, 100);
         }
     };
     
@@ -1927,14 +1448,8 @@
         
         await db.ref().update(updates);
         
-        // UI güncelle
         updateProgressBar();
         updateAdButton();
-        
-        // Haptic feedback
-        if (window.Telegram && Telegram.WebApp) {
-            Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-        }
     }
     
     async function handleAdSuccess() {
@@ -1952,14 +1467,8 @@
         
         await db.ref().update(updates);
         
-        // UI güncelle
         updateProgressBar();
         updateAdButton();
-        
-        // Haptic feedback
-        if (window.Telegram && Telegram.WebApp) {
-            Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-        }
     }
     
     function updateAdButton() {
@@ -1988,26 +1497,23 @@
         
         const { key, title, url, required_ads, watched_ads } = currentPdf;
         
-        // Kontrol
         if (watched_ads < required_ads) {
             showError(`⚠️ Henüz yeterli reklam izlemediniz. ${required_ads - watched_ads} reklam daha izlemelisiniz.`);
             return;
         }
         
-        console.log("🚀 İndirme başlatılıyor:", url);
-        
         // İndirme sayacını artır
-        db.ref('pdfs/' + key).child('downloads').transaction(current => {
-            return (current || 0) + 1;
-        });
+        if (db) {
+            db.ref('pdfs/' + key).child('downloads').transaction(current => {
+                return (current || 0) + 1;
+            });
+        }
         
         // Linki aç
         setTimeout(() => {
             if (window.Telegram && Telegram.WebApp) {
-                // Telegram WebApp'te link açma
                 Telegram.WebApp.openLink(url);
             } else {
-                // Tarayıcıda link açma
                 const link = document.createElement('a');
                 link.href = url;
                 link.target = '_blank';
@@ -2017,52 +1523,52 @@
                 document.body.removeChild(link);
             }
             
-            // Başarı mesajı
-            if (window.Telegram && Telegram.WebApp) {
-                Telegram.WebApp.showAlert(`📥 "${title}" indiriliyor...`);
-            }
-            
-            // Modal'ı kapat
             closeProgressModal();
             
-            // Listeyi güncelle
             setTimeout(() => {
                 fetchPDFList();
-                if (window.Telegram && Telegram.WebApp) {
-                    Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-                }
-            }, 1000);
-        }, 300);
+            }, 500);
+        }, 100);
     };
     
-    // SAYFA GEÇİŞLERİ
+    // SAYFA GEÇİŞLERİ - PROFİL KAYDIRMA DÜZELTMESİ
     window.changeTab = function(tabId) {
-        console.log(`🔘 Tab değiştir: ${tabId}`);
-        
-        // Haptic feedback
-        if (window.Telegram && Telegram.WebApp) {
-            Telegram.WebApp.HapticFeedback.impactOccurred('light');
-        }
-        
-        // Tüm sayfaları ve nav butonlarını sıfırla
+        // Önceki sayfaları kapat
         document.querySelectorAll('.content-page').forEach(page => {
             page.classList.remove('active');
             page.scrollTop = 0;
         });
         
+        // Nav aktifliğini sıfırla
         document.querySelectorAll('.nav-item').forEach(item => {
             item.classList.remove('active');
         });
         
-        // Yeni sayfayı göster
+        // Yeni sayfayı aç
         const newPage = document.getElementById(`page-${tabId}`);
         if (newPage) {
             newPage.classList.add('active');
-            newPage.classList.add('animate-fade-in');
-            setTimeout(() => newPage.classList.remove('animate-fade-in'), 500);
+            
+            // Profil sayfası için özel kaydırma ayarı
+            if (tabId === 'profile') {
+                newPage.style.overflowY = 'auto';
+                newPage.style.webkitOverflowScrolling = 'touch';
+                
+                // Profil bilgilerini hemen yükle
+                setTimeout(() => {
+                    fetchAndShowProfileInfo(currentUser?.id);
+                }, 10);
+            }
+            
+            // PDF listesini yükle
+            if (tabId === 'pdf-list') {
+                setTimeout(() => {
+                    fetchPDFList();
+                }, 10);
+            }
         }
         
-        // Doğru nav butonunu aktif yap
+        // Nav aktifliği
         const navItems = document.querySelectorAll('.nav-item');
         const tabMap = {
             'home': 0,
@@ -2073,15 +1579,6 @@
         if (tabMap[tabId] !== undefined) {
             navItems[tabMap[tabId]]?.classList.add('active');
         }
-        
-        // Sayfa içeriğini yükle
-        setTimeout(() => {
-            if (tabId === 'pdf-list') {
-                fetchPDFList();
-            } else if (tabId === 'profile') {
-                fetchAndShowProfileInfo(currentUser?.id);
-            }
-        }, 50);
     };
     
     // PROFİL BİLGİSİ
@@ -2098,14 +1595,8 @@
         
         if (profileIcon) {
             if (initials) {
-                profileIcon.innerHTML = `<span style="font-size: 28px; font-weight: 800;">${initials}</span>`;
-            } else {
-                profileIcon.innerHTML = '<i class="fas fa-user"></i>';
+                profileIcon.innerHTML = `<span style="font-size: 24px; font-weight: 600;">${initials}</span>`;
             }
-            
-            // Avatar animasyonu
-            profileIcon.classList.add('animate-scale-in');
-            setTimeout(() => profileIcon.classList.remove('animate-scale-in'), 500);
         }
         
         // Bilgiler
@@ -2120,8 +1611,6 @@
             const element = document.getElementById(id);
             if (element) {
                 element.textContent = value;
-                element.classList.add('animate-fade-in');
-                setTimeout(() => element.classList.remove('animate-fade-in'), 500);
             }
         });
         
@@ -2135,7 +1624,7 @@
             }
         }
         
-        // Ek bilgiler için Firebase'den çek
+        // Ek bilgiler
         db.ref('users/' + userId).once('value').then(snapshot => {
             const userData = snapshot.val();
             if (userData?.created_at) {
@@ -2181,28 +1670,9 @@
             const pdfCountElement = document.getElementById('pdfCount');
             if (pdfCountElement) {
                 pdfCountElement.textContent = totalPDFs;
-                pdfCountElement.classList.add('animate-scale-in');
-                setTimeout(() => pdfCountElement.classList.remove('animate-scale-in'), 500);
             }
             
-            const totalPdfAnalysis = document.getElementById('totalPdfCountAnalysis');
-            if (totalPdfAnalysis) totalPdfAnalysis.textContent = totalPDFs;
-            
-            // PDF'leri render et
             renderPDFs();
-        }).catch(error => {
-            console.error("❌ PDF listesi hatası:", error);
-            if (listContainer) {
-                listContainer.innerHTML = `
-                    <div class="list-card">
-                        <div style="padding: 40px 20px; text-align: center; color: var(--danger-color);">
-                            <i class="fas fa-exclamation-circle" style="font-size: 40px; margin-bottom: 15px;"></i>
-                            <h3 style="margin: 0 0 10px 0;">PDF'ler yüklenemedi</h3>
-                            <p>Lütfen internet bağlantınızı kontrol edin ve tekrar deneyin.</p>
-                        </div>
-                    </div>
-                `;
-            }
         });
     };
     
@@ -2210,7 +1680,6 @@
         const listContainer = document.getElementById('pdfDownloadList');
         if (!allPdfsData || !listContainer) return;
         
-        // Filtrele
         let pdfsArray = Object.entries(allPdfsData)
             .map(([key, pdf]) => ({ key, ...pdf }))
             .filter(pdf => !pdf.is_deleted);
@@ -2246,7 +1715,6 @@
             return 0;
         });
         
-        // Kullanıcı ilerlemesini çek
         if (!currentUser) {
             showPDFList(pdfsArray, {});
             return;
@@ -2255,8 +1723,6 @@
         db.ref(`users/${currentUser.id}/pdf_progress`).once('value').then(snapshot => {
             const userProgress = snapshot.val() || {};
             showPDFList(pdfsArray, userProgress);
-        }).catch(() => {
-            showPDFList(pdfsArray, {});
         });
     }
     
@@ -2267,10 +1733,10 @@
         if (pdfsArray.length === 0) {
             listContainer.innerHTML = `
                 <div class="list-card">
-                    <div style="padding: 40px 20px; text-align: center; color: var(--hint-color);">
-                        <i class="fas fa-search" style="font-size: 40px; margin-bottom: 15px; opacity: 0.5;"></i>
-                        <h3 style="margin: 0 0 10px 0;">PDF bulunamadı</h3>
-                        <p>Arama kriterlerinize uygun PDF bulunamadı.</p>
+                    <div style="padding: 30px 20px; text-align: center; color: var(--hint-color);">
+                        <i class="fas fa-search" style="font-size: 30px; margin-bottom: 12px; opacity: 0.5;"></i>
+                        <h3 style="margin: 0 0 8px 0; font-size: 16px;">PDF bulunamadı</h3>
+                        <p style="font-size: 13px;">Arama kriterlerinize uygun PDF bulunamadı.</p>
                     </div>
                 </div>
             `;
@@ -2279,18 +1745,16 @@
         
         let html = '<div class="list-card">';
         
-        pdfsArray.forEach((pdf, index) => {
+        pdfsArray.forEach((pdf) => {
             const { key, title, url, required_ads, downloads } = pdf;
             const safeTitle = (title || '').replace(/'/g, "&#39;");
             const safeUrl = (url || '').replace(/'/g, "&#39;");
             const requiredAds = parseInt(required_ads) || 0;
             
-            // Kullanıcı ilerlemesi
             const watchedAds = userProgress[key]?.watched_ads || 0;
             const remainingAds = Math.max(0, requiredAds - watchedAds);
             const progressPercent = requiredAds > 0 ? (watchedAds / requiredAds) * 100 : 100;
             
-            // Durum metni ve ikon
             let statusText = '';
             let statusIcon = '';
             let statusColor = '';
@@ -2309,20 +1773,19 @@
                 statusColor = 'var(--success-color)';
             }
             
-            // Host ikonu
             let hostIcon = 'cloud';
             if (url.includes('dropbox')) hostIcon = 'dropbox';
             if (url.includes('google') || url.includes('drive')) hostIcon = 'google-drive';
             
             html += `
-                <div class="list-item animate-slide-in-up delay-${(index % 5) * 100}" onclick="handlePDFDownloadClick('${key}', '${safeTitle}', '${safeUrl}', ${requiredAds})">
+                <div class="list-item" onclick="handlePDFDownloadClick('${key}', '${safeTitle}', '${safeUrl}', ${requiredAds})">
                     <div class="list-icon icon-pdf">
                         <i class="fas fa-file-pdf"></i>
                     </div>
                     <div class="list-info">
                         <div class="list-name">${title}</div>
                         <div class="list-detail">
-                            <span style="color: ${statusColor}; font-weight: 700;">
+                            <span style="color: ${statusColor}; font-weight: 600;">
                                 <i class="fas fa-${statusIcon}" style="margin-right: 5px;"></i>
                                 ${statusText}
                             </span>
@@ -2333,7 +1796,7 @@
                             </span>
                         </div>
                         ${requiredAds > 0 ? `
-                            <div class="progress-bar" style="margin-top: 10px;">
+                            <div class="progress-bar" style="margin-top: 8px;">
                                 <div class="progress-fill" style="width: ${progressPercent}%; background: ${progressPercent === 100 ? 'var(--success-gradient)' : 'var(--primary-gradient)'};"></div>
                             </div>
                         ` : ''}
@@ -2353,8 +1816,6 @@
     window.setSort = function(sortType) {
         document.querySelectorAll('.sort-button').forEach(btn => {
             btn.classList.remove('active');
-            btn.classList.add('animate-scale-in');
-            setTimeout(() => btn.classList.remove('animate-scale-in'), 300);
         });
         
         const activeButton = event.target.closest('.sort-button');
@@ -2370,13 +1831,12 @@
         renderPDFs();
     };
     
-    // ADMIN PANELİ
+    // ADMIN PANEL
     window.openAdminModal = function() {
         if (!is_admin) return;
         
         const adminPanel = document.getElementById('page-admin-instance');
         adminPanel.classList.remove('hidden');
-        adminPanel.classList.add('animate-slide-in-up');
         
         fetchAdminPdfList();
         fetchAdminUserList();
@@ -2425,7 +1885,6 @@
             return;
         }
         
-        // Dropbox linkini düzelt
         let finalUrl = url;
         if (url.includes('dropbox.com') && !url.includes('dl=1')) {
             if (url.includes('dl=0')) {
@@ -2448,18 +1907,11 @@
         db.ref('pdfs').push(pdfData).then(() => {
             if (window.Telegram && Telegram.WebApp) {
                 Telegram.WebApp.showAlert("✅ PDF başarıyla eklendi!");
-            } else {
-                alert("✅ PDF başarıyla eklendi!");
             }
             
             document.getElementById('pdfTitle').value = '';
             document.getElementById('pdfUrl').value = '';
             document.getElementById('requiredAds').value = '20';
-            
-            // Animasyon
-            const button = document.getElementById('uploadPdfButton');
-            button.classList.add('animate-scale-in');
-            setTimeout(() => button.classList.remove('animate-scale-in'), 300);
             
             fetchAdminPdfList();
             fetchPDFList();
@@ -2490,13 +1942,13 @@
                             <div class="list-detail">
                                 <i class="fas fa-ad" style="color: var(--warning-color); margin-right: 5px;"></i>
                                 ${pdf.required_ads || 0} reklam • 
-                                <i class="fas fa-download" style="color: var(--primary-color); margin: 0 5px;"></i>
+                                <i class="fas fa-download" style="color: var(--telegram-blue); margin: 0 5px;"></i>
                                 ${pdf.downloads || 0} indirme
                             </div>
                         </div>
                         <div>
-                            <button onclick="deletePdf('${key}', '${safeTitle}')" style="background: var(--danger-gradient); color: white; border: none; padding: 8px 15px; border-radius: 10px; font-size: 13px; cursor: pointer; transition: var(--transition-smooth);">
-                                <i class="fas fa-trash"></i> Sil
+                            <button onclick="deletePdf('${key}', '${safeTitle}')" style="background: var(--danger-gradient); color: white; border: none; padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer;">
+                                <i class="fas fa-trash"></i>
                             </button>
                         </div>
                     </div>
@@ -2504,7 +1956,7 @@
             });
             
             html += '</div>';
-            container.innerHTML = hasPdfs ? html : '<div style="padding: 30px; text-align: center; color: var(--hint-color);"><i class="fas fa-inbox" style="font-size: 40px; margin-bottom: 15px; opacity: 0.5;"></i><p>Henüz PDF eklenmemiş</p></div>';
+            container.innerHTML = hasPdfs ? html : '<div style="padding: 20px; text-align: center; color: var(--hint-color);"><i class="fas fa-inbox" style="font-size: 30px; margin-bottom: 10px; opacity: 0.5;"></i><p>Henüz PDF eklenmemiş</p></div>';
         });
     };
     
@@ -2514,8 +1966,6 @@
         db.ref('pdfs/' + key).update({ is_deleted: true }).then(() => {
             if (window.Telegram && Telegram.WebApp) {
                 Telegram.WebApp.showAlert("✅ PDF silindi");
-            } else {
-                alert("✅ PDF silindi");
             }
             fetchAdminPdfList();
             fetchPDFList();
@@ -2525,13 +1975,11 @@
     window.fetchAdminAnalytics = function() {
         if (!db) return;
         
-        // Toplam reklam izlenme
         db.ref('analytics/total_ads_watched').once('value').then(snap => {
             const element = document.getElementById('totalAdsWatched');
             if (element) element.textContent = snap.val() || 0;
         });
         
-        // Bugünkü reklamlar
         const todayKey = new Date().toISOString().slice(0, 10);
         db.ref(`analytics/daily_ads_watched/${todayKey}`).once('value').then(snap => {
             const element = document.getElementById('todayAdsWatched');
@@ -2543,11 +1991,10 @@
         const container = document.getElementById('adminUserList');
         if (!db || !container) return;
         
-        db.ref('users').orderByChild('last_active').limitToLast(100000).once('value').then(snapshot => {
+        db.ref('users').orderByChild('last_active').limitToLast(50).once('value').then(snapshot => {
             const users = snapshot.val() || {};
             const userArray = Object.entries(users);
             
-            // İstatistikler
             const totalUsersElement = document.getElementById('totalUsersCount');
             if (totalUsersElement) totalUsersElement.textContent = userArray.length;
             
@@ -2561,21 +2008,19 @@
             const todayActiveElement = document.getElementById('todayActiveUsers');
             if (todayActiveElement) todayActiveElement.textContent = todayActive;
             
-            // Kullanıcı listesi
             let html = '<div class="list-card">';
-            userArray.sort((a, b) => (b[1].last_active || 0) - (a[1].last_active || 0)).slice(0, 50).forEach(([id, user], index) => {
+            userArray.sort((a, b) => (b[1].last_active || 0) - (a[1].last_active || 0)).forEach(([id, user], index) => {
                 const name = `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'İsimsiz';
                 const username = user.username ? `@${user.username}` : '';
                 const lastActive = user.last_active ? new Date(user.last_active).toLocaleDateString('tr-TR') : 'Bilinmiyor';
                 const safeName = name.replace(/'/g, "&#39;");
                 
                 html += `
-                    <div class="list-item animate-slide-in-up delay-${(index % 5) * 100}">
+                    <div class="list-item">
                         <div class="list-info">
                             <div class="list-name">
                                 ${name} 
                                 ${user.is_admin ? '<i class="fas fa-crown" style="color: var(--warning-color); margin-left: 5px;"></i>' : ''}
-                                ${user.is_banned ? '<i class="fas fa-ban" style="color: var(--danger-color); margin-left: 5px;"></i>' : ''}
                             </div>
                             <div class="list-detail">
                                 ${username ? `${username} • ` : ''}
@@ -2583,8 +2028,8 @@
                             </div>
                         </div>
                         <div>
-                            <button onclick="banUser(${id}, '${safeName}', ${!!user.is_banned})" style="background: ${user.is_banned ? 'var(--success-gradient)' : 'var(--danger-gradient)'}; color: white; border: none; padding: 8px 15px; border-radius: 10px; font-size: 13px; cursor: pointer; transition: var(--transition-smooth);">
-                                <i class="fas fa-${user.is_banned ? 'check' : 'ban'}"></i> ${user.is_banned ? 'Yasağı Kaldır' : 'Yasakla'}
+                            <button onclick="banUser(${id}, '${safeName}', ${!!user.is_banned})" style="background: ${user.is_banned ? 'var(--success-gradient)' : 'var(--danger-gradient)'}; color: white; border: none; padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer;">
+                                <i class="fas fa-${user.is_banned ? 'check' : 'ban'}"></i>
                             </button>
                         </div>
                     </div>
@@ -2592,7 +2037,7 @@
             });
             
             html += '</div>';
-            container.innerHTML = userArray.length > 0 ? html : '<div style="padding: 30px; text-align: center; color: var(--hint-color);"><i class="fas fa-user-slash" style="font-size: 40px; margin-bottom: 15px; opacity: 0.5;"></i><p>Henüz kullanıcı yok</p></div>';
+            container.innerHTML = userArray.length > 0 ? html : '<div style="padding: 20px; text-align: center; color: var(--hint-color);"><i class="fas fa-user-slash" style="font-size: 30px; margin-bottom: 10px; opacity: 0.5;"></i><p>Henüz kullanıcı yok</p></div>';
         });
     };
     
@@ -2601,11 +2046,8 @@
         if (!confirm(`${name} kullanıcısını ${action} istediğinize emin misiniz?`)) return;
         
         db.ref('users/' + userId).update({ is_banned: !isBanned }).then(() => {
-            const message = `Kullanıcı ${isBanned ? 'yasağı kaldırıldı' : 'yasaklandı'}`;
             if (window.Telegram && Telegram.WebApp) {
-                Telegram.WebApp.showAlert(`✅ ${message}`);
-            } else {
-                alert(`✅ ${message}`);
+                Telegram.WebApp.showAlert(`✅ Kullanıcı ${isBanned ? 'yasağı kaldırıldı' : 'yasaklandı'}`);
             }
             fetchAdminUserList();
         });
@@ -2613,125 +2055,112 @@
     
     // UYGULAMA BAŞLATMA
     document.addEventListener('DOMContentLoaded', function() {
-        console.log("🚀 Uygulama başlatılıyor...");
         initializeApp();
         
-        // SAYFA YÜKLENDİĞİNDE NAVİGASYONU AYARLA
-        const activePage = document.querySelector('.content-page.active');
-        if (activePage) {
-            const pageId = activePage.id.replace('page-', '');
-            changeTab(pageId);
-        }
-        
-        // Nav butonlarına tıklama efekti ekle
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', function() {
-                // Tüm butonlardan active sınıfını kaldır
-                document.querySelectorAll('.nav-item').forEach(nav => {
-                    nav.classList.remove('active');
-                });
-                // Tıklanan butona active sınıfını ekle
-                this.classList.add('active');
-            });
-        });
-        
-        // Terms checkbox
+        // Terms checkbox ve buton kontrolü
         const termsCheckbox = document.getElementById('termsCheckbox');
         const loginButton = document.getElementById('loginButton');
-        
-        if (termsCheckbox && loginButton) {
-            termsCheckbox.addEventListener('change', function() {
-                loginButton.disabled = !this.checked;
-                if (this.checked) {
-                    loginButton.classList.add('animate-pulse-glow');
-                } else {
-                    loginButton.classList.remove('animate-pulse-glow');
-                }
-            });
-        }
-        
-        // Terms modal
         const readTermsLink = document.getElementById('readTermsLink');
+        const closeTermsButton = document.getElementById('closeTermsModal');
+        const acceptTermsButton = document.getElementById('acceptTermsModal');
+        
+        // KURALLAR SORUNU DÜZELTMESİ - EN ÜSTTE AÇILACAK
         if (readTermsLink) {
             readTermsLink.addEventListener('click', function(e) {
                 e.preventDefault();
+                e.stopPropagation();
                 document.getElementById('termsModal').classList.remove('hidden');
+                document.getElementById('termsModal').style.zIndex = '20001';
+                console.log("Kurallar modalı açıldı - EN ÜSTTE");
             });
         }
         
-        const closeTermsButton = document.getElementById('closeTermsModal');
         if (closeTermsButton) {
-            closeTermsButton.addEventListener('click', function() {
+            closeTermsButton.addEventListener('click', function(e) {
+                e.stopPropagation();
                 document.getElementById('termsModal').classList.add('hidden');
                 if (termsCheckbox) termsCheckbox.checked = false;
                 if (loginButton) loginButton.disabled = true;
-                loginButton.classList.remove('animate-pulse-glow');
             });
         }
         
-        const acceptTermsButton = document.getElementById('acceptTermsModal');
         if (acceptTermsButton) {
-            acceptTermsButton.addEventListener('click', function() {
+            acceptTermsButton.addEventListener('click', function(e) {
+                e.stopPropagation();
                 document.getElementById('termsModal').classList.add('hidden');
                 if (termsCheckbox) termsCheckbox.checked = true;
                 if (loginButton) {
                     loginButton.disabled = false;
-                    loginButton.classList.add('animate-pulse-glow');
+                    loginButton.style.background = 'var(--success-gradient)';
                 }
             });
         }
         
-        // Login butonu
-        if (loginButton) {
-            loginButton.addEventListener('click', async function() {
-                if (!termsCheckbox?.checked || !currentUser || !db) {
-                    showError("Lütfen önce kuralları kabul edin");
-                    return;
+        // Checkbox değişimi
+        if (termsCheckbox && loginButton) {
+            termsCheckbox.addEventListener('change', function() {
+                loginButton.disabled = !this.checked;
+                if (this.checked) {
+                    loginButton.style.background = 'var(--success-gradient)';
+                } else {
+                    loginButton.style.background = 'var(--primary-gradient)';
                 }
+            });
+        }
+        
+        // GİRİŞ BUTONU - KURALLAR KONTROLÜ
+        if (loginButton) {
+            loginButton.addEventListener('click', async function(e) {
+                e.stopPropagation();
+                
+                console.log("Giriş butonuna tıklandı");
+                console.log("Checkbox durumu:", termsCheckbox?.checked);
+                
+                if (!termsCheckbox?.checked) {
+                    console.log("Kurallar kabul edilmemiş, modal açılıyor");
+                    // Kurallar kabul edilmemiş, modal aç
+                    document.getElementById('termsModal').classList.remove('hidden');
+                    document.getElementById('termsModal').style.zIndex = '20001';
+                    
+                    // Haptic feedback
+                    if (window.Telegram && Telegram.WebApp) {
+                        Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+                    }
+                    
+                    showError("Lütfen önce kuralları kabul edin!");
+                    return; // İşlemi durdur
+                }
+                
+                // Kurallar kabul edilmiş, devam et
+                console.log("Kurallar kabul edildi, giriş yapılıyor...");
                 
                 loginButton.disabled = true;
                 loginButton.innerHTML = `<i class="fas fa-spinner fa-spin" style="margin-right: 10px;"></i> Giriş yapılıyor...`;
                 
                 try {
-                    // Kullanıcıyı kaydet
                     await saveUserToDatabase(currentUser);
                     
-                    // Uygulamayı göster
                     const splashScreen = document.getElementById('splashScreen');
                     const app = document.getElementById('app');
                     
                     splashScreen.classList.add('hidden');
                     setTimeout(() => {
                         app.classList.remove('hidden');
-                        console.log("🎉 Uygulama başlatıldı");
                         
-                        // PDF listesini yükle
                         fetchPDFList();
-                        
-                        // Profil bilgisini göster
                         fetchAndShowProfileInfo(currentUser.id);
                         
                         // Haptic feedback
                         if (window.Telegram && Telegram.WebApp) {
                             Telegram.WebApp.HapticFeedback.notificationOccurred('success');
                         }
-                    }, 500);
+                    }, 300);
                     
                 } catch (error) {
-                    console.error("❌ Giriş hatası:", error);
+                    console.error("Giriş hatası:", error);
                     showError("Giriş yapılamadı: " + error.message);
                     loginButton.disabled = false;
                     loginButton.innerHTML = `<i class="fas fa-sign-in-alt" style="margin-right: 10px;"></i> Bota Giriş Yap`;
-                }
-            });
-        }
-        
-        // Error modal kapatma
-        const errorModal = document.getElementById('errorModal');
-        if (errorModal) {
-            errorModal.addEventListener('click', function(e) {
-                if (e.target === this) {
-                    this.classList.add('hidden');
                 }
             });
         }
@@ -2744,6 +2173,23 @@
                 }
             });
         });
+        
+        // Nav butonları
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.nav-item').forEach(nav => {
+                    nav.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
+        });
+        
+        // Sayfa yüklenince aktif tab'ı ayarla
+        const activePage = document.querySelector('.content-page.active');
+        if (activePage) {
+            const pageId = activePage.id.replace('page-', '');
+            changeTab(pageId);
+        }
     });
 </script>
 </body>
