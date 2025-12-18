@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* TELEGRAM BLUE THEME - DÜZELTİLMİŞ */
+        /* TELEGRAM BLUE THEME */
         :root {
             --primary-color: #0088cc;
             --primary-gradient: linear-gradient(135deg, #0088cc 0%, #006699 100%);
@@ -42,7 +42,7 @@
             --border-radius: 12px;
         }
         
-        /* GLOBAL RESET */
+        /* GLOBAL RESET - UPDATED */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -69,7 +69,7 @@
             flex-direction: column;
         }
         
-        /* SPLASH SCREEN - DÜZELTİLMİŞ (KURALLAR SORUNU ÇÖZÜLDÜ) */
+        /* SPLASH SCREEN */
         .splash-screen {
             position: fixed;
             top: 0;
@@ -102,7 +102,7 @@
             z-index: 10001;
         }
         
-        /* KURALLAR CONTAINER - TAM DÜZELTİLMİŞ */
+        /* TERMS CONTAINER */
         .terms-container {
             background: rgba(0, 136, 204, 0.08);
             border-radius: 12px;
@@ -125,7 +125,7 @@
             cursor: pointer;
         }
         
-        /* TELEGRAM APP */
+        /* TELEGRAM APP - FIXED */
         .telegram-app {
             flex: 1;
             display: flex;
@@ -137,7 +137,7 @@
             animation: fadeIn 0.5s ease-out 0.3s forwards;
         }
         
-        /* CONTENT PAGES */
+        /* CONTENT PAGES - FIXED OVERFLOW */
         .content-page {
             flex: 1;
             display: none;
@@ -147,18 +147,11 @@
             overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
             position: relative;
-            padding-bottom: 80px;
+            padding-bottom: 80px; /* Space for bottom nav */
         }
         
         .content-page.active {
             display: flex;
-        }
-        
-        /* PROFİL SAYFASI - KAYDIRILABİLİR */
-        #page-profile {
-            overflow-y: auto !important;
-            overflow-x: hidden !important;
-            -webkit-overflow-scrolling: touch !important;
         }
         
         /* APP HEADER */
@@ -185,12 +178,12 @@
             gap: 10px;
         }
         
-        /* CARDS - KESİLME SORUNU DÜZELTİLDİ */
+        /* CARDS - REMOVED OVERFLOW:HIDDEN */
         .list-card {
             background: var(--secondary-color);
             margin: 16px;
             border-radius: var(--border-radius);
-            overflow: visible !important;
+            /* REMOVED: overflow: hidden; */
             box-shadow: var(--card-shadow);
             transition: var(--transition-smooth);
             opacity: 0;
@@ -203,6 +196,7 @@
             box-shadow: var(--card-shadow-hover);
         }
         
+        /* LIST ITEM - FLEXIBLE HEIGHT */
         .list-item {
             display: flex;
             padding: 18px 20px;
@@ -211,8 +205,7 @@
             cursor: pointer;
             transition: var(--transition-smooth);
             position: relative;
-            min-height: 80px;
-            overflow: visible !important;
+            min-height: auto; /* Allow natural height */
         }
         
         .list-item:last-child {
@@ -223,7 +216,7 @@
             background: rgba(0, 136, 204, 0.05);
         }
         
-        /* ICONS - ANIMASYONLU */
+        /* ICONS */
         .list-icon {
             width: 50px;
             height: 50px;
@@ -238,7 +231,7 @@
             z-index: 2;
             flex-shrink: 0;
             background: var(--primary-gradient);
-            overflow: visible !important;
+            overflow: visible; /* Changed from hidden */
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             transform-origin: center;
         }
@@ -256,8 +249,6 @@
         .icon-sponsor { background: linear-gradient(135deg, #0088cc 0%, #00aced 100%); }
         .icon-featured { background: linear-gradient(135deg, #9C27B0 0%, #673AB7 100%); }
         .icon-popular { background: linear-gradient(135deg, #FF5722 0%, #FF9800 100%); }
-        .icon-exclusive { background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%); }
-        .icon-season { background: linear-gradient(135deg, #00BCD4 0%, #0097A7 100%); }
         
         /* ANIMASYONLU NAV IKONLARI */
         .nav-icon {
@@ -284,7 +275,6 @@
             flex: 1;
             min-width: 0;
             padding-right: 10px;
-            overflow: visible !important;
         }
         
         .list-name {
@@ -295,7 +285,6 @@
             line-height: 1.4;
             word-break: break-word;
             overflow-wrap: break-word;
-            overflow: visible !important;
             transition: all 0.3s ease;
         }
         
@@ -314,15 +303,14 @@
             gap: 5px;
             word-break: break-word;
             overflow-wrap: break-word;
-            overflow: visible !important;
         }
         
-        /* BUTTONS - ANIMASYONLU */
+        /* BUTTONS - FLEXIBLE HEIGHT */
         .action-button {
             background: var(--primary-gradient);
             color: white;
             border: none;
-            padding: 16px 24px;
+            padding: 14px 20px; /* Reduced padding for better mobile */
             border-radius: 12px;
             font-size: 16px;
             font-weight: 600;
@@ -331,17 +319,16 @@
             margin: 12px 0;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
-            overflow: visible !important;
+            overflow: visible; /* Changed from hidden */
             box-shadow: 0 4px 12px rgba(0, 136, 204, 0.2);
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 56px;
-            height: auto !important;
             white-space: normal;
             word-wrap: break-word;
             line-height: 1.4;
             transform-origin: center;
+            min-height: auto; /* Allow natural height */
         }
         
         .action-button:hover {
@@ -359,7 +346,7 @@
             transform: none !important;
         }
         
-        /* BOTTOM NAV */
+        /* BOTTOM NAV - IMPROVED HEIGHT HANDLING */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -370,11 +357,13 @@
             display: flex;
             justify-content: space-around;
             align-items: center;
-            z-index: 1000;
-            padding: 12px 0;
+            z-index: 999;
+            padding: 12px 0 16px; /* Added bottom padding for safe area */
             box-shadow: 0 -2px 10px rgba(0, 136, 204, 0.1);
-            height: 80px;
+            min-height: 60px; /* Flexible height */
             backdrop-filter: blur(10px);
+            /* Safe area for notches */
+            padding-bottom: max(16px, env(safe-area-inset-bottom));
         }
         
         .nav-item {
@@ -393,9 +382,8 @@
             background: transparent;
             outline: none;
             gap: 4px;
-            min-height: 56px;
             margin: 0 4px;
-            height: auto !important;
+            min-height: auto; /* Flexible height */
         }
         
         .nav-item.active {
@@ -475,9 +463,289 @@
             flex: 1;
             overflow-y: auto;
             padding: 20px;
+            -webkit-overflow-scrolling: touch;
         }
         
-        /* FEATURED SECTIONS - ANIMASYONLU */
+        /* ADMIN TABS */
+        .admin-tabs {
+            display: flex;
+            background: rgba(0, 136, 204, 0.05);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .admin-tab {
+            flex: 1;
+            padding: 12px 16px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--hint-color);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: var(--transition-smooth);
+            min-width: 120px;
+            margin: 2px;
+        }
+        
+        .admin-tab.active {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 136, 204, 0.2);
+        }
+        
+        /* ADMIN CONTENT SECTIONS */
+        .admin-section {
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .admin-section.active {
+            display: block;
+        }
+        
+        /* STATISTICS GRID */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .stat-card {
+            background: var(--secondary-color);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition-smooth);
+            border: 1px solid rgba(0, 136, 204, 0.1);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--card-shadow-hover);
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--telegram-blue);
+            margin-bottom: 5px;
+            line-height: 1;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: var(--hint-color);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+        
+        /* ADMIN FORM */
+        .admin-form {
+            background: var(--secondary-color);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(0, 136, 204, 0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-color);
+            font-size: 14px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid rgba(0, 136, 204, 0.2);
+            border-radius: 10px;
+            font-size: 15px;
+            background: var(--secondary-color);
+            color: var(--text-color);
+            transition: var(--transition-smooth);
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--telegram-blue);
+            box-shadow: 0 0 0 3px rgba(0, 136, 204, 0.1);
+        }
+        
+        .form-textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid rgba(0, 136, 204, 0.2);
+            border-radius: 10px;
+            font-size: 15px;
+            background: var(--secondary-color);
+            color: var(--text-color);
+            transition: var(--transition-smooth);
+            min-height: 120px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--telegram-blue);
+            box-shadow: 0 0 0 3px rgba(0, 136, 204, 0.1);
+        }
+        
+        /* PIN SECTION */
+        .pin-section {
+            background: linear-gradient(135deg, rgba(0, 136, 204, 0.05), rgba(255, 193, 7, 0.05));
+            border: 2px dashed rgba(0, 136, 204, 0.3);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        /* PDF LIST IN ADMIN */
+        .admin-pdf-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(0, 136, 204, 0.1);
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .admin-pdf-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            background: var(--secondary-color);
+            transition: var(--transition-smooth);
+            min-height: auto;
+        }
+        
+        .admin-pdf-item:hover {
+            background: rgba(0, 136, 204, 0.05);
+        }
+        
+        .admin-pdf-info {
+            flex: 1;
+        }
+        
+        .admin-pdf-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--text-color);
+        }
+        
+        .admin-pdf-details {
+            font-size: 12px;
+            color: var(--hint-color);
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .admin-pdf-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .admin-action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 136, 204, 0.1);
+            color: var(--telegram-blue);
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            border: none;
+        }
+        
+        .admin-action-btn:hover {
+            background: var(--primary-gradient);
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .admin-action-btn.delete {
+            background: rgba(220, 53, 69, 0.1);
+            color: var(--danger-color);
+        }
+        
+        .admin-action-btn.delete:hover {
+            background: var(--danger-gradient);
+            color: white;
+        }
+        
+        /* USER LIST */
+        .user-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(0, 136, 204, 0.1);
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .user-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            background: var(--secondary-color);
+            transition: var(--transition-smooth);
+            min-height: auto;
+        }
+        
+        .user-item:hover {
+            background: rgba(0, 136, 204, 0.05);
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        
+        .user-info {
+            flex: 1;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--text-color);
+        }
+        
+        .user-details {
+            font-size: 12px;
+            color: var(--hint-color);
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        /* FEATURED SECTIONS */
         .featured-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -493,7 +761,7 @@
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             border: 1px solid rgba(0, 136, 204, 0.1);
             position: relative;
-            overflow: hidden;
+            overflow: visible; /* Changed from hidden */
         }
         
         .featured-section::before {
@@ -535,6 +803,7 @@
             color: white;
             font-size: 26px;
             animation: float 3s ease-in-out infinite;
+            overflow: visible;
         }
         
         .featured-title {
@@ -549,11 +818,15 @@
             color: var(--hint-color);
         }
         
+        /* FEATURED CONTENT - FIXED OVERFLOW */
         .featured-content {
             min-height: 200px;
             max-height: 300px;
             overflow-y: auto;
             padding-right: 10px;
+            /* Ensure rounded corners work with overflow */
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+            -webkit-overflow-scrolling: touch;
         }
         
         /* MODALS */
@@ -573,6 +846,7 @@
             animation: fadeIn 0.2s ease-out !important;
         }
         
+        /* MODAL CONTENT - FIXED OVERFLOW */
         .modal-content {
             background: var(--secondary-color);
             border-radius: 16px;
@@ -586,6 +860,9 @@
             position: relative;
             border: 1px solid rgba(0, 136, 204, 0.1);
             z-index: 20002;
+            /* Ensure rounded corners are visible */
+            overflow: visible;
+            -webkit-overflow-scrolling: touch;
         }
         
         /* PROGRESS BAR */
@@ -640,7 +917,7 @@
             font-size: 16px;
         }
         
-        /* CATEGORIES */
+        /* CATEGORY NAV - FIXED FOR MOBILE */
         .category-nav-scroll {
             display: flex;
             overflow-x: auto;
@@ -649,6 +926,10 @@
             -webkit-overflow-scrolling: touch;
             background: var(--secondary-color);
             border-bottom: 1px solid rgba(0, 136, 204, 0.1);
+            /* Prevent clipping */
+            overflow: visible;
+            position: relative;
+            z-index: 1;
         }
         
         .category-item {
@@ -663,6 +944,9 @@
             cursor: pointer;
             transition: var(--transition-smooth);
             flex-shrink: 0;
+            /* Ensure full visibility */
+            position: relative;
+            z-index: 2;
         }
         
         .category-item.active {
@@ -672,11 +956,12 @@
             box-shadow: 0 4px 12px rgba(0, 136, 204, 0.2);
         }
         
-        /* SORT BUTTONS */
+        /* SORT BUTTONS - FLEXIBLE HEIGHT */
         .sort-buttons {
             display: flex;
             gap: 10px;
             margin: 0 20px 20px;
+            flex-wrap: wrap; /* Allow wrapping on small screens */
         }
         
         .sort-button {
@@ -694,6 +979,8 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
+            min-height: auto; /* Flexible height */
+            min-width: 100px; /* Minimum width */
         }
         
         .sort-button.active {
@@ -712,6 +999,7 @@
             border-radius: var(--border-radius);
             margin: 20px;
             box-shadow: 0 8px 24px rgba(0, 136, 204, 0.2);
+            overflow: visible;
         }
         
         .analysis-item {
@@ -720,6 +1008,7 @@
             background: rgba(255, 255, 255, 0.95);
             border-radius: 10px;
             transition: var(--transition-smooth);
+            min-height: auto;
         }
         
         .analysis-value {
@@ -773,7 +1062,7 @@
             pointer-events: none !important;
         }
         
-        /* ANIMATIONS - YENİ ANIMASYONLAR */
+        /* ANIMATIONS */
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -810,12 +1099,7 @@
             100% { transform: scale(1); }
         }
         
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        
-        /* RESPONSIVE */
+        /* RESPONSIVE FIXES */
         @media (max-width: 768px) {
             .featured-grid {
                 grid-template-columns: 1fr;
@@ -828,6 +1112,16 @@
             .featured-section {
                 padding: 20px;
             }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .admin-tab {
+                min-width: 100px;
+                padding: 10px 12px;
+                font-size: 13px;
+            }
         }
         
         @media (max-width: 480px) {
@@ -836,7 +1130,8 @@
             }
             
             .bottom-nav {
-                height: 70px;
+                min-height: 60px;
+                padding-bottom: max(12px, env(safe-area-inset-bottom));
             }
             
             .nav-icon {
@@ -851,6 +1146,7 @@
             
             .list-item {
                 padding: 16px;
+                flex-wrap: wrap; /* Allow wrapping on small screens */
             }
             
             .list-icon {
@@ -860,9 +1156,13 @@
                 margin-right: 12px;
             }
             
+            .list-info {
+                flex: 1 1 200px; /* Flexible width */
+                min-width: 0;
+            }
+            
             .action-button {
                 padding: 14px 20px;
-                min-height: 52px;
             }
             
             .modal-content {
@@ -878,9 +1178,66 @@
             .terms-container {
                 padding: 16px;
             }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .sort-buttons {
+                flex-wrap: wrap;
+            }
+            
+            .sort-button {
+                min-width: calc(33.333% - 7px);
+                font-size: 12px;
+                padding: 10px;
+            }
+            
+            .category-nav-scroll {
+                padding: 12px 10px;
+            }
+            
+            .category-item {
+                padding: 8px 14px;
+                font-size: 12px;
+            }
         }
         
-        /* DARK MODE */
+        @media (max-width: 360px) {
+            .sort-button {
+                min-width: calc(50% - 5px);
+                font-size: 11px;
+                padding: 8px;
+            }
+            
+            .list-item {
+                padding: 14px;
+            }
+            
+            .list-icon {
+                width: 40px;
+                height: 40px;
+                margin-right: 10px;
+            }
+            
+            .bottom-nav {
+                min-height: 56px;
+                padding: 8px 0 12px;
+                padding-bottom: max(12px, env(safe-area-inset-bottom));
+            }
+            
+            .nav-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 18px;
+            }
+            
+            .nav-text {
+                font-size: 10px;
+            }
+        }
+        
+        /* DARK MODE FIXES */
         @media (prefers-color-scheme: dark) {
             :root {
                 --secondary-color: #1a1d21;
@@ -893,6 +1250,7 @@
             .bottom-nav {
                 background: #1a1d21;
                 border-top: 1px solid rgba(255, 255, 255, 0.05);
+                box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
             }
             
             #pdfSearchInput {
@@ -914,19 +1272,36 @@
                 background: #1a1d21;
                 border: 1px solid rgba(255, 255, 255, 0.05);
             }
+            
+            .form-input,
+            .form-textarea {
+                background: #2d333b;
+                border-color: rgba(255, 255, 255, 0.1);
+                color: white;
+            }
+            
+            .list-card {
+                border-color: rgba(255, 255, 255, 0.05);
+            }
+            
+            .action-button {
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            }
         }
         
-        /* PROFİL SCROLL FIX */
-        .profile-scroll-container {
-            flex: 1;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            width: 100%;
-        }
-        
-        /* REKLAM MODALI HIZLI */
-        #adProgressModal .modal-content {
-            animation: scaleIn 0.15s ease-out !important;
+        /* FIX FOR IOS SAFARI VIEWPORT */
+        @supports (-webkit-touch-callout: none) {
+            .content-page {
+                min-height: -webkit-fill-available;
+            }
+            
+            .telegram-app {
+                min-height: -webkit-fill-available;
+            }
+            
+            .bottom-nav {
+                padding-bottom: max(16px, env(safe-area-inset-bottom));
+            }
         }
         
         /* Z-INDEX DÜZENLEMESİ */
@@ -1001,12 +1376,12 @@
     </div>
 </div>
 
-<!-- ADMIN FRAME (YENİ) -->
+<!-- ADMIN FRAME - GÜNCELLENMİŞ -->
 <div class="admin-frame hidden" id="adminFrame">
     <div class="admin-frame-header">
         <div class="admin-frame-title">
-            <i class="fas fa-star" style="color: #9C27B0;"></i>
-            Öne Çıkan İçerikler
+            <i class="fas fa-crown" style="color: #FFD700;"></i>
+            Admin Panel
         </div>
         <div class="admin-frame-close" onclick="closeAdminFrame()">
             <i class="fas fa-times"></i>
@@ -1014,132 +1389,320 @@
     </div>
     
     <div class="admin-frame-content">
-        <!-- FEATURED SECTIONS GRID -->
-        <div class="featured-grid">
-            <!-- SADECE BİZDE OLAN -->
-            <div class="featured-section">
-                <div class="featured-header">
-                    <div class="featured-icon icon-exclusive">
-                        <i class="fas fa-crown"></i>
-                    </div>
-                    <div>
-                        <div class="featured-title">Sadece Bizde Olan</div>
-                        <div class="featured-subtitle">Exclusive içerikler</div>
-                    </div>
-                </div>
-                <div class="featured-content" id="exclusiveContent">
-                    <div style="text-align: center; padding: 40px 20px; color: var(--hint-color);">
-                        <i class="fas fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 10px;"></i>
-                        <p>Yükleniyor...</p>
-                    </div>
-                </div>
+        <!-- ADMIN TABS -->
+        <div class="admin-tabs">
+            <div class="admin-tab active" onclick="switchAdminTab('stats')">
+                <i class="fas fa-chart-bar" style="margin-right: 8px;"></i>
+                İstatistikler
             </div>
-            
-            <!-- EN ÇOK ARANAN -->
-            <div class="featured-section">
-                <div class="featured-header">
-                    <div class="featured-icon icon-popular">
-                        <i class="fas fa-fire"></i>
-                    </div>
-                    <div>
-                        <div class="featured-title">En Çok Aranan</div>
-                        <div class="featured-subtitle">Trend PDF'ler</div>
-                    </div>
-                </div>
-                <div class="featured-content" id="mostSearchedContent">
-                    <div style="text-align: center; padding: 40px 20px; color: var(--hint-color);">
-                        <i class="fas fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 10px;"></i>
-                        <p>Yükleniyor...</p>
-                    </div>
-                </div>
+            <div class="admin-tab" onclick="switchAdminTab('users')">
+                <i class="fas fa-users" style="margin-right: 8px;"></i>
+                Kullanıcılar
             </div>
-            
-            <!-- SEZONUN İNCİLERİ -->
-            <div class="featured-section">
-                <div class="featured-header">
-                    <div class="featured-icon icon-season">
-                        <i class="fas fa-gem"></i>
-                    </div>
-                    <div>
-                        <div class="featured-title">Sezonun İncileri</div>
-                        <div class="featured-subtitle">Güncel içerikler</div>
-                    </div>
-                </div>
-                <div class="featured-content" id="seasonPicksContent">
-                    <div style="text-align: center; padding: 40px 20px; color: var(--hint-color);">
-                        <i class="fas fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 10px;"></i>
-                        <p>Yükleniyor...</p>
-                    </div>
-                </div>
+            <div class="admin-tab" onclick="switchAdminTab('pdfs')">
+                <i class="fas fa-file-pdf" style="margin-right: 8px;"></i>
+                PDF Yönetimi
             </div>
-            
-            <!-- POPÜLER -->
-            <div class="featured-section">
-                <div class="featured-header">
-                    <div class="featured-icon icon-featured">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <div>
-                        <div class="featured-title">Popüler</div>
-                        <div class="featured-subtitle">En çok indirilenler</div>
-                    </div>
-                </div>
-                <div class="featured-content" id="popularContent">
-                    <div style="text-align: center; padding: 40px 20px; color: var(--hint-color);">
-                        <i class="fas fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 10px;"></i>
-                        <p>Yükleniyor...</p>
-                    </div>
-                </div>
+            <div class="admin-tab" onclick="switchAdminTab('ads')">
+                <i class="fas fa-ad" style="margin-right: 8px;"></i>
+                Reklam Ayarları
+            </div>
+            <div class="admin-tab" onclick="switchAdminTab('pin')">
+                <i class="fas fa-thumbtack" style="margin-right: 8px;"></i>
+                Pin Yönetimi
             </div>
         </div>
         
-        <!-- KULLANICI İSTATİSTİKLERİ -->
-        <div class="list-card" style="margin: 0 0 20px 0;">
-            <div style="padding: 20px;">
-                <h3 style="margin: 0 0 15px 0; font-size: 18px; color: var(--telegram-blue); display: flex; align-items: center; gap: 10px;">
-                    <i class="fas fa-users"></i>
-                    Kullanıcı İstatistikleri
-                </h3>
-                <div class="analysis-card">
-                    <div class="analysis-item">
-                        <div class="analysis-value" id="totalUsers">0</div>
-                        <div class="analysis-label">Toplam Kullanıcı</div>
-                    </div>
-                    <div class="analysis-item">
-                        <div class="analysis-value" id="activeUsers">0</div>
-                        <div class="analysis-label">Aktif Kullanıcı</div>
-                    </div>
-                    <div class="analysis-item">
-                        <div class="analysis-value" id="todayUsers">0</div>
-                        <div class="analysis-label">Bugün Kayıtlı</div>
-                    </div>
-                    <div class="analysis-item">
-                        <div class="analysis-value" id="premiumUsers">0</div>
-                        <div class="analysis-label">Premium Kullanıcı</div>
-                    </div>
+        <!-- İSTATİSTİKLER TAB -->
+        <div class="admin-section active" id="adminStatsTab">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalUsersStat">0</div>
+                    <div class="stat-label">Toplam Kullanıcı</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalPdfsStat">0</div>
+                    <div class="stat-label">Toplam PDF</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalDownloadsStat">0</div>
+                    <div class="stat-label">Toplam İndirme</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalAdsStat">0</div>
+                    <div class="stat-label">Toplam Reklam</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="todayUsersStat">0</div>
+                    <div class="stat-label">Bugün Kayıtlı</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="activeUsersStat">0</div>
+                    <div class="stat-label">Aktif Kullanıcı</div>
                 </div>
             </div>
-        </div>
-        
-        <!-- SON KULLANICILAR (SINIRSIZ) -->
-        <div class="list-card" style="margin: 0;">
-            <div style="padding: 20px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h3 style="margin: 0; font-size: 18px; color: var(--telegram-blue); display: flex; align-items: center; gap: 10px;">
-                        <i class="fas fa-user-clock"></i>
-                        Son Kullanıcılar
-                    </h3>
-                    <div style="font-size: 12px; color: var(--hint-color);">
-                        <i class="fas fa-infinity"></i> Sınırsız Liste
-                    </div>
-                </div>
-                <div style="max-height: 400px; overflow-y: auto; padding-right: 10px;">
-                    <div id="recentUsersList">
-                        <div style="text-align: center; padding: 30px 20px; color: var(--hint-color);">
-                            <i class="fas fa-spinner fa-spin" style="font-size: 20px; margin-bottom: 10px;"></i>
-                            <p>Kullanıcılar yükleniyor...</p>
+            
+            <!-- ÖNE ÇIKAN İÇERİKLER - HERKES GÖREBİLİR -->
+            <h3 style="margin: 25px 0 15px 0; font-size: 18px; color: var(--telegram-blue); display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-star"></i>
+                Popüler PDF'ler
+            </h3>
+            
+            <div class="featured-grid">
+                <!-- POPÜLER PDF'LER -->
+                <div class="featured-section">
+                    <div class="featured-header">
+                        <div class="featured-icon icon-popular">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div>
+                            <div class="featured-title">En Popüler</div>
+                            <div class="featured-subtitle">En çok indirilenler</div>
                         </div>
                     </div>
+                    <div class="featured-content" id="popularPdfsList">
+                        <div style="text-align: center; padding: 40px 20px; color: var(--hint-color);">
+                            <i class="fas fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 10px;"></i>
+                            <p>Yükleniyor...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- YENİ PDF'LER -->
+                <div class="featured-section">
+                    <div class="featured-header">
+                        <div class="featured-icon icon-featured">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <div>
+                            <div class="featured-title">Yeni Eklenenler</div>
+                            <div class="featured-subtitle">Son eklenen PDF'ler</div>
+                        </div>
+                    </div>
+                    <div class="featured-content" id="newPdfsList">
+                        <div style="text-align: center; padding: 40px 20px; color: var(--hint-color);">
+                            <i class="fas fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 10px;"></i>
+                            <p>Yükleniyor...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- KULLANICILAR TAB -->
+        <div class="admin-section" id="adminUsersTab">
+            <div class="admin-form">
+                <h3 style="margin: 0 0 15px 0; font-size: 18px; color: var(--telegram-blue); display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-user-cog"></i>
+                    Kullanıcı Yönetimi
+                </h3>
+                
+                <div class="form-group">
+                    <label class="form-label">Kullanıcı Ara (ID, Ad, Kullanıcı Adı)</label>
+                    <input type="text" class="form-input" id="userSearchInput" placeholder="Kullanıcı ara..." oninput="searchUsers()">
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button class="action-button" onclick="refreshUsers()" style="flex: 1;">
+                        <i class="fas fa-sync-alt" style="margin-right: 8px;"></i>
+                        Yenile
+                    </button>
+                    <button class="action-button" onclick="exportUsers()" style="flex: 1; background: var(--success-gradient);">
+                        <i class="fas fa-download" style="margin-right: 8px;"></i>
+                        Dışa Aktar
+                    </button>
+                </div>
+            </div>
+            
+            <h4 style="margin: 20px 0 10px 0; color: var(--text-color);">
+                <i class="fas fa-users" style="margin-right: 8px;"></i>
+                Kullanıcı Listesi
+            </h4>
+            
+            <div class="user-list" id="usersListContainer">
+                <div style="text-align: center; padding: 40px 20px; color: var(--hint-color);">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 10px;"></i>
+                    <p>Kullanıcılar yükleniyor...</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- PDF YÖNETİMİ TAB -->
+        <div class="admin-section" id="adminPdfsTab">
+            <div class="admin-form">
+                <h3 style="margin: 0 0 15px 0; font-size: 18px; color: var(--telegram-blue); display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-plus-circle"></i>
+                    Yeni PDF Ekle
+                </h3>
+                
+                <div class="form-group">
+                    <label class="form-label">PDF Başlığı (Otomatik Tamamlama)</label>
+                    <input type="text" class="form-input" id="pdfTitleInput" placeholder="PDF başlığını yazın..." oninput="autoCompletePdfTitle()">
+                    <div id="pdfTitleSuggestions" style="margin-top: 5px;"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Dropbox Linki</label>
+                    <input type="text" class="form-input" id="pdfDropboxLink" placeholder="https://www.dropbox.com/..." oninput="autoFixDropboxLink()">
+                    <div style="font-size: 12px; color: var(--hint-color); margin-top: 5px;">
+                        <i class="fas fa-info-circle"></i> Link otomatik olarak düzeltilecektir
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Gerekli Reklam Sayısı (1-99)</label>
+                    <input type="number" class="form-input" id="pdfRequiredAds" min="1" max="99" value="5">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Kategori</label>
+                    <select class="form-input" id="pdfCategory">
+                        <option value="tyt">TYT</option>
+                        <option value="ayt">AYT</option>
+                        <option value="lgs">LGS</option>
+                        <option value="denemeler">Denemeler</option>
+                        <option value="notlar">Özet Notlar</option>
+                        <option value="diger">Diğer</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Açıklama</label>
+                    <textarea class="form-textarea" id="pdfDescription" placeholder="PDF açıklaması..."></textarea>
+                </div>
+                
+                <button class="action-button" onclick="addNewPdf()" style="background: var(--success-gradient);">
+                    <i class="fas fa-save" style="margin-right: 10px;"></i>
+                    PDF'i Kaydet
+                </button>
+            </div>
+            
+            <h4 style="margin: 20px 0 10px 0; color: var(--text-color);">
+                <i class="fas fa-list" style="margin-right: 8px;"></i>
+                Mevcut PDF'ler
+            </h4>
+            
+            <div class="admin-pdf-list" id="adminPdfList">
+                <div style="text-align: center; padding: 40px 20px; color: var(--hint-color);">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 10px;"></i>
+                    <p>PDF'ler yükleniyor...</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- REKLAM AYARLARI TAB -->
+        <div class="admin-section" id="adminAdsTab">
+            <div class="admin-form">
+                <h3 style="margin: 0 0 15px 0; font-size: 18px; color: var(--telegram-blue); display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-adjust"></i>
+                    Reklam Ayarları
+                </h3>
+                
+                <div class="form-group">
+                    <label class="form-label">Varsayılan Reklam Sayısı (1-99)</label>
+                    <input type="number" class="form-input" id="defaultAdsCount" min="1" max="99" value="5">
+                    <div style="font-size: 12px; color: var(--hint-color); margin-top: 5px;">
+                        <i class="fas fa-info-circle"></i> Yeni PDF'ler için varsayılan reklam sayısı
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Premium Reklam Sayısı</label>
+                    <input type="number" class="form-input" id="premiumAdsCount" min="0" max="10" value="1">
+                    <div style="font-size: 12px; color: var(--hint-color); margin-top: 5px;">
+                        <i class="fas fa-info-circle"></i> Premium kullanıcılar için gerekli reklam sayısı (0 = ücretsiz)
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Reklam Süresi (saniye)</label>
+                    <input type="number" class="form-input" id="adDuration" min="5" max="60" value="30">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Günlük Reklam Limiti</label>
+                    <input type="number" class="form-input" id="dailyAdLimit" min="0" max="100" value="20">
+                    <div style="font-size: 12px; color: var(--hint-color); margin-top: 5px;">
+                        <i class="fas fa-info-circle"></i> 0 = limitsiz
+                    </div>
+                </div>
+                
+                <button class="action-button" onclick="saveAdSettings()">
+                    <i class="fas fa-save" style="margin-right: 10px;"></i>
+                    Ayarları Kaydet
+                </button>
+            </div>
+            
+            <div class="pin-section">
+                <h3 style="margin: 0 0 10px 0; font-size: 16px; color: var(--warning-color);">
+                    <i class="fas fa-exclamation-triangle" style="margin-right: 8px;"></i>
+                    Reklam Ekranı Ayarları
+                </h3>
+                <p style="font-size: 14px; color: var(--hint-color); margin-bottom: 15px;">
+                    Reklam izleme ekranı için pin ayarları
+                </p>
+                <button class="action-button" onclick="pinAdScreen()" style="background: var(--warning-gradient);">
+                    <i class="fas fa-thumbtack" style="margin-right: 10px;"></i>
+                    Reklam Ekranını Sabitle
+                </button>
+            </div>
+        </div>
+        
+        <!-- PIN YÖNETİMİ TAB -->
+        <div class="admin-section" id="adminPinTab">
+            <div class="pin-section">
+                <h3 style="margin: 0 0 10px 0; font-size: 18px; color: var(--telegram-blue);">
+                    <i class="fas fa-thumbtack" style="margin-right: 8px;"></i>
+                    Ekran Sabitleme
+                </h3>
+                <p style="font-size: 14px; color: var(--hint-color); margin-bottom: 20px;">
+                    Belirli ekranları kullanıcılar için sabitleyebilirsiniz
+                </p>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                    <button class="action-button" onclick="pinScreen('home')" style="background: var(--primary-gradient);">
+                        <i class="fas fa-home" style="margin-right: 10px;"></i>
+                        Ana Sayfayı Sabitle
+                    </button>
+                    <button class="action-button" onclick="pinScreen('pdf-list')" style="background: var(--danger-gradient);">
+                        <i class="fas fa-book" style="margin-right: 10px;"></i>
+                        PDF Listesini Sabitle
+                    </button>
+                    <button class="action-button" onclick="pinScreen('profile')" style="background: var(--accent-gradient);">
+                        <i class="fas fa-user" style="margin-right: 10px;"></i>
+                        Profili Sabitle
+                    </button>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Özel Mesaj (Sabitlenmiş Ekranda Gösterilecek)</label>
+                    <textarea class="form-textarea" id="pinnedMessage" placeholder="Sabitlenmiş ekranda gösterilecek mesaj...">📚 PDF Dershanem Bot - En kaliteli PDF'ler burada! 🚀</textarea>
+                </div>
+                
+                <button class="action-button" onclick="updatePinnedMessage()" style="background: var(--success-gradient);">
+                    <i class="fas fa-bullhorn" style="margin-right: 10px;"></i>
+                    Mesajı Güncelle
+                </button>
+            </div>
+            
+            <div style="margin-top: 25px;">
+                <h4 style="margin: 0 0 10px 0; color: var(--text-color);">
+                    <i class="fas fa-trash-alt" style="margin-right: 8px;"></i>
+                    Temizlik İşlemleri
+                </h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
+                    <button class="action-button" onclick="cleanOldUsers()" style="background: var(--warning-gradient); font-size: 14px;">
+                        <i class="fas fa-user-slash" style="margin-right: 8px;"></i>
+                        Eski Kullanıcıları Temizle
+                    </button>
+                    <button class="action-button" onclick="cleanUnusedPdfs()" style="background: var(--danger-gradient); font-size: 14px;">
+                        <i class="fas fa-trash" style="margin-right: 8px;"></i>
+                        Kullanılmayan PDF'leri Sil
+                    </button>
+                    <button class="action-button" onclick="resetStatistics()" style="background: var(--accent-gradient); font-size: 14px;">
+                        <i class="fas fa-redo" style="margin-right: 8px;"></i>
+                        İstatistikleri Sıfırla
+                    </button>
                 </div>
             </div>
         </div>
@@ -1169,6 +1732,22 @@
                 </div>
                 <div class="list-meta">
                     <i class="fas fa-arrow-right"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ÖNE ÇIKAN İÇERİKLER BUTONU - HERKES GÖREBİLİR -->
+        <div class="list-card" onclick="openAdminFrame()">
+            <div class="list-item">
+                <div class="list-icon icon-featured">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div class="list-info">
+                    <div class="list-name">Popüler PDF'ler</div>
+                    <div class="list-detail">En çok indirilen ve yeni eklenen PDF'leri görüntüle</div>
+                </div>
+                <div class="list-meta" style="color: #9C27B0;">
+                    <i class="fas fa-rocket"></i>
                 </div>
             </div>
         </div>
@@ -1216,18 +1795,18 @@
             </div>
         </div>
         
-        <!-- ADMIN PANEL BUTTON -->
-        <div class="list-card hidden" id="adminControlCard" onclick="openAdminFrame()">
+        <!-- ADMIN PANEL BUTTON (SADECE ADMIN) -->
+        <div class="list-card hidden" id="adminPanelCard" onclick="openAdminPanel()">
             <div class="list-item">
                 <div class="list-icon icon-admin">
-                    <i class="fas fa-star"></i>
+                    <i class="fas fa-crown"></i>
                 </div>
                 <div class="list-info">
-                    <div class="list-name">Öne Çıkan İçerikler</div>
-                    <div class="list-detail">Sadece bizde olan, popüler ve özel içerikler</div>
+                    <div class="list-name">Admin Paneli</div>
+                    <div class="list-detail">Sistem yönetimi ve istatistikler</div>
                 </div>
-                <div class="list-meta" style="color: #9C27B0;">
-                    <i class="fas fa-rocket"></i>
+                <div class="list-meta" style="color: #FFD700;">
+                    <i class="fas fa-lock"></i>
                 </div>
             </div>
         </div>
@@ -1280,13 +1859,13 @@
         </div>
         
         <div class="sort-buttons">
-            <button class="sort-button active" onclick="setSort('newest')">
+            <button class="sort-button active" onclick="setSort('popular')">
+                <i class="fas fa-fire"></i>
+                Popüler
+            </button>
+            <button class="sort-button" onclick="setSort('newest')">
                 <i class="fas fa-clock"></i>
                 En Yeni
-            </button>
-            <button class="sort-button" onclick="setSort('oldest')">
-                <i class="fas fa-history"></i>
-                En Eski
             </button>
             <button class="sort-button" onclick="setSort('name')">
                 <i class="fas fa-sort-alpha-down"></i>
@@ -1300,7 +1879,7 @@
         </div>
         
         <!-- PDF LIST -->
-        <div id="pdfDownloadList" style="flex: 1; overflow-y: auto; padding: 0 20px 20px;">
+        <div id="pdfDownloadList" style="flex: 1; overflow-y: auto; padding: 0 20px 20px; -webkit-overflow-scrolling: touch;">
             <!-- PDFs will be added here -->
         </div>
     </div>
@@ -1314,7 +1893,7 @@
             </h1>
         </div>
         
-        <div class="profile-scroll-container">
+        <div style="flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; width: 100%;">
             <!-- AVATAR AND INFO -->
             <div class="list-card">
                 <div style="padding: 30px 20px; text-align: center;">
@@ -1367,18 +1946,67 @@
                 </div>
             </div>
             
-            <!-- ADMIN PANEL BUTTON -->
-            <div class="list-card hidden" id="adminControlCardProfile" onclick="openAdminFrame()">
+            <!-- STATISTICS -->
+            <div class="list-card">
                 <div class="list-item">
-                    <div class="list-icon icon-admin">
+                    <div class="list-icon" style="background: linear-gradient(135deg, #9C27B0 0%, #673AB7 100%);">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="list-info">
+                        <div class="list-name">İstatistiklerim</div>
+                        <div class="list-detail">Toplam indirme: <span id="user-total-downloads" style="color: var(--telegram-blue); font-weight: 600;">0</span></div>
+                    </div>
+                </div>
+                
+                <div class="list-item">
+                    <div class="list-icon" style="background: linear-gradient(135deg, #FF5722 0%, #FF9800 100%);">
+                        <i class="fas fa-ad"></i>
+                    </div>
+                    <div class="list-info">
+                        <div class="list-name">İzlenen Reklamlar</div>
+                        <div class="list-detail">Toplam: <span id="user-total-ads" style="color: var(--telegram-blue); font-weight: 600;">0</span></div>
+                    </div>
+                </div>
+                
+                <div class="list-item">
+                    <div class="list-icon" style="background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="list-info">
+                        <div class="list-name">Tamamlanan PDF'ler</div>
+                        <div class="list-detail">Sayı: <span id="user-completed-pdfs" style="color: var(--telegram-blue); font-weight: 600;">0</span></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ÖNE ÇIKAN İÇERİKLER BUTONU - HERKES GÖREBİLİR -->
+            <div class="list-card" onclick="openAdminFrame()">
+                <div class="list-item">
+                    <div class="list-icon icon-featured">
                         <i class="fas fa-star"></i>
                     </div>
                     <div class="list-info">
-                        <div class="list-name">Öne Çıkan İçerikler</div>
-                        <div class="list-detail">Özel içeriklere erişin</div>
+                        <div class="list-name">Popüler PDF'ler</div>
+                        <div class="list-detail">En çok indirilen ve yeni eklenen PDF'ler</div>
                     </div>
                     <div class="list-meta" style="color: #9C27B0;">
                         <i class="fas fa-rocket"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ADMIN PANEL BUTTON (SADECE ADMIN) -->
+            <div class="list-card hidden" id="adminPanelCardProfile" onclick="openAdminPanel()">
+                <div class="list-item">
+                    <div class="list-icon icon-admin">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                    <div class="list-info">
+                        <div class="list-name">Admin Paneli</div>
+                        <div class="list-detail">Sistem yönetimi ve istatistikler</div>
+                    </div>
+                    <div class="list-meta" style="color: #FFD700;">
+                        <i class="fas fa-lock"></i>
                     </div>
                 </div>
             </div>
@@ -1433,6 +2061,27 @@
     </div>
 </div>
 
+<!-- CONFIRMATION MODAL -->
+<div class="modal-overlay hidden" id="confirmModal">
+    <div class="modal-content">
+        <h3 id="confirmModalTitle" style="margin: 0 0 15px 0; font-size: 20px; color: var(--telegram-blue); display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-question-circle"></i>
+            Onay
+        </h3>
+        <p id="confirmModalMessage" style="font-size: 14px; line-height: 1.6; margin-bottom: 20px;"></p>
+        <div style="display: flex; gap: 10px;">
+            <button onclick="confirmAction(true)" class="action-button" style="background: var(--success-gradient); flex: 1;">
+                <i class="fas fa-check" style="margin-right: 8px;"></i>
+                Evet
+            </button>
+            <button onclick="confirmAction(false)" class="action-button" style="background: var(--warning-gradient); flex: 1;">
+                <i class="fas fa-times" style="margin-right: 8px;"></i>
+                Hayır
+            </button>
+        </div>
+    </div>
+</div>
+
 <!-- BOTTOM NAVIGATION -->
 <div class="bottom-nav">
     <div class="nav-item active" onclick="changeTab('home')">
@@ -1476,7 +2125,9 @@
     let currentPdf = null;
     let allPdfsData = {};
     let currentCategory = 'all';
-    let currentSort = 'newest';
+    let currentSort = 'popular';
+    let pendingAction = null;
+    let pendingActionData = null;
     
     const PDF_CATEGORIES = {
         'all': 'Tümü',
@@ -1487,6 +2138,25 @@
         'notlar': 'Özet Notlar',
         'diger': 'Diğer'
     };
+    
+    // PDF TITLE SUGGESTIONS
+    const PDF_TITLE_SUGGESTIONS = [
+        "TYT Matematik Denemesi",
+        "AYT Fizik Konu Anlatımı",
+        "LGS Türkçe Soru Bankası",
+        "Kimya Ders Notları",
+        "Biyoloji Özet PDF",
+        "Geometri Formülleri",
+        "Tarih Ders Notları",
+        "Coğrafya Haritaları",
+        "Felsefe Konu Özeti",
+        "Dil Bilgisi Kılavuzu",
+        "Problemler Testi",
+        "Paragraf Soruları",
+        "İngilizce Kelime Listesi",
+        "Matematik Formül Kitabı",
+        "Fizik Deneyleri PDF"
+    ];
     
     // SES EFEKTİ FONKSİYONU
     function playButtonSound() {
@@ -1530,13 +2200,43 @@
         
         // Admin kontrolü
         if (is_admin) {
-            document.getElementById('adminControlCard')?.classList?.remove('hidden');
-            document.getElementById('adminControlCardProfile')?.classList?.remove('hidden');
+            document.getElementById('adminPanelCard')?.classList?.remove('hidden');
+            document.getElementById('adminPanelCardProfile')?.classList?.remove('hidden');
         }
     }
     
-    // YENİ ADMIN FRAME FUNCTIONS
+    // YENİ ADMIN FUNCTIONS
     window.openAdminFrame = function() {
+        playButtonSound();
+        if (window.Telegram && Telegram.WebApp) {
+            Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+        }
+        
+        // Admin frame'i göster (sadece popüler PDF'ler - herkes görebilir)
+        document.getElementById('adminFrame').classList.remove('hidden');
+        
+        // Admin başlığını değiştir
+        document.querySelector('.admin-frame-title').innerHTML = `
+            <i class="fas fa-star" style="color: #9C27B0;"></i>
+            Popüler PDF'ler
+        `;
+        
+        // Diğer içeriği gizle
+        document.getElementById('app').classList.add('hidden');
+        
+        // Admin tabs'ı gizle (herkes için sadece istatistikler gözüksün)
+        document.querySelector('.admin-tabs').classList.add('hidden');
+        
+        // Sadece istatistikler tab'ını göster
+        switchAdminTab('stats');
+        
+        // Verileri yükle
+        loadStatistics();
+        loadPopularPdfs();
+        loadNewPdfs();
+    };
+    
+    window.openAdminPanel = function() {
         if (!is_admin) {
             showError("Bu özellik sadece yöneticiler içindir");
             return;
@@ -1550,13 +2250,27 @@
         // Admin frame'i göster
         document.getElementById('adminFrame').classList.remove('hidden');
         
+        // Admin başlığını ayarla
+        document.querySelector('.admin-frame-title').innerHTML = `
+            <i class="fas fa-crown" style="color: #FFD700;"></i>
+            Admin Panel
+        `;
+        
         // Diğer içeriği gizle
         document.getElementById('app').classList.add('hidden');
         
-        // Verileri yükle
-        loadFeaturedContent();
-        loadUserStatistics();
-        loadRecentUsers();
+        // Admin tabs'ı göster
+        document.querySelector('.admin-tabs').classList.remove('hidden');
+        
+        // İstatistikler tab'ını aç
+        switchAdminTab('stats');
+        
+        // Tüm verileri yükle
+        loadStatistics();
+        loadPopularPdfs();
+        loadNewPdfs();
+        loadUsers();
+        loadAdminPdfs();
     };
     
     window.closeAdminFrame = function() {
@@ -1566,56 +2280,147 @@
         document.getElementById('app').classList.remove('hidden');
     };
     
-    // ÖNE ÇIKAN İÇERİKLERİ YÜKLE
-    async function loadFeaturedContent() {
+    // ADMIN TAB SWITCH
+    window.switchAdminTab = function(tabName) {
+        playButtonSound();
+        
+        // Tüm tab'ları deaktif et
+        document.querySelectorAll('.admin-tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        
+        // Tüm section'ları gizle
+        document.querySelectorAll('.admin-section').forEach(section => {
+            section.classList.remove('active');
+        });
+        
+        // Seçilen tab'ı aktif et
+        document.querySelectorAll('.admin-tab').forEach(tab => {
+            if (tab.textContent.includes(tabName === 'stats' ? 'İstatistikler' : 
+                                        tabName === 'users' ? 'Kullanıcılar' :
+                                        tabName === 'pdfs' ? 'PDF Yönetimi' :
+                                        tabName === 'ads' ? 'Reklam Ayarları' : 'Pin Yönetimi')) {
+                tab.classList.add('active');
+            }
+        });
+        
+        // Seçilen section'ı göster
+        const section = document.getElementById(`admin${tabName.charAt(0).toUpperCase() + tabName.slice(1)}Tab`);
+        if (section) {
+            section.classList.add('active');
+            
+            // Verileri yükle
+            switch(tabName) {
+                case 'stats':
+                    loadStatistics();
+                    loadPopularPdfs();
+                    loadNewPdfs();
+                    break;
+                case 'users':
+                    loadUsers();
+                    break;
+                case 'pdfs':
+                    loadAdminPdfs();
+                    break;
+                case 'ads':
+                    loadAdSettings();
+                    break;
+            }
+        }
+    };
+    
+    // İSTATİSTİKLERİ YÜKLE
+    async function loadStatistics() {
         if (!db) return;
         
         try {
-            // Tüm PDF'leri al
+            // Tüm kullanıcıları al
+            const usersSnapshot = await db.ref('users').once('value');
+            const allUsers = usersSnapshot.val() || {};
+            const usersArray = Object.values(allUsers);
+            
+            // Toplam kullanıcı
+            document.getElementById('totalUsersStat').textContent = usersArray.length;
+            
+            // Aktif kullanıcılar (son 7 gün)
+            const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+            const activeUsers = usersArray.filter(user => 
+                user.last_active && user.last_active > sevenDaysAgo
+            ).length;
+            document.getElementById('activeUsersStat').textContent = activeUsers;
+            
+            // Bugün kayıtlı kullanıcılar
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const todayUsers = usersArray.filter(user => 
+                user.created_at && user.created_at > today.getTime()
+            ).length;
+            document.getElementById('todayUsersStat').textContent = todayUsers;
+            
+            // PDF istatistikleri
             const pdfsSnapshot = await db.ref('pdfs').once('value');
             const allPdfs = pdfsSnapshot.val() || {};
+            const pdfsArray = Object.values(allPdfs).filter(pdf => !pdf.is_deleted);
             
-            // PDF'leri array'e çevir
-            let pdfsArray = Object.entries(allPdfs)
-                .map(([key, pdf]) => ({ key, ...pdf }))
-                .filter(pdf => !pdf.is_deleted);
+            document.getElementById('totalPdfsStat').textContent = pdfsArray.length;
             
-            // 1. SADECE BİZDE OLAN (Exclusive)
-            const exclusivePdfs = pdfsArray
-                .filter(pdf => pdf.is_exclusive)
-                .slice(0, 10);
+            // Toplam indirme sayısı
+            const totalDownloads = pdfsArray.reduce((sum, pdf) => sum + (pdf.downloads || 0), 0);
+            document.getElementById('totalDownloadsStat').textContent = totalDownloads;
             
-            renderFeaturedSection('exclusiveContent', exclusivePdfs, 'Sadece bizde olan içerikler');
-            
-            // 2. EN ÇOK ARANAN (Most Searched)
-            const mostSearched = pdfsArray
-                .sort((a, b) => (b.search_count || 0) - (a.search_count || 0))
-                .slice(0, 10);
-            
-            renderFeaturedSection('mostSearchedContent', mostSearched, 'En çok aranan PDF\'ler');
-            
-            // 3. SEZONUN İNCİLERİ (Son 30 gün)
-            const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
-            const seasonPicks = pdfsArray
-                .filter(pdf => pdf.created_at > thirtyDaysAgo)
-                .sort((a, b) => b.downloads - a.downloads)
-                .slice(0, 10);
-            
-            renderFeaturedSection('seasonPicksContent', seasonPicks, 'Son 30 günün en iyileri');
-            
-            // 4. POPÜLER (En çok indirilen)
-            const popularPdfs = pdfsArray
-                .sort((a, b) => (b.downloads || 0) - (a.downloads || 0))
-                .slice(0, 10);
-            
-            renderFeaturedSection('popularContent', popularPdfs, 'En çok indirilen PDF\'ler');
+            // Toplam reklam sayısı
+            const analyticsSnapshot = await db.ref('analytics/total_ads_watched').once('value');
+            const totalAds = analyticsSnapshot.val() || 0;
+            document.getElementById('totalAdsStat').textContent = totalAds;
             
         } catch (error) {
-            console.error("Featured content loading error:", error);
+            console.error("Statistics loading error:", error);
         }
     }
     
-    function renderFeaturedSection(containerId, pdfs, defaultText) {
+    // POPÜLER PDF'LERİ YÜKLE
+    async function loadPopularPdfs() {
+        if (!db) return;
+        
+        try {
+            const pdfsSnapshot = await db.ref('pdfs').once('value');
+            const allPdfs = pdfsSnapshot.val() || {};
+            
+            let pdfsArray = Object.entries(allPdfs)
+                .map(([key, pdf]) => ({ key, ...pdf }))
+                .filter(pdf => !pdf.is_deleted)
+                .sort((a, b) => (b.downloads || 0) - (a.downloads || 0))
+                .slice(0, 10);
+            
+            renderPdfList('popularPdfsList', pdfsArray, 'Popüler PDF bulunamadı');
+            
+        } catch (error) {
+            console.error("Popular PDFs loading error:", error);
+        }
+    }
+    
+    // YENİ PDF'LERİ YÜKLE
+    async function loadNewPdfs() {
+        if (!db) return;
+        
+        try {
+            const pdfsSnapshot = await db.ref('pdfs').once('value');
+            const allPdfs = pdfsSnapshot.val() || {};
+            
+            let pdfsArray = Object.entries(allPdfs)
+                .map(([key, pdf]) => ({ key, ...pdf }))
+                .filter(pdf => !pdf.is_deleted)
+                .sort((a, b) => (b.created_at || 0) - (a.created_at || 0))
+                .slice(0, 10);
+            
+            renderPdfList('newPdfsList', pdfsArray, 'Yeni PDF bulunamadı');
+            
+        } catch (error) {
+            console.error("New PDFs loading error:", error);
+        }
+    }
+    
+    function renderPdfList(containerId, pdfs, emptyMessage) {
         const container = document.getElementById(containerId);
         if (!container) return;
         
@@ -1623,8 +2428,7 @@
             container.innerHTML = `
                 <div style="text-align: center; padding: 40px 20px; color: var(--hint-color);">
                     <i class="fas fa-inbox" style="font-size: 30px; margin-bottom: 10px; opacity: 0.5;"></i>
-                    <p>${defaultText}</p>
-                    <p style="font-size: 12px; margin-top: 10px;">Henüz içerik eklenmemiş</p>
+                    <p>${emptyMessage}</p>
                 </div>
             `;
             return;
@@ -1640,7 +2444,7 @@
                 Math.min(100, (progress / pdf.required_ads) * 100) : 100;
             
             html += `
-                <div class="list-item" onclick="handlePDFDownloadClick('${pdf.key}', '${pdf.title.replace(/'/g, "\\'")}', '${pdf.url}', ${pdf.required_ads || 0})" style="padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.03);">
+                <div class="list-item" onclick="handlePDFDownloadClick('${pdf.key}', '${pdf.title.replace(/'/g, "\\'")}', '${pdf.url}', ${pdf.required_ads || 0})" style="padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.03); cursor: pointer;">
                     <div class="list-icon" style="width: 40px; height: 40px; font-size: 16px; background: ${progressPercent === 100 ? 'var(--success-gradient)' : 'var(--primary-gradient)'};">
                         ${progressPercent === 100 ? '<i class="fas fa-check"></i>' : `<span style="font-size: 11px;">${progress}/${pdf.required_ads}</span>`}
                     </div>
@@ -1663,76 +2467,35 @@
         container.innerHTML = html;
     }
     
-    // KULLANICI İSTATİSTİKLERİ
-    async function loadUserStatistics() {
-        if (!db) return;
+    // KULLANICI LİSTESİ YÜKLE
+    async function loadUsers() {
+        if (!db || !is_admin) return;
         
         try {
-            // Tüm kullanıcıları al (sınırsız)
-            const usersSnapshot = await db.ref('users').once('value');
-            const allUsers = usersSnapshot.val() || {};
-            const usersArray = Object.values(allUsers);
-            
-            // Toplam kullanıcı
-            document.getElementById('totalUsers').textContent = usersArray.length;
-            
-            // Aktif kullanıcılar (son 7 gün)
-            const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
-            const activeUsers = usersArray.filter(user => 
-                user.last_active && user.last_active > sevenDaysAgo
-            ).length;
-            document.getElementById('activeUsers').textContent = activeUsers;
-            
-            // Bugün kayıtlı kullanıcılar
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            const todayUsers = usersArray.filter(user => 
-                user.created_at && user.created_at > today.getTime()
-            ).length;
-            document.getElementById('todayUsers').textContent = todayUsers;
-            
-            // Premium kullanıcılar (örnek)
-            const premiumUsers = usersArray.filter(user => user.is_premium).length;
-            document.getElementById('premiumUsers').textContent = premiumUsers;
-            
-        } catch (error) {
-            console.error("User statistics error:", error);
-        }
-    }
-    
-    // SON KULLANICILAR (SINIRSIZ)
-    async function loadRecentUsers() {
-        if (!db) return;
-        
-        try {
-            // Tüm kullanıcıları al, son aktif olanlara göre sırala
-            const usersSnapshot = await db.ref('users').orderByChild('last_active').once('value');
+            const usersSnapshot = await db.ref('users').orderByChild('created_at').once('value');
             const allUsers = usersSnapshot.val() || {};
             
-            // Kullanıcıları array'e çevir ve sırala
             let usersArray = Object.entries(allUsers).map(([id, user]) => ({
                 id,
                 ...user
             }));
             
-            // Son aktif olana göre sırala (en yeni en üstte)
-            usersArray.sort((a, b) => (b.last_active || 0) - (a.last_active || 0));
+            usersArray.sort((a, b) => (b.created_at || 0) - (a.created_at || 0));
             
-            // Tüm kullanıcıları göster (sınırsız)
-            renderRecentUsers(usersArray);
+            renderUsersList(usersArray);
             
         } catch (error) {
-            console.error("Recent users error:", error);
+            console.error("Users loading error:", error);
         }
     }
     
-    function renderRecentUsers(usersArray) {
-        const container = document.getElementById('recentUsersList');
+    function renderUsersList(usersArray) {
+        const container = document.getElementById('usersListContainer');
         if (!container) return;
         
         if (usersArray.length === 0) {
             container.innerHTML = `
-                <div style="text-align: center; padding: 30px 20px; color: var(--hint-color);">
+                <div style="text-align: center; padding: 40px 20px; color: var(--hint-color);">
                     <i class="fas fa-user-slash" style="font-size: 30px; margin-bottom: 10px; opacity: 0.5;"></i>
                     <p>Henüz kullanıcı yok</p>
                 </div>
@@ -1750,25 +2513,29 @@
                 new Date(user.created_at).toLocaleDateString('tr-TR') : 'Bilinmiyor';
             
             html += `
-                <div class="list-item" style="padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.03); animation: slideInUp 0.5s ease-out ${index * 0.05}s both;">
-                    <div class="list-icon" style="width: 40px; height: 40px; font-size: 16px; background: ${user.is_admin ? 'var(--warning-gradient)' : 'var(--primary-gradient)'};">
-                        ${user.is_admin ? '<i class="fas fa-crown"></i>' : name.charAt(0).toUpperCase()}
+                <div class="user-item" style="animation: slideInUp 0.5s ease-out ${index * 0.05}s both;">
+                    <div class="user-avatar">
+                        ${name.charAt(0).toUpperCase()}
                     </div>
-                    <div class="list-info" style="flex: 1;">
-                        <div class="list-name" style="font-size: 14px; margin-bottom: 4px;">
+                    <div class="user-info">
+                        <div class="user-name">
                             ${name}
                             ${user.is_admin ? '<span style="background: var(--warning-color); color: white; padding: 1px 6px; border-radius: 10px; font-size: 10px; margin-left: 5px;">ADMIN</span>' : ''}
-                            ${user.is_premium ? '<span style="background: #9C27B0; color: white; padding: 1px 6px; border-radius: 10px; font-size: 10px; margin-left: 5px;">PREMIUM</span>' : ''}
                         </div>
-                        <div class="list-detail" style="font-size: 11px;">
-                            ${username ? `${username} • ` : ''}
-                            <i class="far fa-clock" style="margin-right: 3px;"></i>${lastActive}
-                            ${user.created_at ? ` • <i class="far fa-calendar" style="margin-left: 5px;"></i>${createdDate}` : ''}
+                        <div class="user-details">
+                            <span><i class="fas fa-id-card"></i> ${user.id}</span>
+                            ${username ? `<span><i class="fas fa-at"></i> ${username}</span>` : ''}
+                            <span><i class="far fa-clock"></i> ${lastActive}</span>
+                            <span><i class="far fa-calendar"></i> ${createdDate}</span>
                         </div>
                     </div>
-                    <div style="font-size: 12px; color: var(--hint-color); text-align: right;">
-                        <div>ID: ${user.id}</div>
-                        <div style="font-size: 10px; margin-top: 2px;">${getUserStatus(user)}</div>
+                    <div class="admin-pdf-actions">
+                        <button class="admin-action-btn" onclick="viewUserDetails('${user.id}')" title="Detaylar">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="admin-action-btn delete" onclick="deleteUser('${user.id}', '${name}')" title="Sil">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </div>
                 </div>
             `;
@@ -1777,41 +2544,522 @@
         container.innerHTML = html;
     }
     
-    function formatTimeAgo(timestamp) {
-        const now = Date.now();
-        const diff = now - timestamp;
+    // KULLANICI ARA
+    window.searchUsers = function() {
+        const searchTerm = document.getElementById('userSearchInput').value.toLowerCase();
+        const userItems = document.querySelectorAll('.user-item');
         
-        if (diff < 60000) return 'Az önce';
-        if (diff < 3600000) return `${Math.floor(diff / 60000)} dakika önce`;
-        if (diff < 86400000) return `${Math.floor(diff / 3600000)} saat önce`;
-        if (diff < 604800000) return `${Math.floor(diff / 86400000)} gün önce`;
-        return new Date(timestamp).toLocaleDateString('tr-TR');
+        userItems.forEach(item => {
+            const text = item.textContent.toLowerCase();
+            item.style.display = text.includes(searchTerm) ? 'flex' : 'none';
+        });
+    };
+    
+    // KULLANICILARI YENİLE
+    window.refreshUsers = function() {
+        playButtonSound();
+        loadUsers();
+    };
+    
+    // KULLANICI DIŞA AKTAR
+    window.exportUsers = function() {
+        showConfirm(
+            'Dışa Aktar',
+            'Kullanıcı listesini CSV formatında dışa aktarmak istiyor musunuz?',
+            'exportUsersConfirm'
+        );
+    };
+    
+    function exportUsersConfirm() {
+        // Bu fonksiyon gerçek implementasyonda doldurulacak
+        showError("Bu özellik yakında eklenecektir");
     }
     
-    function getUserStatus(user) {
-        if (!user.last_active) return 'Pasif';
+    // ADMIN PDF YÖNETİMİ
+    async function loadAdminPdfs() {
+        if (!db || !is_admin) return;
         
-        const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
-        if (user.last_active > sevenDaysAgo) return 'Aktif';
-        
-        const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
-        if (user.last_active > thirtyDaysAgo) return 'Orta';
-        
-        return 'Pasif';
+        try {
+            const pdfsSnapshot = await db.ref('pdfs').once('value');
+            const allPdfs = pdfsSnapshot.val() || {};
+            
+            let pdfsArray = Object.entries(allPdfs)
+                .map(([key, pdf]) => ({ key, ...pdf }))
+                .filter(pdf => !pdf.is_deleted)
+                .sort((a, b) => (b.created_at || 0) - (a.created_at || 0));
+            
+            renderAdminPdfList(pdfsArray);
+            
+        } catch (error) {
+            console.error("Admin PDFs loading error:", error);
+        }
     }
+    
+    function renderAdminPdfList(pdfsArray) {
+        const container = document.getElementById('adminPdfList');
+        if (!container) return;
+        
+        if (pdfsArray.length === 0) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 40px 20px; color: var(--hint-color);">
+                    <i class="fas fa-inbox" style="font-size: 30px; margin-bottom: 10px; opacity: 0.5;"></i>
+                    <p>Henüz PDF eklenmemiş</p>
+                </div>
+            `;
+            return;
+        }
+        
+        let html = '';
+        pdfsArray.forEach((pdf, index) => {
+            const createdDate = pdf.created_at ? 
+                new Date(pdf.created_at).toLocaleDateString('tr-TR') : 'Bilinmiyor';
+            
+            html += `
+                <div class="admin-pdf-item" style="animation: slideInUp 0.5s ease-out ${index * 0.05}s both;">
+                    <div class="admin-pdf-info">
+                        <div class="admin-pdf-name">${pdf.title}</div>
+                        <div class="admin-pdf-details">
+                            <span><i class="fas fa-download"></i> ${pdf.downloads || 0} indirme</span>
+                            <span><i class="fas fa-ad"></i> ${pdf.required_ads || 0} reklam</span>
+                            <span><i class="far fa-calendar"></i> ${createdDate}</span>
+                            <span><i class="fas fa-folder"></i> ${PDF_CATEGORIES[pdf.category] || 'Diğer'}</span>
+                        </div>
+                    </div>
+                    <div class="admin-pdf-actions">
+                        <button class="admin-action-btn" onclick="editPdf('${pdf.key}')" title="Düzenle">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="admin-action-btn delete" onclick="deletePdf('${pdf.key}', '${pdf.title.replace(/'/g, "\\'")}')" title="Sil">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+    }
+    
+    // PDF BAŞLIĞI OTOMATİK TAMAMLAMA
+    window.autoCompletePdfTitle = function() {
+        const input = document.getElementById('pdfTitleInput');
+        const suggestions = document.getElementById('pdfTitleSuggestions');
+        const value = input.value.toLowerCase();
+        
+        if (!value.trim()) {
+            suggestions.innerHTML = '';
+            return;
+        }
+        
+        const filtered = PDF_TITLE_SUGGESTIONS.filter(title => 
+            title.toLowerCase().includes(value)
+        ).slice(0, 5);
+        
+        if (filtered.length === 0) {
+            suggestions.innerHTML = '';
+            return;
+        }
+        
+        let html = '<div style="background: var(--secondary-color); border-radius: 8px; border: 1px solid rgba(0,136,204,0.1); overflow: hidden; margin-top: 5px;">';
+        filtered.forEach(title => {
+            html += `
+                <div style="padding: 8px 12px; cursor: pointer; border-bottom: 1px solid rgba(0,0,0,0.05); transition: var(--transition-smooth);"
+                     onclick="selectPdfTitle('${title}')"
+                     onmouseover="this.style.background='rgba(0,136,204,0.1)'"
+                     onmouseout="this.style.background='transparent'">
+                    ${title}
+                </div>
+            `;
+        });
+        html += '</div>';
+        
+        suggestions.innerHTML = html;
+    };
+    
+    window.selectPdfTitle = function(title) {
+        document.getElementById('pdfTitleInput').value = title;
+        document.getElementById('pdfTitleSuggestions').innerHTML = '';
+    };
+    
+    // DROPBOX LINK OTOMATİK DÜZELTME
+    window.autoFixDropboxLink = function() {
+        const input = document.getElementById('pdfDropboxLink');
+        let value = input.value.trim();
+        
+        if (value.includes('dropbox.com')) {
+            if (value.includes('dl=0')) {
+                value = value.replace('dl=0', 'dl=1');
+            } else if (value.includes('?')) {
+                value = value + '&dl=1';
+            } else {
+                value = value + '?dl=1';
+            }
+            
+            input.value = value;
+        }
+    };
+    
+    // YENİ PDF EKLE
+    window.addNewPdf = async function() {
+        if (!db || !is_admin) {
+            showError("Bu işlem için yetkiniz yok");
+            return;
+        }
+        
+        const title = document.getElementById('pdfTitleInput').value.trim();
+        const url = document.getElementById('pdfDropboxLink').value.trim();
+        const requiredAds = parseInt(document.getElementById('pdfRequiredAds').value) || 5;
+        const category = document.getElementById('pdfCategory').value;
+        const description = document.getElementById('pdfDescription').value.trim();
+        
+        if (!title) {
+            showError("PDF başlığı gereklidir");
+            return;
+        }
+        
+        if (!url || !url.includes('dropbox.com')) {
+            showError("Geçerli bir Dropbox linki gereklidir");
+            return;
+        }
+        
+        if (requiredAds < 1 || requiredAds > 99) {
+            showError("Reklam sayısı 1-99 arasında olmalıdır");
+            return;
+        }
+        
+        playButtonSound();
+        
+        try {
+            const newPdfRef = db.ref('pdfs').push();
+            const pdfData = {
+                title: title,
+                url: url,
+                required_ads: requiredAds,
+                category: category,
+                description: description || '',
+                downloads: 0,
+                created_at: firebase.database.ServerValue.TIMESTAMP,
+                is_deleted: false
+            };
+            
+            await newPdfRef.set(pdfData);
+            
+            // Formu temizle
+            document.getElementById('pdfTitleInput').value = '';
+            document.getElementById('pdfDropboxLink').value = '';
+            document.getElementById('pdfDescription').value = '';
+            
+            // PDF listesini yenile
+            loadAdminPdfs();
+            fetchPDFList();
+            
+            showError("PDF başarıyla eklendi!", false);
+            
+        } catch (error) {
+            console.error("PDF ekleme hatası:", error);
+            showError("PDF eklenirken bir hata oluştu");
+        }
+    };
+    
+    // PDF DÜZENLE
+    window.editPdf = function(pdfKey) {
+        showError("Düzenleme özelliği yakında eklenecektir");
+    };
+    
+    // PDF SİL
+    window.deletePdf = function(pdfKey, pdfTitle) {
+        showConfirm(
+            'PDF Sil',
+            `"${pdfTitle}" adlı PDF'i silmek istediğinize emin misiniz?`,
+            'deletePdfConfirm',
+            { pdfKey, pdfTitle }
+        );
+    };
+    
+    async function deletePdfConfirm() {
+        if (!pendingActionData) return;
+        
+        const { pdfKey, pdfTitle } = pendingActionData;
+        
+        try {
+            await db.ref(`pdfs/${pdfKey}`).update({
+                is_deleted: true,
+                deleted_at: firebase.database.ServerValue.TIMESTAMP
+            });
+            
+            loadAdminPdfs();
+            fetchPDFList();
+            
+            showError(`"${pdfTitle}" başarıyla silindi`, false);
+            
+        } catch (error) {
+            console.error("PDF silme hatası:", error);
+            showError("PDF silinirken bir hata oluştu");
+        }
+    }
+    
+    // KULLANICI SİL
+    window.deleteUser = function(userId, userName) {
+        showConfirm(
+            'Kullanıcı Sil',
+            `"${userName}" adlı kullanıcıyı silmek istediğinize emin misiniz?`,
+            'deleteUserConfirm',
+            { userId, userName }
+        );
+    };
+    
+    async function deleteUserConfirm() {
+        if (!pendingActionData) return;
+        
+        const { userId, userName } = pendingActionData;
+        
+        try {
+            await db.ref(`users/${userId}`).remove();
+            loadUsers();
+            
+            showError(`"${userName}" başarıyla silindi`, false);
+            
+        } catch (error) {
+            console.error("Kullanıcı silme hatası:", error);
+            showError("Kullanıcı silinirken bir hata oluştu");
+        }
+    }
+    
+    // REKLAM AYARLARI YÜKLE
+    async function loadAdSettings() {
+        if (!db || !is_admin) return;
+        
+        try {
+            const settingsSnapshot = await db.ref('settings/ads').once('value');
+            const settings = settingsSnapshot.val() || {};
+            
+            document.getElementById('defaultAdsCount').value = settings.default_ads || 5;
+            document.getElementById('premiumAdsCount').value = settings.premium_ads || 1;
+            document.getElementById('adDuration').value = settings.duration || 30;
+            document.getElementById('dailyAdLimit').value = settings.daily_limit || 20;
+            
+        } catch (error) {
+            console.error("Ad settings loading error:", error);
+        }
+    }
+    
+    // REKLAM AYARLARI KAYDET
+    window.saveAdSettings = async function() {
+        if (!db || !is_admin) {
+            showError("Bu işlem için yetkiniz yok");
+            return;
+        }
+        
+        const defaultAds = parseInt(document.getElementById('defaultAdsCount').value) || 5;
+        const premiumAds = parseInt(document.getElementById('premiumAdsCount').value) || 1;
+        const duration = parseInt(document.getElementById('adDuration').value) || 30;
+        const dailyLimit = parseInt(document.getElementById('dailyAdLimit').value) || 20;
+        
+        if (defaultAds < 1 || defaultAds > 99) {
+            showError("Varsayılan reklam sayısı 1-99 arasında olmalıdır");
+            return;
+        }
+        
+        if (premiumAds < 0 || premiumAds > 10) {
+            showError("Premium reklam sayısı 0-10 arasında olmalıdır");
+            return;
+        }
+        
+        if (duration < 5 || duration > 60) {
+            showError("Reklam süresi 5-60 saniye arasında olmalıdır");
+            return;
+        }
+        
+        if (dailyLimit < 0 || dailyLimit > 100) {
+            showError("Günlük limit 0-100 arasında olmalıdır");
+            return;
+        }
+        
+        playButtonSound();
+        
+        try {
+            await db.ref('settings/ads').set({
+                default_ads: defaultAds,
+                premium_ads: premiumAds,
+                duration: duration,
+                daily_limit: dailyLimit,
+                updated_at: firebase.database.ServerValue.TIMESTAMP
+            });
+            
+            showError("Reklam ayarları başarıyla kaydedildi!", false);
+            
+        } catch (error) {
+            console.error("Ad settings save error:", error);
+            showError("Ayarlar kaydedilirken bir hata oluştu");
+        }
+    };
+    
+    // REKLAM EKRANI SABİTLE
+    window.pinAdScreen = function() {
+        showConfirm(
+            'Ekran Sabitle',
+            'Reklam izleme ekranını sabitlemek istediğinize emin misiniz?',
+            'pinAdScreenConfirm'
+        );
+    };
+    
+    function pinAdScreenConfirm() {
+        // Bu fonksiyon gerçek implementasyonda doldurulacak
+        showError("Bu özellik yakında eklenecektir");
+    }
+    
+    // EKRAN SABİTLE
+    window.pinScreen = function(screen) {
+        const screenNames = {
+            'home': 'Ana Sayfa',
+            'pdf-list': 'PDF Listesi',
+            'profile': 'Profil'
+        };
+        
+        showConfirm(
+            'Ekran Sabitle',
+            `${screenNames[screen]} ekranını sabitlemek istediğinize emin misiniz?`,
+            'pinScreenConfirm',
+            { screen }
+        );
+    };
+    
+    function pinScreenConfirm() {
+        if (!pendingActionData) return;
+        
+        const { screen } = pendingActionData;
+        
+        // Bu fonksiyon gerçek implementasyonda doldurulacak
+        showError(`${screen} ekranı sabitlendi (demo)`, false);
+    }
+    
+    // SABİTLENMİŞ MESAJI GÜNCELLE
+    window.updatePinnedMessage = function() {
+        const message = document.getElementById('pinnedMessage').value.trim();
+        
+        if (!message) {
+            showError("Mesaj boş olamaz");
+            return;
+        }
+        
+        showError("Sabitlenmiş mesaj güncellendi!", false);
+    };
+    
+    // TEMİZLİK İŞLEMLERİ
+    window.cleanOldUsers = function() {
+        showConfirm(
+            'Eski Kullanıcıları Temizle',
+            '30 günden eski kullanıcıları silmek istediğinize emin misiniz?',
+            'cleanOldUsersConfirm'
+        );
+    };
+    
+    function cleanOldUsersConfirm() {
+        showError("Eski kullanıcılar temizlendi (demo)", false);
+    };
+    
+    window.cleanUnusedPdfs = function() {
+        showConfirm(
+            'Kullanılmayan PDF\'leri Sil',
+            'İndirilmemiş PDF\'leri silmek istediğinize emin misiniz?',
+            'cleanUnusedPdfsConfirm'
+        );
+    };
+    
+    function cleanUnusedPdfsConfirm() {
+        showError("Kullanılmayan PDF'ler silindi (demo)", false);
+    };
+    
+    window.resetStatistics = function() {
+        showConfirm(
+            'İstatistikleri Sıfırla',
+            'Tüm istatistikleri sıfırlamak istediğinize emin misiniz?',
+            'resetStatisticsConfirm'
+        );
+    };
+    
+    function resetStatisticsConfirm() {
+        showError("İstatistikler sıfırlandı (demo)", false);
+    };
     
     // HATA GÖSTERME
-    function showError(message) {
+    function showError(message, isError = true) {
         const modal = document.getElementById('errorModal');
         const messageElement = document.getElementById('errorModalMessage');
         
         messageElement.textContent = message;
+        
+        if (!isError) {
+            messageElement.style.color = 'var(--success-color)';
+            document.querySelector('#errorModal h3').innerHTML = `
+                <i class="fas fa-check-circle" style="color: var(--success-color); margin-right: 8px;"></i>
+                Başarılı!
+            `;
+        } else {
+            messageElement.style.color = '';
+            document.querySelector('#errorModal h3').innerHTML = `
+                <i class="fas fa-exclamation-triangle" style="color: var(--danger-color); margin-right: 8px;"></i>
+                Hata!
+            `;
+        }
+        
         modal.classList.remove('hidden');
     }
     
     function closeModal(modalId) {
         document.getElementById(modalId).classList.add('hidden');
     }
+    
+    // ONAY MODALI
+    function showConfirm(title, message, action, data = null) {
+        playButtonSound();
+        
+        document.getElementById('confirmModalTitle').textContent = title;
+        document.getElementById('confirmModalMessage').textContent = message;
+        
+        pendingAction = action;
+        pendingActionData = data;
+        
+        document.getElementById('confirmModal').classList.remove('hidden');
+    }
+    
+    window.confirmAction = function(confirmed) {
+        playButtonSound();
+        
+        document.getElementById('confirmModal').classList.add('hidden');
+        
+        if (confirmed && pendingAction) {
+            switch(pendingAction) {
+                case 'exportUsersConfirm':
+                    exportUsersConfirm();
+                    break;
+                case 'deletePdfConfirm':
+                    deletePdfConfirm();
+                    break;
+                case 'deleteUserConfirm':
+                    deleteUserConfirm();
+                    break;
+                case 'pinAdScreenConfirm':
+                    pinAdScreenConfirm();
+                    break;
+                case 'pinScreenConfirm':
+                    pinScreenConfirm();
+                    break;
+                case 'cleanOldUsersConfirm':
+                    cleanOldUsersConfirm();
+                    break;
+                case 'cleanUnusedPdfsConfirm':
+                    cleanUnusedPdfsConfirm();
+                    break;
+                case 'resetStatisticsConfirm':
+                    resetStatisticsConfirm();
+                    break;
+            }
+        }
+        
+        pendingAction = null;
+        pendingActionData = null;
+    };
     
     // KULLANICI KAYDI
     async function saveUserToDatabase(user) {
@@ -2031,6 +3279,11 @@
             db.ref('pdfs/' + key).child('downloads').transaction(current => {
                 return (current || 0) + 1;
             });
+            
+            // Kullanıcı istatistiklerini güncelle
+            db.ref(`users/${currentUser.id}/total_downloads`).transaction(current => {
+                return (current || 0) + 1;
+            });
         }
         
         // Linki aç
@@ -2051,8 +3304,11 @@
             
             setTimeout(() => {
                 fetchPDFList();
-                if (document.getElementById('adminFrame').classList.contains('hidden') === false) {
-                    loadFeaturedContent();
+                if (!document.getElementById('adminFrame').classList.contains('hidden')) {
+                    loadStatistics();
+                    loadPopularPdfs();
+                    loadNewPdfs();
+                    loadAdminPdfs();
                 }
             }, 500);
         }, 100);
@@ -2076,9 +3332,6 @@
             newPage.classList.add('active');
             
             if (tabId === 'profile') {
-                newPage.style.overflowY = 'auto';
-                newPage.style.webkitOverflowScrolling = 'touch';
-                
                 setTimeout(() => {
                     fetchAndShowProfileInfo(currentUser?.id);
                 }, 10);
@@ -2152,6 +3405,23 @@
                     createdElement.textContent = date.toLocaleDateString('tr-TR');
                 }
             }
+            
+            // Kullanıcı istatistiklerini yükle
+            if (userData?.total_downloads) {
+                document.getElementById('user-total-downloads').textContent = userData.total_downloads;
+            }
+            
+            if (userData?.total_ads_watched) {
+                document.getElementById('user-total-ads').textContent = userData.total_ads_watched;
+            }
+            
+            // Tamamlanan PDF'leri hesapla
+            if (userData?.pdf_progress) {
+                const completedPdfs = Object.values(userData.pdf_progress).filter(
+                    progress => progress.watched_ads >= progress.required_ads
+                ).length;
+                document.getElementById('user-completed-pdfs').textContent = completedPdfs;
+            }
         });
     };
     
@@ -2204,7 +3474,8 @@
             pdfsArray = pdfsArray.filter(pdf => {
                 const title = (pdf.title || '').toLowerCase();
                 const tags = (pdf.tags || '').toLowerCase();
-                return title.includes(currentCategory) || tags.includes(currentCategory);
+                const category = pdf.category || '';
+                return title.includes(currentCategory) || tags.includes(currentCategory) || category === currentCategory;
             });
         }
         
@@ -2213,15 +3484,16 @@
         if (searchText) {
             pdfsArray = pdfsArray.filter(pdf => {
                 const title = (pdf.title || '').toLowerCase();
-                return title.includes(searchText);
+                const description = (pdf.description || '').toLowerCase();
+                return title.includes(searchText) || description.includes(searchText);
             });
         }
         
         pdfsArray.sort((a, b) => {
-            if (currentSort === 'newest') {
+            if (currentSort === 'popular') {
+                return (b.downloads || 0) - (a.downloads || 0);
+            } else if (currentSort === 'newest') {
                 return (b.created_at || 0) - (a.created_at || 0);
-            } else if (currentSort === 'oldest') {
-                return (a.created_at || 0) - (b.created_at || 0);
             } else if (currentSort === 'name') {
                 return (a.title || '').localeCompare(b.title || '');
             }
@@ -2259,7 +3531,7 @@
         let html = '<div class="list-card">';
         
         pdfsArray.forEach((pdf, index) => {
-            const { key, title, url, required_ads, downloads } = pdf;
+            const { key, title, url, required_ads, downloads, category } = pdf;
             const safeTitle = (title || '').replace(/'/g, "&#39;");
             const safeUrl = (url || '').replace(/'/g, "&#39;");
             const requiredAds = parseInt(required_ads) || 0;
@@ -2303,6 +3575,7 @@
                                 ${statusText}
                             </span>
                             ${downloads ? ` • <i class="fas fa-download" style="margin-right: 3px;"></i>${downloads}` : ''}
+                            ${category ? ` • <i class="fas fa-folder" style="margin-right: 3px;"></i>${PDF_CATEGORIES[category] || category}` : ''}
                             <span class="host-tag">
                                 <i class="fab fa-${hostIcon}" style="margin-right: 3px;"></i>
                                 ${hostIcon === 'dropbox' ? 'Dropbox' : hostIcon === 'google-drive' ? 'Drive' : 'Cloud'}
@@ -2346,6 +3619,18 @@
         renderPDFs();
     };
     
+    // ZAMAN FORMATLAMA
+    function formatTimeAgo(timestamp) {
+        const now = Date.now();
+        const diff = now - timestamp;
+        
+        if (diff < 60000) return 'Az önce';
+        if (diff < 3600000) return `${Math.floor(diff / 60000)} dakika önce`;
+        if (diff < 86400000) return `${Math.floor(diff / 3600000)} saat önce`;
+        if (diff < 604800000) return `${Math.floor(diff / 86400000)} gün önce`;
+        return new Date(timestamp).toLocaleDateString('tr-TR');
+    }
+    
     // UYGULAMA BAŞLATMA
     document.addEventListener('DOMContentLoaded', function() {
         initializeApp();
@@ -2356,7 +3641,9 @@
                 e.target.closest('.nav-item') || 
                 e.target.closest('.list-item') ||
                 e.target.closest('.sort-button') ||
-                e.target.closest('.category-item')) {
+                e.target.closest('.category-item') ||
+                e.target.closest('.admin-tab') ||
+                e.target.closest('.admin-action-btn')) {
                 playButtonSound();
             }
         });
@@ -2480,13 +3767,23 @@
             });
         });
         
-        // Admin kartlarına direkt tıklama
+        // Öne çıkan içerikler butonlarına tıklama
         document.querySelectorAll('[onclick*="openAdminFrame"]').forEach(card => {
             card.style.cursor = 'pointer';
             card.addEventListener('click', function(e) {
                 e.stopPropagation();
                 playButtonSound();
                 openAdminFrame();
+            });
+        });
+        
+        // Admin panel butonlarına tıklama
+        document.querySelectorAll('[onclick*="openAdminPanel"]').forEach(card => {
+            card.style.cursor = 'pointer';
+            card.addEventListener('click', function(e) {
+                e.stopPropagation();
+                playButtonSound();
+                openAdminPanel();
             });
         });
         
