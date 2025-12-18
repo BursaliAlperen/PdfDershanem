@@ -1671,7 +1671,7 @@
     </div>
     
     <div class="admin-frame-content">
-        <!-- ADMIN TABS -->
+        <!-- ADMIN TABS - Sadece 3 tab -->
         <div class="admin-tabs">
             <div class="admin-tab active" onclick="switchAdminTab('stats')">
                 <i class="fas fa-chart-bar" style="margin-right: 8px;"></i>
@@ -1685,14 +1685,7 @@
                 <i class="fas fa-file-pdf" style="margin-right: 8px;"></i>
                 PDF Yönetimi
             </div>
-            <div class="admin-tab" onclick="switchAdminTab('ads')">
-                <i class="fas fa-ad" style="margin-right: 8px;"></i>
-                Reklam Ayarları
-            </div>
-            <div class="admin-tab" onclick="switchAdminTab('pin')">
-                <i class="fas fa-thumbtack" style="margin-right: 8px;"></i>
-                Pin Yönetimi
-            </div>
+            <!-- REKLAM AYARLARI VE PIN YÖNETİMİ KALDIRILDI -->
         </div>
         
         <!-- İSTATİSTİKLER TAB -->
@@ -1880,122 +1873,7 @@
             </div>
         </div>
         
-        <!-- REKLAM AYARLARI TAB -->
-        <div class="admin-section" id="adminAdsTab">
-            <div class="admin-form">
-                <h3 style="margin: 0 0 15px 0; font-size: 18px; color: var(--telegram-blue); display: flex; align-items: center; gap: 10px;">
-                    <i class="fas fa-adjust"></i>
-                    Reklam Ayarları
-                </h3>
-                
-                <div class="form-group">
-                    <label class="form-label">Varsayılan Reklam Sayısı (1-99)</label>
-                    <input type="number" class="form-input" id="defaultAdsCount" min="1" max="99" value="5">
-                    <div style="font-size: 12px; color: var(--hint-color); margin-top: 5px;">
-                        <i class="fas fa-info-circle"></i> Yeni PDF'ler için varsayılan reklam sayısı
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Premium Reklam Sayısı</label>
-                    <input type="number" class="form-input" id="premiumAdsCount" min="0" max="10" value="1">
-                    <div style="font-size: 12px; color: var(--hint-color); margin-top: 5px;">
-                        <i class="fas fa-info-circle"></i> Premium kullanıcılar için gerekli reklam sayısı (0 = ücretsiz)
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Reklam Süresi (saniye)</label>
-                    <input type="number" class="form-input" id="adDuration" min="5" max="60" value="30">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Günlük Reklam Limiti</label>
-                    <input type="number" class="form-input" id="dailyAdLimit" min="0" max="100" value="20">
-                    <div style="font-size: 12px; color: var(--hint-color); margin-top: 5px;">
-                        <i class="fas fa-info-circle"></i> 0 = limitsiz
-                    </div>
-                </div>
-                
-                <button class="action-button" onclick="saveAdSettings()">
-                    <i class="fas fa-save" style="margin-right: 10px;"></i>
-                    Ayarları Kaydet
-                </button>
-            </div>
-            
-            <div class="pin-section">
-                <h3 style="margin: 0 0 10px 0; font-size: 16px; color: var(--warning-color);">
-                    <i class="fas fa-exclamation-triangle" style="margin-right: 8px;"></i>
-                    Reklam Ekranı Ayarları
-                </h3>
-                <p style="font-size: 14px; color: var(--hint-color); margin-bottom: 15px;">
-                    Reklam izleme ekranı için pin ayarları
-                </p>
-                <button class="action-button" onclick="pinAdScreen()" style="background: var(--warning-gradient);">
-                    <i class="fas fa-thumbtack" style="margin-right: 10px;"></i>
-                    Reklam Ekranını Sabitle
-                </button>
-            </div>
-        </div>
-        
-        <!-- PIN YÖNETİMİ TAB -->
-        <div class="admin-section" id="adminPinTab">
-            <div class="pin-section">
-                <h3 style="margin: 0 0 10px 0; font-size: 18px; color: var(--telegram-blue);">
-                    <i class="fas fa-thumbtack" style="margin-right: 8px;"></i>
-                    Ekran Sabitleme
-                </h3>
-                <p style="font-size: 14px; color: var(--hint-color); margin-bottom: 20px;">
-                    Belirli ekranları kullanıcılar için sabitleyebilirsiniz
-                </p>
-                
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
-                    <button class="action-button" onclick="pinScreen('home')" style="background: var(--primary-gradient);">
-                        <i class="fas fa-home" style="margin-right: 10px;"></i>
-                        Ana Sayfayı Sabitle
-                    </button>
-                    <button class="action-button" onclick="pinScreen('pdf-list')" style="background: var(--danger-gradient);">
-                        <i class="fas fa-book" style="margin-right: 10px;"></i>
-                        PDF Listesini Sabitle
-                    </button>
-                    <button class="action-button" onclick="pinScreen('profile')" style="background: var(--accent-gradient);">
-                        <i class="fas fa-user" style="margin-right: 10px;"></i>
-                        Profili Sabitle
-                    </button>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Özel Mesaj (Sabitlenmiş Ekranda Gösterilecek)</label>
-                    <textarea class="form-textarea" id="pinnedMessage" placeholder="Sabitlenmiş ekranda gösterilecek mesaj...">📚 PDF Dershanem Bot - En kaliteli PDF'ler burada! 🚀</textarea>
-                </div>
-                
-                <button class="action-button" onclick="updatePinnedMessage()" style="background: var(--success-gradient);">
-                    <i class="fas fa-bullhorn" style="margin-right: 10px;"></i>
-                    Mesajı Güncelle
-                </button>
-            </div>
-            
-            <div style="margin-top: 25px;">
-                <h4 style="margin: 0 0 10px 0; color: var(--text-color);">
-                    <i class="fas fa-trash-alt" style="margin-right: 8px;"></i>
-                    Temizlik İşlemleri
-                </h4>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
-                    <button class="action-button" onclick="cleanOldUsers()" style="background: var(--warning-gradient); font-size: 14px;">
-                        <i class="fas fa-user-slash" style="margin-right: 8px;"></i>
-                        Eski Kullanıcıları Temizle
-                    </button>
-                    <button class="action-button" onclick="cleanUnusedPdfs()" style="background: var(--danger-gradient); font-size: 14px;">
-                        <i class="fas fa-trash" style="margin-right: 8px;"></i>
-                        Kullanılmayan PDF'leri Sil
-                    </button>
-                    <button class="action-button" onclick="resetStatistics()" style="background: var(--accent-gradient); font-size: 14px;">
-                        <i class="fas fa-redo" style="margin-right: 8px;"></i>
-                        İstatistikleri Sıfırla
-                    </button>
-                </div>
-            </div>
-        </div>
+        <!-- REKLAM AYARLARI VE PIN YÖNETİMİ KALDIRILDI -->
     </div>
 </div>
 
@@ -2040,14 +1918,14 @@
                     <i class="fas fa-fire" style="color: var(--warning-color);"></i>
                     Popüler PDF'ler
                 </div>
-                <button class="action-button" onclick="openAdminFrame()" style="width: auto; padding: 8px 12px; font-size: 12px; margin: 0;">
+                <button class="action-button" onclick="openPopularPdfs()" style="width: auto; padding: 8px 12px; font-size: 12px; margin: 0;">
                     <i class="fas fa-rocket" style="margin-right: 5px;"></i>
                     Tümünü Gör
                 </button>
             </div>
             
             <div class="downloaded-items" id="homePopularPdfs">
-                <div class="downloaded-item" onclick="openAdminFrame()">
+                <div class="downloaded-item" onclick="openPopularPdfs()">
                     <div class="downloaded-item-icon" style="background: linear-gradient(135deg, #FF5722 0%, #FF9800 100%);">
                         <i class="fas fa-fire"></i>
                     </div>
@@ -2351,22 +2229,6 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- ADMIN PANEL BUTTON (SADECE ADMIN) -->
-            <div class="list-card hidden" id="adminPanelCardProfile" onclick="openAdminPanel()">
-                <div class="list-item">
-                    <div class="list-icon icon-admin">
-                        <i class="fas fa-crown"></i>
-                    </div>
-                    <div class="list-info">
-                        <div class="list-name">Admin Paneli</div>
-                        <div class="list-detail">Sistem yönetimi ve istatistikler</div>
-                    </div>
-                    <div class="list-meta" style="color: #FFD700;">
-                        <i class="fas fa-lock"></i>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -2593,12 +2455,11 @@
         // Admin kontrolü
         if (is_admin) {
             document.getElementById('adminPanelCard')?.classList?.remove('hidden');
-            document.getElementById('adminPanelCardProfile')?.classList?.remove('hidden');
         }
     }
     
     // YENİ ADMIN FUNCTIONS
-    window.openAdminFrame = function() {
+    window.openPopularPdfs = function() {
         playButtonSound();
         if (window.Telegram && Telegram.WebApp) {
             Telegram.WebApp.HapticFeedback.impactOccurred('medium');
@@ -2613,7 +2474,12 @@
         document.getElementById('app').classList.add('hidden');
         document.querySelector('.admin-tabs').classList.add('hidden');
         
-        switchAdminTab('stats');
+        // Sadece istatistikler sekmesini göster
+        document.querySelectorAll('.admin-section').forEach(section => {
+            section.classList.remove('active');
+        });
+        document.getElementById('adminStatsTab').classList.add('active');
+        
         loadStatistics();
         loadPopularPdfs();
         loadNewPdfs();
@@ -2638,7 +2504,22 @@
         
         document.getElementById('app').classList.add('hidden');
         document.querySelector('.admin-tabs').classList.remove('hidden');
-        switchAdminTab('stats');
+        
+        // Tüm admin section'ları gizle, sadece stats'i göster
+        document.querySelectorAll('.admin-section').forEach(section => {
+            section.classList.remove('active');
+        });
+        document.getElementById('adminStatsTab').classList.add('active');
+        
+        // Tab'ları güncelle
+        document.querySelectorAll('.admin-tab').forEach(tab => {
+            tab.classList.remove('active');
+            if (tab.textContent.includes('İstatistikler')) {
+                tab.classList.add('active');
+            }
+        });
+        
+        // Verileri yükle
         loadStatistics();
         loadPopularPdfs();
         loadNewPdfs();
@@ -2656,6 +2537,12 @@
     window.switchAdminTab = function(tabName) {
         playButtonSound();
         
+        // Sadece izin verilen tab'lar
+        const allowedTabs = ['stats', 'users', 'pdfs'];
+        if (!allowedTabs.includes(tabName)) {
+            return;
+        }
+        
         document.querySelectorAll('.admin-tab').forEach(tab => {
             tab.classList.remove('active');
         });
@@ -2667,8 +2554,7 @@
         document.querySelectorAll('.admin-tab').forEach(tab => {
             if (tab.textContent.includes(tabName === 'stats' ? 'İstatistikler' : 
                                         tabName === 'users' ? 'Kullanıcılar' :
-                                        tabName === 'pdfs' ? 'PDF Yönetimi' :
-                                        tabName === 'ads' ? 'Reklam Ayarları' : 'Pin Yönetimi')) {
+                                        'PDF Yönetimi')) {
                 tab.classList.add('active');
             }
         });
@@ -2688,9 +2574,6 @@
                     break;
                 case 'pdfs':
                     loadAdminPdfs();
-                    break;
-                case 'ads':
-                    loadAdSettings();
                     break;
             }
         }
@@ -3288,159 +3171,6 @@
         }
     }
     
-    // REKLAM AYARLARI YÜKLE
-    async function loadAdSettings() {
-        if (!db || !is_admin) return;
-        
-        try {
-            const settingsSnapshot = await db.ref('settings/ads').once('value');
-            const settings = settingsSnapshot.val() || {};
-            
-            document.getElementById('defaultAdsCount').value = settings.default_ads || 5;
-            document.getElementById('premiumAdsCount').value = settings.premium_ads || 1;
-            document.getElementById('adDuration').value = settings.duration || 30;
-            document.getElementById('dailyAdLimit').value = settings.daily_limit || 20;
-            
-        } catch (error) {
-            console.error("Ad settings loading error:", error);
-        }
-    }
-    
-    // REKLAM AYARLARI KAYDET
-    window.saveAdSettings = async function() {
-        if (!db || !is_admin) {
-            showError("Bu işlem için yetkiniz yok");
-            return;
-        }
-        
-        const defaultAds = parseInt(document.getElementById('defaultAdsCount').value) || 5;
-        const premiumAds = parseInt(document.getElementById('premiumAdsCount').value) || 1;
-        const duration = parseInt(document.getElementById('adDuration').value) || 30;
-        const dailyLimit = parseInt(document.getElementById('dailyAdLimit').value) || 20;
-        
-        if (defaultAds < 1 || defaultAds > 99) {
-            showError("Varsayılan reklam sayısı 1-99 arasında olmalıdır");
-            return;
-        }
-        
-        if (premiumAds < 0 || premiumAds > 10) {
-            showError("Premium reklam sayısı 0-10 arasında olmalıdır");
-            return;
-        }
-        
-        if (duration < 5 || duration > 60) {
-            showError("Reklam süresi 5-60 saniye arasında olmalıdır");
-            return;
-        }
-        
-        if (dailyLimit < 0 || dailyLimit > 100) {
-            showError("Günlük limit 0-100 arasında olmalıdır");
-            return;
-        }
-        
-        playButtonSound();
-        
-        try {
-            await db.ref('settings/ads').set({
-                default_ads: defaultAds,
-                premium_ads: premiumAds,
-                duration: duration,
-                daily_limit: dailyLimit,
-                updated_at: firebase.database.ServerValue.TIMESTAMP
-            });
-            
-            showError("Reklam ayarları başarıyla kaydedildi!", false);
-            
-        } catch (error) {
-            console.error("Ad settings save error:", error);
-            showError("Ayarlar kaydedilirken bir hata oluştu");
-        }
-    };
-    
-    // REKLAM EKRANI SABİTLE
-    window.pinAdScreen = function() {
-        showConfirm(
-            'Ekran Sabitle',
-            'Reklam izleme ekranını sabitlemek istediğinize emin misiniz?',
-            'pinAdScreenConfirm'
-        );
-    };
-    
-    function pinAdScreenConfirm() {
-        showError("Bu özellik yakında eklenecektir");
-    }
-    
-    // EKRAN SABİTLE
-    window.pinScreen = function(screen) {
-        const screenNames = {
-            'home': 'Ana Sayfa',
-            'pdf-list': 'PDF Listesi',
-            'profile': 'Profil'
-        };
-        
-        showConfirm(
-            'Ekran Sabitle',
-            `${screenNames[screen]} ekranını sabitlemek istediğinize emin misiniz?`,
-            'pinScreenConfirm',
-            { screen }
-        );
-    };
-    
-    function pinScreenConfirm() {
-        if (!pendingActionData) return;
-        const { screen } = pendingActionData;
-        showError(`${screen} ekranı sabitlendi (demo)`, false);
-    }
-    
-    // SABİTLENMİŞ MESAJI GÜNCELLE
-    window.updatePinnedMessage = function() {
-        const message = document.getElementById('pinnedMessage').value.trim();
-        
-        if (!message) {
-            showError("Mesaj boş olamaz");
-            return;
-        }
-        
-        showError("Sabitlenmiş mesaj güncellendi!", false);
-    };
-    
-    // TEMİZLİK İŞLEMLERİ
-    window.cleanOldUsers = function() {
-        showConfirm(
-            'Eski Kullanıcıları Temizle',
-            '30 günden eski kullanıcıları silmek istediğinize emin misiniz?',
-            'cleanOldUsersConfirm'
-        );
-    };
-    
-    function cleanOldUsersConfirm() {
-        showError("Eski kullanıcılar temizlendi (demo)", false);
-    };
-    
-    window.cleanUnusedPdfs = function() {
-        showConfirm(
-            'Kullanılmayan PDF\'leri Sil',
-            'İndirilmemiş PDF\'leri silmek istediğinize emin misiniz?',
-            'cleanUnusedPdfsConfirm'
-        );
-    };
-    
-    function cleanUnusedPdfsConfirm() {
-        showError("Kullanılmayan PDF'ler silindi (demo)", false);
-    };
-    
-    window.resetStatistics = function() {
-        showConfirm(
-            'İstatistikleri Sıfırla',
-            'Tüm istatistikleri sıfırlamak istediğinize emin misiniz?',
-            'resetStatisticsConfirm'
-        );
-    };
-    
-    function resetStatisticsConfirm() {
-        showError("İstatistikler sıfırlandı (demo)", false);
-    };
-    
     // HATA GÖSTERME
     function showError(message, isError = true) {
         const modal = document.getElementById('errorModal');
@@ -3500,21 +3230,6 @@
                     break;
                 case 'deleteUserConfirm':
                     deleteUserConfirm();
-                    break;
-                case 'pinAdScreenConfirm':
-                    pinAdScreenConfirm();
-                    break;
-                case 'pinScreenConfirm':
-                    pinScreenConfirm();
-                    break;
-                case 'cleanOldUsersConfirm':
-                    cleanOldUsersConfirm();
-                    break;
-                case 'cleanUnusedPdfsConfirm':
-                    cleanUnusedPdfsConfirm();
-                    break;
-                case 'resetStatisticsConfirm':
-                    resetStatisticsConfirm();
                     break;
             }
         }
@@ -4385,6 +4100,14 @@
     document.addEventListener('DOMContentLoaded', function() {
         initializeApp();
         
+        // Admin kontrolü - Ana sayfadaki admin panel butonunu göster/gizle
+        if (is_admin) {
+            const adminPanelCard = document.getElementById('adminPanelCard');
+            if (adminPanelCard) {
+                adminPanelCard.classList.remove('hidden');
+            }
+        }
+        
         // Tüm butonlara tıklanınca ses efekti ekle
         document.addEventListener('click', function(e) {
             if (e.target.closest('.action-button') || 
@@ -4522,12 +4245,12 @@
         });
         
         // Öne çıkan içerikler butonlarına tıklama
-        document.querySelectorAll('[onclick*="openAdminFrame"]').forEach(card => {
+        document.querySelectorAll('[onclick*="openPopularPdfs"]').forEach(card => {
             card.style.cursor = 'pointer';
             card.addEventListener('click', function(e) {
                 e.stopPropagation();
                 playButtonSound();
-                openAdminFrame();
+                openPopularPdfs();
             });
         });
         
