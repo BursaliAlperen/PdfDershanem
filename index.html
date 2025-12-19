@@ -457,7 +457,7 @@
         .icon-home { background: var(--primary-gradient); }
         .icon-profile { background: var(--accent-gradient); }
         .icon-info { background: var(--success-gradient); }
-        .icon-admin { background: var(--warning-gradient); }
+        .icon-admin { background: linear-gradient(135deg, #9C27B0 0%, #673AB7 100%); }
         .icon-sponsor { background: linear-gradient(135deg, #0088cc 0%, #00aced 100%); }
         .icon-featured { background: linear-gradient(135deg, #9C27B0 0%, #673AB7 100%); }
         .icon-popular { background: linear-gradient(135deg, #FF5722 0%, #FF9800 100%); }
@@ -1303,6 +1303,29 @@
             </div>
         </div>
         
+        <!-- ADMIN PANEL - SADECE ADMİNLER İÇİN -->
+        <div id="admin-section" style="padding: 20px 20px 10px; display: none;">
+            <div style="font-size: 12px; color: var(--hint-color); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                <i class="fas fa-shield-alt" style="margin-right: 6px;"></i>
+                YÖNETİM PANELİ
+            </div>
+        </div>
+        
+        <div id="admin-card" class="list-card" style="display: none;" onclick="changeTab('admin-panel')">
+            <div class="list-item">
+                <div class="list-icon" style="background: linear-gradient(135deg, #9C27B0 0%, #673AB7 100%);">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="list-info">
+                    <div class="list-name">Admin Paneli</div>
+                    <div class="list-detail">Yönetici araçları ve istatistikler</div>
+                </div>
+                <div class="list-meta">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+        </div>
+        
         <!-- ACCOUNT -->
         <div style="padding: 20px 20px 10px;">
             <div style="font-size: 12px; color: var(--hint-color); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
@@ -1448,6 +1471,143 @@
             </div>
             
             <!-- PROFİLDEN ADMIN VE POPÜLER BUTONLARI KALDIRILDI -->
+        </div>
+    </div>
+    
+    <!-- ADMIN PANEL PAGE -->
+    <div class="content-page" id="page-admin-panel">
+        <div class="app-header">
+            <h1 class="app-header-title">
+                <i class="fas fa-shield-alt"></i>
+                Admin Paneli
+            </h1>
+        </div>
+        
+        <div style="flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; width: 100%; padding-bottom: 20px;">
+            <!-- TOPLAM İSTATİSTİKLER -->
+            <div class="list-card">
+                <div style="padding: 25px 20px 15px;">
+                    <h3 style="margin: 0 0 15px 0; font-size: 18px; color: var(--telegram-blue); display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-chart-bar"></i>
+                        Genel İstatistikler
+                    </h3>
+                    
+                    <div class="list-item">
+                        <div class="list-icon" style="background: var(--primary-gradient);">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="list-info">
+                            <div class="list-name">Toplam Kullanıcı</div>
+                            <div class="list-detail" id="admin-total-users">Yükleniyor...</div>
+                        </div>
+                    </div>
+                    
+                    <div class="list-item">
+                        <div class="list-icon" style="background: var(--success-gradient);">
+                            <i class="fas fa-file-pdf"></i>
+                        </div>
+                        <div class="list-info">
+                            <div class="list-name">Toplam PDF</div>
+                            <div class="list-detail" id="admin-total-pdfs">Yükleniyor...</div>
+                        </div>
+                    </div>
+                    
+                    <div class="list-item">
+                        <div class="list-icon" style="background: var(--warning-gradient);">
+                            <i class="fas fa-download"></i>
+                        </div>
+                        <div class="list-info">
+                            <div class="list-name">Toplam İndirme</div>
+                            <div class="list-detail" id="admin-total-downloads">Yükleniyor...</div>
+                        </div>
+                    </div>
+                    
+                    <div class="list-item">
+                        <div class="list-icon" style="background: var(--danger-gradient);">
+                            <i class="fas fa-ad"></i>
+                        </div>
+                        <div class="list-info">
+                            <div class="list-name">İzlenen Reklam</div>
+                            <div class="list-detail" id="admin-total-ads">Yükleniyor...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ADMIN ARAÇLARI -->
+            <div class="list-card" style="margin-top: 20px;">
+                <div style="padding: 25px 20px 15px;">
+                    <h3 style="margin: 0 0 15px 0; font-size: 18px; color: var(--telegram-blue); display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-tools"></i>
+                        Yönetici Araçları
+                    </h3>
+                    
+                    <div class="list-item" onclick="adminAddPDF()">
+                        <div class="list-icon" style="background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);">
+                            <i class="fas fa-plus-circle"></i>
+                        </div>
+                        <div class="list-info">
+                            <div class="list-name">Yeni PDF Ekle</div>
+                            <div class="list-detail">Kütüphaneye yeni PDF ekle</div>
+                        </div>
+                        <div class="list-meta">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="list-item" onclick="adminManagePDFs()">
+                        <div class="list-icon" style="background: linear-gradient(135deg, #2196F3 0%, #03A9F4 100%);">
+                            <i class="fas fa-edit"></i>
+                        </div>
+                        <div class="list-info">
+                            <div class="list-name">PDF'leri Yönet</div>
+                            <div class="list-detail">Mevcut PDF'leri düzenle/sil</div>
+                        </div>
+                        <div class="list-meta">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="list-item" onclick="adminViewUsers()">
+                        <div class="list-icon" style="background: linear-gradient(135deg, #9C27B0 0%, #673AB7 100%);">
+                            <i class="fas fa-user-cog"></i>
+                        </div>
+                        <div class="list-info">
+                            <div class="list-name">Kullanıcıları Yönet</div>
+                            <div class="list-detail">Kullanıcı istatistiklerini görüntüle</div>
+                        </div>
+                        <div class="list-meta">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="list-item" onclick="adminViewAnalytics()">
+                        <div class="list-icon" style="background: linear-gradient(135deg, #FF9800 0%, #FF5722 100%);">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="list-info">
+                            <div class="list-name">Detaylı Analiz</div>
+                            <div class="list-detail">Ayrıntılı istatistikler ve raporlar</div>
+                        </div>
+                        <div class="list-meta">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- HIZLI İŞLEMLER -->
+            <div style="padding: 20px;">
+                <button class="action-button" onclick="adminRefreshStats()" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);">
+                    <i class="fas fa-sync-alt" style="margin-right: 10px;"></i>
+                    İstatistikleri Yenile
+                </button>
+                
+                <button class="action-button" onclick="adminExportData()" style="background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%); margin-top: 10px;">
+                    <i class="fas fa-file-export" style="margin-right: 10px;"></i>
+                    Verileri Dışa Aktar
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -2295,6 +2455,12 @@
                     fetchPDFList();
                 }, 10);
             }
+            
+            if (tabId === 'admin-panel') {
+                setTimeout(() => {
+                    loadAdminStatistics();
+                }, 10);
+            }
         }
         
         const navItems = document.querySelectorAll('.nav-item');
@@ -2309,7 +2475,75 @@
         }
     };
     
-    // PROFİL BİLGİSİ - ADMIN VE POPÜLER BUTONLARI KALDIRILDI
+    // ADMIN PANEL KONTROLÜ
+    function checkAndShowAdminPanel() {
+        if (is_admin) {
+            document.getElementById('admin-section').style.display = 'block';
+            document.getElementById('admin-card').style.display = 'block';
+        }
+    }
+    
+    // ADMIN İSTATİSTİKLERİ YÜKLE
+    async function loadAdminStatistics() {
+        if (!db || !is_admin) return;
+        
+        try {
+            // Toplam kullanıcı sayısı
+            const usersSnapshot = await db.ref('users').once('value');
+            const totalUsers = usersSnapshot.numChildren();
+            document.getElementById('admin-total-users').textContent = totalUsers;
+            
+            // Toplam PDF sayısı
+            const pdfsSnapshot = await db.ref('pdfs').once('value');
+            const totalPDFs = pdfsSnapshot.numChildren();
+            document.getElementById('admin-total-pdfs').textContent = totalPDFs;
+            
+            // Toplam indirme sayısı
+            let totalDownloads = 0;
+            pdfsSnapshot.forEach(pdf => {
+                totalDownloads += (pdf.val().downloads || 0);
+            });
+            document.getElementById('admin-total-downloads').textContent = totalDownloads;
+            
+            // Toplam izlenen reklam
+            const adsSnapshot = await db.ref('analytics/total_ads_watched').once('value');
+            const totalAds = adsSnapshot.val() || 0;
+            document.getElementById('admin-total-ads').textContent = totalAds;
+            
+        } catch (error) {
+            console.error("Admin istatistik yükleme hatası:", error);
+        }
+    }
+    
+    // ADMIN FONKSİYONLARI
+    function adminAddPDF() {
+        showError("PDF ekleme özelliği yakında eklenecek!", false);
+    }
+    
+    function adminManagePDFs() {
+        showError("PDF yönetimi yakında eklenecek!", false);
+    }
+    
+    function adminViewUsers() {
+        showError("Kullanıcı yönetimi yakında eklenecek!", false);
+    }
+    
+    function adminViewAnalytics() {
+        showError("Analiz paneli yakında eklenecek!", false);
+    }
+    
+    function adminRefreshStats() {
+        playButtonSound();
+        loadAdminStatistics();
+        showError("İstatistikler yenilendi!", false);
+    }
+    
+    function adminExportData() {
+        playButtonSound();
+        showError("Veri dışa aktarma özelliği yakında eklenecek!", false);
+    }
+    
+    // PROFİL BİLGİSİ
     window.fetchAndShowProfileInfo = function(userId) {
         if (!db || !userId) return;
         
@@ -2704,6 +2938,13 @@
                 
                 try {
                     await saveUserToDatabase(currentUser);
+                    
+                    // Admin paneli kontrolü
+                    if (is_admin) {
+                        setTimeout(() => {
+                            checkAndShowAdminPanel();
+                        }, 500);
+                    }
                     
                     const splashScreen = document.getElementById('splashScreen');
                     const app = document.getElementById('app');
