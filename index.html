@@ -1081,6 +1081,196 @@
                 font-size: 10px;
             }
         }
+
+        /* ADMIN MODAL STYLLER */
+        .modal-overlay .modal-content {
+            animation: scaleIn 0.2s ease-out;
+        }
+
+        /* RANGE INPUT STYLING */
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(0,136,204,0.1);
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--telegram-blue);
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(0,136,204,0.3);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--telegram-blue);
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(0,136,204,0.3);
+        }
+
+        /* CHECKBOX VE RADIO STYLING */
+        input[type="checkbox"], input[type="radio"] {
+            accent-color: var(--telegram-blue);
+            cursor: pointer;
+        }
+
+        /* SELECT STYLING */
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230088cc' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 40px !important;
+        }
+
+        /* ANALİZ KARTLARI */
+        .analytics-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(0,136,204,0.1);
+            box-shadow: 0 2px 8px rgba(0,136,204,0.05);
+        }
+
+        .analytics-card h4 {
+            margin: 0 0 15px 0;
+            font-size: 16px;
+            color: var(--telegram-blue);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .analytics-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--telegram-blue);
+            margin-bottom: 5px;
+        }
+
+        .analytics-label {
+            font-size: 12px;
+            color: var(--hint-color);
+            margin-bottom: 8px;
+        }
+
+        /* GRAFİK STYLLERİ */
+        .chart-bar {
+            background: var(--primary-gradient);
+            border-radius: 4px 4px 0 0;
+            transition: height 0.3s ease;
+        }
+
+        .chart-container {
+            height: 200px;
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            padding: 20px 0;
+        }
+
+        /* YÖNETİM LİSTE STYLLERİ */
+        .admin-list-container {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .admin-list-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .admin-list-container::-webkit-scrollbar-track {
+            background: rgba(0,136,204,0.05);
+            border-radius: 3px;
+        }
+
+        .admin-list-container::-webkit-scrollbar-thumb {
+            background: rgba(0,136,204,0.2);
+            border-radius: 3px;
+        }
+
+        .admin-list-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(0,136,204,0.3);
+        }
+
+        /* BUTTON GRUPLARI */
+        .button-group {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .action-icon-button {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-icon-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .action-icon-button.edit {
+            background: rgba(33,150,243,0.1);
+            color: #2196F3;
+        }
+
+        .action-icon-button.delete {
+            background: rgba(220,53,69,0.1);
+            color: #dc3545;
+        }
+
+        .action-icon-button.pin {
+            background: rgba(255,193,7,0.1);
+            color: #ffc107;
+        }
+
+        /* YÖNETİM INPUT STYLLERİ */
+        .admin-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(0,136,204,0.2);
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .admin-input:focus {
+            outline: none;
+            border-color: var(--telegram-blue);
+            box-shadow: 0 0 0 3px rgba(0,136,204,0.1);
+        }
+
+        .admin-label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: var(--text-color);
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -1213,6 +1403,279 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- YENİ PDF EKLE MODALI -->
+<div class="modal-overlay hidden" id="addPDFModal">
+    <div class="modal-content" style="max-width: 500px;">
+        <h3 style="margin: 0 0 20px 0; font-size: 20px; color: var(--telegram-blue); display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-plus-circle"></i>
+            Yeni PDF Ekle
+        </h3>
+        
+        <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px;">
+            <div>
+                <label style="display: block; margin-bottom: 6px; font-weight: 600; color: var(--text-color);">
+                    <i class="fas fa-link" style="margin-right: 8px;"></i>
+                    Dropbox Linki
+                </label>
+                <input type="text" id="pdfDropboxLink" placeholder="https://www.dropbox.com/s/..." style="width: 100%; padding: 12px; border: 1px solid rgba(0,136,204,0.2); border-radius: 8px; font-size: 14px;">
+                <p style="font-size: 12px; color: var(--hint-color); margin-top: 5px;">
+                    Link analiz edilerek otomatik isim ve tür atanacak
+                </p>
+            </div>
+            
+            <div>
+                <label style="display: block; margin-bottom: 6px; font-weight: 600; color: var(--text-color);">
+                    <i class="fas fa-heading" style="margin-right: 8px;"></i>
+                    PDF Başlığı
+                </label>
+                <input type="text" id="pdfTitleInput" placeholder="Otomatik dolacak" style="width: 100%; padding: 12px; border: 1px solid rgba(0,136,204,0.2); border-radius: 8px; font-size: 14px;">
+            </div>
+            
+            <div>
+                <label style="display: block; margin-bottom: 6px; font-weight: 600; color: var(--text-color);">
+                    <i class="fas fa-tag" style="margin-right: 8px;"></i>
+                    Kategori
+                </label>
+                <select id="pdfCategorySelect" style="width: 100%; padding: 12px; border: 1px solid rgba(0,136,204,0.2); border-radius: 8px; font-size: 14px; background: white;">
+                    <option value="">Otomatik belirlenecek</option>
+                    <option value="tyt">TYT</option>
+                    <option value="ayt">AYT</option>
+                    <option value="yks">YKS</option>
+                    <option value="lgs">LGS</option>
+                    <option value="kpss">KPSS</option>
+                    <option value="ales">ALES</option>
+                    <option value="dgs">DGS</option>
+                    <option value="matematik">Matematik</option>
+                    <option value="fizik">Fizik</option>
+                    <option value="kimya">Kimya</option>
+                    <option value="biyoloji">Biyoloji</option>
+                    <option value="tarih">Tarih</option>
+                    <option value="coğrafya">Coğrafya</option>
+                    <option value="edebiyat">Edebiyat</option>
+                    <option value="felsefe">Felsefe</option>
+                    <option value="din">Din Kültürü</option>
+                    <option value="ingilizce">İngilizce</option>
+                    <option value="denemeler">Denemeler</option>
+                    <option value="notlar">Özet Notlar</option>
+                    <option value="soru-bankası">Soru Bankası</option>
+                    <option value="konu-anlatım">Konu Anlatım</option>
+                    <option value="yaprak-test">Yaprak Test</option>
+                    <option value="çıkmış-sorular">Çıkmış Sorular</option>
+                    <option value="diger">Diğer</option>
+                </select>
+            </div>
+            
+            <div>
+                <label style="display: block; margin-bottom: 6px; font-weight: 600; color: var(--text-color);">
+                    <i class="fas fa-ad" style="margin-right: 8px;"></i>
+                    Gerekli Reklam Sayısı (1-99)
+                </label>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="range" id="adsRange" min="1" max="99" value="5" style="flex: 1;">
+                    <span id="adsValue" style="font-weight: 600; color: var(--telegram-blue); min-width: 40px;">5</span>
+                </div>
+                <p style="font-size: 12px; color: var(--hint-color); margin-top: 5px;">
+                    Kullanıcı bu kadar reklam izlemeli
+                </p>
+            </div>
+            
+            <div>
+                <label style="display: block; margin-bottom: 6px; font-weight: 600; color: var(--text-color);">
+                    <i class="fas fa-star" style="margin-right: 8px;"></i>
+                    Özel İçerik
+                </label>
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                    <input type="checkbox" id="pdfExclusiveCheckbox" style="width: 18px; height: 18px;">
+                    <span>Sadece bizde olan içerik olarak işaretle</span>
+                </label>
+            </div>
+        </div>
+        
+        <div style="display: flex; gap: 10px;">
+            <button onclick="closeModal('addPDFModal')" class="action-button" style="background: var(--warning-gradient); flex: 1;">
+                <i class="fas fa-times" style="margin-right: 8px;"></i>
+                İptal
+            </button>
+            <button onclick="saveNewPDF()" class="action-button" style="background: var(--success-gradient); flex: 1;">
+                <i class="fas fa-save" style="margin-right: 8px;"></i>
+                PDF'i Kaydet
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- PDF YÖNETİM MODALI -->
+<div class="modal-overlay hidden" id="managePDFsModal">
+    <div class="modal-content" style="max-width: 800px; max-height: 90vh;">
+        <h3 style="margin: 0 0 20px 0; font-size: 20px; color: var(--telegram-blue); display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-edit"></i>
+            PDF'leri Yönet
+        </h3>
+        
+        <div style="margin-bottom: 20px;">
+            <div class="search-container" style="margin: 0 0 15px 0;">
+                <i class="fas fa-search search-icon"></i>
+                <input type="search" id="adminPdfSearch" placeholder="PDF ara..." style="width: 100%;">
+            </div>
+            
+            <div id="adminPDFsList" style="max-height: 400px; overflow-y: auto;">
+                <!-- PDF listesi buraya yüklenecek -->
+            </div>
+        </div>
+        
+        <div style="display: flex; gap: 10px;">
+            <button onclick="closeModal('managePDFsModal')" class="action-button" style="background: var(--warning-gradient); flex: 1;">
+                <i class="fas fa-times" style="margin-right: 8px;"></i>
+                Kapat
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- PDF DÜZENLEME MODALI -->
+<div class="modal-overlay hidden" id="editPDFModal">
+    <div class="modal-content" style="max-width: 500px;">
+        <h3 style="margin: 0 0 20px 0; font-size: 20px; color: var(--telegram-blue); display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-edit"></i>
+            PDF Düzenle
+        </h3>
+        
+        <div id="editPDFForm">
+            <!-- Form dinamik olarak doldurulacak -->
+        </div>
+        
+        <div style="display: flex; gap: 10px;">
+            <button onclick="closeModal('editPDFModal')" class="action-button" style="background: var(--warning-gradient); flex: 1;">
+                <i class="fas fa-times" style="margin-right: 8px;"></i>
+                İptal
+            </button>
+            <button onclick="savePDFChanges()" class="action-button" style="background: var(--success-gradient); flex: 1;">
+                <i class="fas fa-save" style="margin-right: 8px;"></i>
+                Kaydet
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- KULLANICI YÖNETİMİ MODALI -->
+<div class="modal-overlay hidden" id="userManagementModal">
+    <div class="modal-content" style="max-width: 800px; max-height: 90vh;">
+        <h3 style="margin: 0 0 20px 0; font-size: 20px; color: var(--telegram-blue); display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-users-cog"></i>
+            Kullanıcı Yönetimi
+        </h3>
+        
+        <div style="margin-bottom: 20px;">
+            <div class="search-container" style="margin: 0 0 15px 0;">
+                <i class="fas fa-search search-icon"></i>
+                <input type="search" id="userSearchInput" placeholder="Kullanıcı adı veya ID ara..." style="width: 100%;">
+            </div>
+            
+            <div id="usersList" style="max-height: 400px; overflow-y: auto;">
+                <!-- Kullanıcı listesi buraya yüklenecek -->
+            </div>
+        </div>
+        
+        <div style="display: flex; gap: 10px;">
+            <button onclick="closeModal('userManagementModal')" class="action-button" style="background: var(--warning-gradient); flex: 1;">
+                <i class="fas fa-times" style="margin-right: 8px;"></i>
+                Kapat
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- DETAYLI ANALİZ MODALI -->
+<div class="modal-overlay hidden" id="analyticsModal">
+    <div class="modal-content" style="max-width: 800px; max-height: 90vh;">
+        <h3 style="margin: 0 0 20px 0; font-size: 20px; color: var(--telegram-blue); display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-chart-line"></i>
+            Detaylı Analiz
+        </h3>
+        
+        <div id="analyticsContent">
+            <!-- Analiz verileri buraya yüklenecek -->
+        </div>
+        
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button onclick="resetStatistics()" class="action-button" style="background: var(--danger-gradient); flex: 1;">
+                <i class="fas fa-redo" style="margin-right: 8px;"></i>
+                İstatistikleri Sıfırla
+            </button>
+            <button onclick="closeModal('analyticsModal')" class="action-button" style="background: var(--warning-gradient); flex: 1;">
+                <i class="fas fa-times" style="margin-right: 8px;"></i>
+                Kapat
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- SABİTLEME SEÇENEKLERİ MODALI -->
+<div class="modal-overlay hidden" id="pinOptionsModal">
+    <div class="modal-content" style="max-width: 400px;">
+        <h3 style="margin: 0 0 20px 0; font-size: 20px; color: var(--telegram-blue); display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-thumbtack"></i>
+            Sabitleme Seçenekleri
+        </h3>
+        
+        <div style="margin-bottom: 20px;">
+            <p style="margin-bottom: 15px; font-weight: 600;">Bu PDF'i nerede sabitlemek istiyorsunuz?</p>
+            
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <label style="display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid rgba(0,136,204,0.2); border-radius: 8px; cursor: pointer;">
+                    <input type="radio" name="pinOption" value="popular" checked style="width: 18px; height: 18px;">
+                    <div>
+                        <div style="font-weight: 600; color: var(--text-color);">
+                            <i class="fas fa-fire" style="margin-right: 8px; color: #FF5722;"></i>
+                            En Popülerler
+                        </div>
+                        <div style="font-size: 12px; color: var(--hint-color);">
+                            En çok indirilen PDF'ler arasında göster
+                        </div>
+                    </div>
+                </label>
+                
+                <label style="display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid rgba(0,136,204,0.2); border-radius: 8px; cursor: pointer;">
+                    <input type="radio" name="pinOption" value="exclusive" style="width: 18px; height: 18px;">
+                    <div>
+                        <div style="font-weight: 600; color: var(--text-color);">
+                            <i class="fas fa-crown" style="margin-right: 8px; color: #9C27B0;"></i>
+                            Sadece Bizde Olanlar
+                        </div>
+                        <div style="font-size: 12px; color: var(--hint-color);">
+                            Özel içerikler bölümünde göster
+                        </div>
+                    </div>
+                </label>
+                
+                <label style="display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid rgba(0,136,204,0.2); border-radius: 8px; cursor: pointer;">
+                    <input type="radio" name="pinOption" value="featured" style="width: 18px; height: 18px;">
+                    <div>
+                        <div style="font-weight: 600; color: var(--text-color);">
+                            <i class="fas fa-star" style="margin-right: 8px; color: #FF9800;"></i>
+                            Öne Çıkanlar
+                        </div>
+                        <div style="font-size: 12px; color: var(--hint-color);">
+                            Özel olarak öne çıkar
+                        </div>
+                    </div>
+                </label>
+            </div>
+        </div>
+        
+        <div style="display: flex; gap: 10px;">
+            <button onclick="closeModal('pinOptionsModal')" class="action-button" style="background: var(--warning-gradient); flex: 1;">
+                <i class="fas fa-times" style="margin-right: 8px;"></i>
+                İptal
+            </button>
+            <button onclick="confirmPinPDF()" class="action-button" style="background: var(--success-gradient); flex: 1;">
+                <i class="fas fa-thumbtack" style="margin-right: 8px;"></i>
+                Sabitle
+            </button>
         </div>
     </div>
 </div>
@@ -1705,6 +2168,8 @@
     let currentSort = 'popular';
     let pendingAction = null;
     let pendingActionData = null;
+    let editingPDFKey = null;
+    let currentAnalyticsData = null;
     
     // GENİŞLETİLMİŞ KATEGORİLER
     const PDF_CATEGORIES = {
@@ -2176,9 +2641,19 @@
         modal.classList.remove('hidden');
     }
     
-    function closeModal(modalId) {
+    window.closeModal = function(modalId) {
+        playButtonSound();
         document.getElementById(modalId).classList.add('hidden');
-    }
+        
+        if (modalId === 'editPDFModal') {
+            editingPDFKey = null;
+        }
+        
+        if (modalId === 'pinOptionsModal') {
+            pendingAction = null;
+            pendingActionData = null;
+        }
+    };
     
     // KULLANICI KAYDI
     async function saveUserToDatabase(user) {
@@ -2515,23 +2990,782 @@
         }
     }
     
+    // 1. YENİ PDF EKLEME SİSTEMİ
+    window.adminAddPDF = function() {
+        playButtonSound();
+        document.getElementById('addPDFModal').classList.remove('hidden');
+        
+        // Range değeri güncelleme
+        const adsRange = document.getElementById('adsRange');
+        const adsValue = document.getElementById('adsValue');
+        
+        adsRange.addEventListener('input', function() {
+            adsValue.textContent = this.value;
+        });
+        
+        // Dropbox link analizi
+        const dropboxInput = document.getElementById('pdfDropboxLink');
+        const titleInput = document.getElementById('pdfTitleInput');
+        
+        dropboxInput.addEventListener('blur', function() {
+            const link = this.value.trim();
+            if (link && link.includes('dropbox.com')) {
+                analyzeDropboxLink(link);
+            }
+        });
+    };
+    
+    async function analyzeDropboxLink(link) {
+        try {
+            // Linkten dosya adını çıkar
+            const urlParts = link.split('/');
+            let fileName = urlParts[urlParts.length - 1];
+            
+            // Parametreleri temizle
+            if (fileName.includes('?')) {
+                fileName = fileName.split('?')[0];
+            }
+            
+            // URL decode
+            fileName = decodeURIComponent(fileName);
+            
+            // .pdf uzantısını kaldır
+            fileName = fileName.replace('.pdf', '').replace('.PDF', '');
+            
+            // Özel karakterleri temizle ve formatla
+            fileName = fileName
+                .replace(/[_-]/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+            
+            // Başlık kısmını büyük harfle başlat
+            fileName = fileName.split(' ')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
+            
+            // Başlığı input'a yerleştir
+            document.getElementById('pdfTitleInput').value = fileName;
+            
+            // Kategoriyi otomatik belirle
+            const category = detectCategoryFromTitle(fileName);
+            if (category) {
+                document.getElementById('pdfCategorySelect').value = category;
+            }
+            
+        } catch (error) {
+            console.error("Link analiz hatası:", error);
+        }
+    }
+    
+    function detectCategoryFromTitle(title) {
+        const lowerTitle = title.toLowerCase();
+        
+        const categoryMap = {
+            'tyt': 'tyt',
+            'türkçe': 'tyt',
+            'temel yetenek': 'tyt',
+            'ayt': 'ayt',
+            'alan yeterlilik': 'ayt',
+            'yks': 'yks',
+            'lgs': 'lgs',
+            'kpss': 'kpss',
+            'ales': 'ales',
+            'dgs': 'dgs',
+            'matematik': 'matematik',
+            'geometri': 'matematik',
+            'fizik': 'fizik',
+            'kimya': 'kimya',
+            'biyoloji': 'biyoloji',
+            'tarih': 'tarih',
+            'coğrafya': 'coğrafya',
+            'edebiyat': 'edebiyat',
+            'türk edebiyatı': 'edebiyat',
+            'felsefe': 'felsefe',
+            'din': 'din',
+            'ingilizce': 'ingilizce',
+            'yabancı dil': 'ingilizce',
+            'deneme': 'denemeler',
+            'sınav': 'denemeler',
+            'not': 'notlar',
+            'özet': 'notlar',
+            'soru bankası': 'soru-bankası',
+            'sorubank': 'soru-bankası',
+            'konu anlatım': 'konu-anlatım',
+            'anlatım': 'konu-anlatım',
+            'yaprak test': 'yaprak-test',
+            'test': 'yaprak-test',
+            'çıkmış soru': 'çıkmış-sorular'
+        };
+        
+        for (const [keyword, category] of Object.entries(categoryMap)) {
+            if (lowerTitle.includes(keyword)) {
+                return category;
+            }
+        }
+        
+        return '';
+    }
+    
+    async function saveNewPDF() {
+        playButtonSound();
+        
+        const link = document.getElementById('pdfDropboxLink').value.trim();
+        const title = document.getElementById('pdfTitleInput').value.trim();
+        const category = document.getElementById('pdfCategorySelect').value;
+        const adsCount = parseInt(document.getElementById('adsRange').value);
+        const isExclusive = document.getElementById('pdfExclusiveCheckbox').checked;
+        
+        if (!link || !title) {
+            showError("Lütfen link ve başlık girin!");
+            return;
+        }
+        
+        if (!link.includes('dropbox.com')) {
+            showError("Lütfen geçerli bir Dropbox linki girin!");
+            return;
+        }
+        
+        try {
+            const pdfKey = 'pdf_' + Date.now();
+            const pdfData = {
+                key: pdfKey,
+                title: title,
+                url: link,
+                required_ads: adsCount,
+                category: category || 'diger',
+                is_exclusive: isExclusive,
+                downloads: 0,
+                created_at: firebase.database.ServerValue.TIMESTAMP,
+                last_updated: firebase.database.ServerValue.TIMESTAMP,
+                is_deleted: false
+            };
+            
+            await db.ref(`pdfs/${pdfKey}`).set(pdfData);
+            
+            closeModal('addPDFModal');
+            showError("PDF başarıyla eklendi!", false);
+            
+            // Formu temizle
+            document.getElementById('pdfDropboxLink').value = '';
+            document.getElementById('pdfTitleInput').value = '';
+            document.getElementById('pdfCategorySelect').value = '';
+            document.getElementById('adsRange').value = 5;
+            document.getElementById('adsValue').textContent = '5';
+            document.getElementById('pdfExclusiveCheckbox').checked = false;
+            
+            // Listeyi yenile
+            fetchPDFList();
+            
+        } catch (error) {
+            showError("PDF kaydedilemedi: " + error.message);
+        }
+    }
+    
+    // 2. PDF YÖNETİM SİSTEMİ
+    window.adminManagePDFs = async function() {
+        playButtonSound();
+        document.getElementById('managePDFsModal').classList.remove('hidden');
+        
+        try {
+            const pdfsSnapshot = await db.ref('pdfs').once('value');
+            const pdfs = pdfsSnapshot.val() || {};
+            
+            renderAdminPDFsList(pdfs);
+            
+            // Arama fonksiyonu
+            document.getElementById('adminPdfSearch').addEventListener('input', function() {
+                const searchText = this.value.toLowerCase();
+                renderAdminPDFsList(pdfs, searchText);
+            });
+            
+        } catch (error) {
+            showError("PDF'ler yüklenemedi: " + error.message);
+        }
+    };
+    
+    function renderAdminPDFsList(pdfs, searchText = '') {
+        const container = document.getElementById('adminPDFsList');
+        if (!container) return;
+        
+        let pdfsArray = Object.entries(pdfs)
+            .map(([key, pdf]) => ({ key, ...pdf }))
+            .filter(pdf => !pdf.is_deleted);
+        
+        if (searchText) {
+            pdfsArray = pdfsArray.filter(pdf => {
+                const title = (pdf.title || '').toLowerCase();
+                const category = (pdf.category || '').toLowerCase();
+                return title.includes(searchText) || category.includes(searchText);
+            });
+        }
+        
+        if (pdfsArray.length === 0) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 40px 20px; color: var(--hint-color);">
+                    <i class="fas fa-inbox" style="font-size: 30px; margin-bottom: 10px; opacity: 0.5;"></i>
+                    <p>PDF bulunamadı</p>
+                </div>
+            `;
+            return;
+        }
+        
+        let html = '<div style="display: flex; flex-direction: column; gap: 10px;">';
+        
+        pdfsArray.forEach(pdf => {
+            const { key, title, category, downloads, required_ads, is_exclusive } = pdf;
+            
+            html += `
+                <div class="list-item" style="border: 1px solid rgba(0,136,204,0.1); border-radius: 8px; padding: 15px; background: white;">
+                    <div style="display: flex; align-items: center; gap: 15px; width: 100%;">
+                        <div style="flex: 1; min-width: 0;">
+                            <div style="font-weight: 600; margin-bottom: 5px; color: var(--text-color);">
+                                ${title}
+                            </div>
+                            <div style="display: flex; flex-wrap: wrap; gap: 8px; font-size: 12px; color: var(--hint-color);">
+                                <span class="host-tag">
+                                    <i class="fas fa-folder" style="margin-right: 3px;"></i>
+                                    ${PDF_CATEGORIES[category] || category}
+                                </span>
+                                <span class="host-tag">
+                                    <i class="fas fa-download" style="margin-right: 3px;"></i>
+                                    ${downloads || 0} indirme
+                                </span>
+                                <span class="host-tag">
+                                    <i class="fas fa-ad" style="margin-right: 3px;"></i>
+                                    ${required_ads || 0} reklam
+                                </span>
+                                ${is_exclusive ? `
+                                    <span class="host-tag" style="background: rgba(156,39,176,0.1); color: #9C27B0;">
+                                        <i class="fas fa-crown" style="margin-right: 3px;"></i>
+                                        Özel
+                                    </span>
+                                ` : ''}
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 8px; flex-shrink: 0;">
+                            <button onclick="editPDF('${key}')" style="width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: rgba(33,150,243,0.1); color: #2196F3; border: none; cursor: pointer;">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deletePDF('${key}', '${title.replace(/'/g, "\\'")}')" style="width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: rgba(220,53,69,0.1); color: #dc3545; border: none; cursor: pointer;">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            <button onclick="showPinOptions('${key}')" style="width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: rgba(255,193,7,0.1); color: #ffc107; border: none; cursor: pointer;">
+                                <i class="fas fa-thumbtack"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += '</div>';
+        container.innerHTML = html;
+    }
+    
+    // 3. PDF DÜZENLEME
+    async function editPDF(pdfKey) {
+        playButtonSound();
+        editingPDFKey = pdfKey;
+        
+        try {
+            const pdfSnapshot = await db.ref(`pdfs/${pdfKey}`).once('value');
+            const pdfData = pdfSnapshot.val();
+            
+            if (!pdfData) {
+                showError("PDF bulunamadı!");
+                return;
+            }
+            
+            const formHtml = `
+                <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 6px; font-weight: 600; color: var(--text-color);">
+                            <i class="fas fa-heading" style="margin-right: 8px;"></i>
+                            PDF Başlığı
+                        </label>
+                        <input type="text" id="editPdfTitle" value="${pdfData.title || ''}" style="width: 100%; padding: 12px; border: 1px solid rgba(0,136,204,0.2); border-radius: 8px; font-size: 14px;">
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; margin-bottom: 6px; font-weight: 600; color: var(--text-color);">
+                            <i class="fas fa-link" style="margin-right: 8px;"></i>
+                            PDF Linki
+                        </label>
+                        <input type="text" id="editPdfUrl" value="${pdfData.url || ''}" style="width: 100%; padding: 12px; border: 1px solid rgba(0,136,204,0.2); border-radius: 8px; font-size: 14px;">
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; margin-bottom: 6px; font-weight: 600; color: var(--text-color);">
+                            <i class="fas fa-tag" style="margin-right: 8px;"></i>
+                            Kategori
+                        </label>
+                        <select id="editPdfCategory" style="width: 100%; padding: 12px; border: 1px solid rgba(0,136,204,0.2); border-radius: 8px; font-size: 14px; background: white;">
+                            ${Object.entries(PDF_CATEGORIES).map(([key, value]) => 
+                                `<option value="${key}" ${key === pdfData.category ? 'selected' : ''}>${value}</option>`
+                            ).join('')}
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; margin-bottom: 6px; font-weight: 600; color: var(--text-color);">
+                            <i class="fas fa-ad" style="margin-right: 8px;"></i>
+                            Gerekli Reklam Sayısı
+                        </label>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <input type="range" id="editAdsRange" min="0" max="99" value="${pdfData.required_ads || 0}" style="flex: 1;">
+                            <span id="editAdsValue" style="font-weight: 600; color: var(--telegram-blue); min-width: 40px;">${pdfData.required_ads || 0}</span>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; margin-bottom: 6px; font-weight: 600; color: var(--text-color);">
+                            <i class="fas fa-star" style="margin-right: 8px;"></i>
+                            Özel İçerik
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                            <input type="checkbox" id="editPdfExclusive" ${pdfData.is_exclusive ? 'checked' : ''} style="width: 18px; height: 18px;">
+                            <span>Sadece bizde olan içerik</span>
+                        </label>
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; margin-bottom: 6px; font-weight: 600; color: var(--text-color);">
+                            <i class="fas fa-ban" style="margin-right: 8px;"></i>
+                            Durum
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                            <input type="checkbox" id="editPdfDeleted" ${pdfData.is_deleted ? 'checked' : ''} style="width: 18px; height: 18px;">
+                            <span>PDF'i sil (gizle)</span>
+                        </label>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('editPDFForm').innerHTML = formHtml;
+            document.getElementById('editPDFModal').classList.remove('hidden');
+            
+            // Range değerini güncelle
+            const range = document.getElementById('editAdsRange');
+            const value = document.getElementById('editAdsValue');
+            
+            range.addEventListener('input', function() {
+                value.textContent = this.value;
+            });
+            
+        } catch (error) {
+            showError("PDF yüklenemedi: " + error.message);
+        }
+    }
+    
+    async function savePDFChanges() {
+        if (!editingPDFKey) return;
+        
+        playButtonSound();
+        
+        const title = document.getElementById('editPdfTitle').value.trim();
+        const url = document.getElementById('editPdfUrl').value.trim();
+        const category = document.getElementById('editPdfCategory').value;
+        const adsCount = parseInt(document.getElementById('editAdsRange').value);
+        const isExclusive = document.getElementById('editPdfExclusive').checked;
+        const isDeleted = document.getElementById('editPdfDeleted').checked;
+        
+        if (!title || !url) {
+            showError("Lütfen başlık ve link girin!");
+            return;
+        }
+        
+        try {
+            const updates = {
+                title: title,
+                url: url,
+                category: category,
+                required_ads: adsCount,
+                is_exclusive: isExclusive,
+                is_deleted: isDeleted,
+                last_updated: firebase.database.ServerValue.TIMESTAMP
+            };
+            
+            await db.ref(`pdfs/${editingPDFKey}`).update(updates);
+            
+            closeModal('editPDFModal');
+            showError("PDF başarıyla güncellendi!", false);
+            
+            // Listeleri yenile
+            adminManagePDFs();
+            fetchPDFList();
+            
+            editingPDFKey = null;
+            
+        } catch (error) {
+            showError("Güncelleme hatası: " + error.message);
+        }
+    }
+    
+    // 4. PDF SİLME
+    async function deletePDF(pdfKey, pdfTitle) {
+        playButtonSound();
+        
+        if (!confirm(`"${pdfTitle}" PDF'ini silmek istediğinize emin misiniz?\n\nBu işlem geri alınamaz!`)) {
+            return;
+        }
+        
+        try {
+            await db.ref(`pdfs/${pdfKey}`).update({
+                is_deleted: true,
+                last_updated: firebase.database.ServerValue.TIMESTAMP
+            });
+            
+            showError("PDF başarıyla silindi!", false);
+            
+            // Listeleri yenile
+            adminManagePDFs();
+            fetchPDFList();
+            
+        } catch (error) {
+            showError("Silme hatası: " + error.message);
+        }
+    }
+    
+    // 5. SABİTLEME SEÇENEKLERİ
+    function showPinOptions(pdfKey) {
+        playButtonSound();
+        pendingAction = 'pinPDF';
+        pendingActionData = pdfKey;
+        
+        document.getElementById('pinOptionsModal').classList.remove('hidden');
+    }
+    
+    async function confirmPinPDF() {
+        const option = document.querySelector('input[name="pinOption"]:checked').value;
+        const pdfKey = pendingActionData;
+        
+        try {
+            const updates = {};
+            
+            if (option === 'popular') {
+                updates[`pdfs/${pdfKey}/is_featured`] = true;
+                updates[`pdfs/${pdfKey}/featured_in_popular`] = true;
+            } else if (option === 'exclusive') {
+                updates[`pdfs/${pdfKey}/is_exclusive`] = true;
+                updates[`pdfs/${pdfKey}/featured_in_exclusive`] = true;
+            } else if (option === 'featured') {
+                updates[`pdfs/${pdfKey}/is_featured`] = true;
+                updates[`pdfs/${pdfKey}/featured_in_home`] = true;
+            }
+            
+            updates[`pdfs/${pdfKey}/last_updated`] = firebase.database.ServerValue.TIMESTAMP;
+            
+            await db.ref().update(updates);
+            
+            closeModal('pinOptionsModal');
+            showError("PDF başarıyla sabitlendi!", false);
+            
+            pendingAction = null;
+            pendingActionData = null;
+            
+        } catch (error) {
+            showError("Sabitleme hatası: " + error.message);
+        }
+    }
+    
+    // 6. KULLANICI YÖNETİMİ
+    window.adminViewUsers = async function() {
+        playButtonSound();
+        document.getElementById('userManagementModal').classList.remove('hidden');
+        
+        try {
+            const usersSnapshot = await db.ref('users').once('value');
+            const users = usersSnapshot.val() || {};
+            
+            renderUsersList(users);
+            
+            // Arama fonksiyonu
+            document.getElementById('userSearchInput').addEventListener('input', function() {
+                const searchText = this.value.toLowerCase();
+                renderUsersList(users, searchText);
+            });
+            
+        } catch (error) {
+            showError("Kullanıcılar yüklenemedi: " + error.message);
+        }
+    };
+    
+    function renderUsersList(users, searchText = '') {
+        const container = document.getElementById('usersList');
+        if (!container) return;
+        
+        let usersArray = Object.entries(users)
+            .map(([id, user]) => ({ id, ...user }));
+        
+        if (searchText) {
+            usersArray = usersArray.filter(user => {
+                const name = (user.first_name + ' ' + (user.last_name || '')).toLowerCase();
+                const username = (user.username || '').toLowerCase();
+                const idStr = user.id.toString();
+                
+                return name.includes(searchText) || 
+                       username.includes(searchText) || 
+                       idStr.includes(searchText);
+            });
+        }
+        
+        usersArray.sort((a, b) => (b.last_active || 0) - (a.last_active || 0));
+        
+        if (usersArray.length === 0) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 40px 20px; color: var(--hint-color);">
+                    <i class="fas fa-users" style="font-size: 30px; margin-bottom: 10px; opacity: 0.5;"></i>
+                    <p>Kullanıcı bulunamadı</p>
+                </div>
+            `;
+            return;
+        }
+        
+        let html = '<div style="display: flex; flex-direction: column; gap: 10px;">';
+        
+        usersArray.forEach(user => {
+            const { id, first_name, last_name, username, created_at, last_active, total_downloads, is_admin } = user;
+            const fullName = `${first_name || ''} ${last_name || ''}`.trim();
+            const joinDate = created_at ? new Date(created_at).toLocaleDateString('tr-TR') : '-';
+            const lastActive = last_active ? new Date(last_active).toLocaleDateString('tr-TR') : '-';
+            
+            html += `
+                <div class="list-item" style="border: 1px solid rgba(0,136,204,0.1); border-radius: 8px; padding: 15px; background: white;">
+                    <div style="display: flex; align-items: center; gap: 15px; width: 100%;">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--primary-gradient); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; flex-shrink: 0;">
+                            ${fullName.charAt(0).toUpperCase()}
+                        </div>
+                        
+                        <div style="flex: 1; min-width: 0;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                                <div style="font-weight: 600; color: var(--text-color);">
+                                    ${fullName || 'Kullanıcı'}
+                                    ${is_admin ? '<i class="fas fa-crown" style="color: #ffc107; margin-left: 5px;"></i>' : ''}
+                                </div>
+                                <div style="font-size: 11px; color: var(--hint-color);">
+                                    ID: ${id}
+                                </div>
+                            </div>
+                            
+                            <div style="display: flex; flex-wrap: wrap; gap: 8px; font-size: 12px; color: var(--hint-color);">
+                                ${username ? `
+                                    <span class="host-tag">
+                                        <i class="fas fa-at" style="margin-right: 3px;"></i>
+                                        ${username}
+                                    </span>
+                                ` : ''}
+                                
+                                <span class="host-tag">
+                                    <i class="fas fa-download" style="margin-right: 3px;"></i>
+                                    ${total_downloads || 0} indirme
+                                </span>
+                                
+                                <span class="host-tag">
+                                    <i class="fas fa-calendar-plus" style="margin-right: 3px;"></i>
+                                    ${joinDate}
+                                </span>
+                                
+                                <span class="host-tag">
+                                    <i class="fas fa-clock" style="margin-right: 3px;"></i>
+                                    ${lastActive}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += '</div>';
+        container.innerHTML = html;
+    }
+    
+    // 7. DETAYLI ANALİZ
+    window.adminViewAnalytics = async function() {
+        playButtonSound();
+        document.getElementById('analyticsModal').classList.remove('hidden');
+        
+        try {
+            const today = new Date().toISOString().slice(0, 10);
+            
+            // Günlük verileri al
+            const dailyAdsRef = db.ref('analytics/daily_ads_watched');
+            const dailyAdsSnapshot = await dailyAdsRef.once('value');
+            const dailyAds = dailyAdsSnapshot.val() || {};
+            
+            // Toplam verileri al
+            const totalAdsSnapshot = await db.ref('analytics/total_ads_watched').once('value');
+            const totalAds = totalAdsSnapshot.val() || 0;
+            
+            // Aktif kullanıcıları al (son 24 saat)
+            const usersSnapshot = await db.ref('users').once('value');
+            const users = usersSnapshot.val() || {};
+            
+            const now = Date.now();
+            const twentyFourHoursAgo = now - (24 * 60 * 60 * 1000);
+            
+            let dailyActiveUsers = 0;
+            let currentActiveUsers = 0;
+            const last5Minutes = now - (5 * 60 * 1000);
+            
+            Object.values(users).forEach(user => {
+                if (user.last_active > twentyFourHoursAgo) {
+                    dailyActiveUsers++;
+                }
+                if (user.last_active > last5Minutes) {
+                    currentActiveUsers++;
+                }
+            });
+            
+            // Günlük reklam izleme
+            const todayAds = dailyAds[today] || 0;
+            
+            // Analiz HTML'i oluştur
+            const analyticsHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 25px;">
+                    <div style="background: rgba(0,136,204,0.05); border: 1px solid rgba(0,136,204,0.1); border-radius: 10px; padding: 20px;">
+                        <div style="font-size: 12px; color: var(--hint-color); margin-bottom: 8px;">
+                            <i class="fas fa-calendar-day" style="margin-right: 6px;"></i>
+                            Bugünkü Reklam İzlenme
+                        </div>
+                        <div style="font-size: 28px; font-weight: 700; color: var(--telegram-blue);">
+                            ${todayAds}
+                        </div>
+                    </div>
+                    
+                    <div style="background: rgba(40,167,69,0.05); border: 1px solid rgba(40,167,69,0.1); border-radius: 10px; padding: 20px;">
+                        <div style="font-size: 12px; color: var(--hint-color); margin-bottom: 8px;">
+                            <i class="fas fa-users" style="margin-right: 6px;"></i>
+                            Günlük Aktif Kullanıcı
+                        </div>
+                        <div style="font-size: 28px; font-weight: 700; color: var(--success-color);">
+                            ${dailyActiveUsers}
+                        </div>
+                    </div>
+                    
+                    <div style="background: rgba(255,193,7,0.05); border: 1px solid rgba(255,193,7,0.1); border-radius: 10px; padding: 20px;">
+                        <div style="font-size: 12px; color: var(--hint-color); margin-bottom: 8px;">
+                            <i class="fas fa-user-clock" style="margin-right: 6px;"></i>
+                            Anlık Aktif Kullanıcı
+                        </div>
+                        <div style="font-size: 28px; font-weight: 700; color: var(--warning-color);">
+                            ${currentActiveUsers}
+                        </div>
+                    </div>
+                    
+                    <div style="background: rgba(220,53,69,0.05); border: 1px solid rgba(220,53,69,0.1); border-radius: 10px; padding: 20px;">
+                        <div style="font-size: 12px; color: var(--hint-color); margin-bottom: 8px;">
+                            <i class="fas fa-ad" style="margin-right: 6px;"></i>
+                            Toplam Reklam İzlenme
+                        </div>
+                        <div style="font-size: 28px; font-weight: 700; color: var(--danger-color);">
+                            ${totalAds}
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="background: rgba(0,136,204,0.05); border: 1px solid rgba(0,136,204,0.1); border-radius: 10px; padding: 20px;">
+                    <h4 style="margin: 0 0 15px 0; font-size: 16px; color: var(--telegram-blue);">
+                        <i class="fas fa-chart-bar" style="margin-right: 8px;"></i>
+                        Son 7 Günün Reklam İstatistikleri
+                    </h4>
+                    
+                    <div id="weeklyChart" style="height: 200px; display: flex; align-items: flex-end; gap: 10px; padding: 20px 0;">
+                        <!-- Grafik buraya çizilecek -->
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('analyticsContent').innerHTML = analyticsHTML;
+            
+            // Haftalık grafik oluştur
+            renderWeeklyChart(dailyAds);
+            
+            currentAnalyticsData = {
+                dailyAds: dailyAds,
+                totalAds: totalAds,
+                dailyActiveUsers: dailyActiveUsers,
+                currentActiveUsers: currentActiveUsers
+            };
+            
+        } catch (error) {
+            showError("Analiz verileri yüklenemedi: " + error.message);
+        }
+    };
+    
+    function renderWeeklyChart(dailyAds) {
+        const chartContainer = document.getElementById('weeklyChart');
+        if (!chartContainer) return;
+        
+        // Son 7 günü al
+        const dates = [];
+        const values = [];
+        
+        for (let i = 6; i >= 0; i--) {
+            const date = new Date();
+            date.setDate(date.getDate() - i);
+            const dateStr = date.toISOString().slice(0, 10);
+            dates.push(dateStr);
+            values.push(dailyAds[dateStr] || 0);
+        }
+        
+        // Maksimum değeri bul
+        const maxValue = Math.max(...values, 1);
+        
+        let chartHTML = '';
+        dates.forEach((date, index) => {
+            const value = values[index];
+            const heightPercent = (value / maxValue) * 100;
+            const dayName = new Date(date).toLocaleDateString('tr-TR', { weekday: 'short' });
+            
+            chartHTML += `
+                <div style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%;">
+                    <div style="flex: 1; display: flex; align-items: flex-end; width: 100%;">
+                        <div style="width: 100%; background: var(--primary-gradient); border-radius: 4px 4px 0 0; height: ${heightPercent}%; min-height: ${value > 0 ? '10px' : '0'};"></div>
+                    </div>
+                    <div style="margin-top: 10px; font-size: 12px; color: var(--hint-color); text-align: center;">
+                        <div style="font-weight: 600;">${dayName}</div>
+                        <div style="font-size: 11px;">${value}</div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        chartContainer.innerHTML = chartHTML;
+    }
+    
+    // 8. İSTATİSTİKLERİ SIFIRLA
+    async function resetStatistics() {
+        playButtonSound();
+        
+        if (!confirm("İstatistikleri sıfırlamak istediğinize emin misiniz?\n\n• Reklam istatistikleri sıfırlanacak\n• Kullanıcı istatistikleri KALACAK\n• Toplam kullanıcı sayısı değişmeyecek\n\nBu işlem geri alınamaz!")) {
+            return;
+        }
+        
+        try {
+            // Sadece reklam istatistiklerini sıfırla
+            const updates = {
+                'analytics/total_ads_watched': 0,
+                'analytics/daily_ads_watched': {}
+            };
+            
+            await db.ref().update(updates);
+            
+            showError("İstatistikler başarıyla sıfırlandı!", false);
+            
+            // Analiz modalını kapat ve yenile
+            closeModal('analyticsModal');
+            setTimeout(() => {
+                adminViewAnalytics();
+            }, 500);
+            
+        } catch (error) {
+            showError("Sıfırlama hatası: " + error.message);
+        }
+    }
+    
     // ADMIN FONKSİYONLARI
-    function adminAddPDF() {
-        showError("PDF ekleme özelliği yakında eklenecek!", false);
-    }
-    
-    function adminManagePDFs() {
-        showError("PDF yönetimi yakında eklenecek!", false);
-    }
-    
-    function adminViewUsers() {
-        showError("Kullanıcı yönetimi yakında eklenecek!", false);
-    }
-    
-    function adminViewAnalytics() {
-        showError("Analiz paneli yakında eklenecek!", false);
-    }
-    
     function adminRefreshStats() {
         playButtonSound();
         loadAdminStatistics();
