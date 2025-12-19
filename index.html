@@ -5,10 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
     <title>@Pdf_DershanemBot - PDF Kütüphanesi</title>
     
-    <!-- CHALPUS REKLAM KODLARI -->
+    <!-- TELEGRAM SCRIPT -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <!-- ADEXIUM REKLAM SCRIPT -->
+    <script type="text/javascript" src="https://cdn.tgads.space/assets/js/adexium-widget.min.js"></script>
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', () => {
+            const adexiumWidget = new AdexiumWidget({wid: '77e87d3c-5ac4-47e2-805f-231f60107300', adFormat: 'interstitial'});
+            adexiumWidget.autoMode();
+        });
+    </script>
+    
+    <!-- MONETAG (ESKİ CHALPUS) REKLAM SCRIPT -->
     <script src='//libtl.com/sdk.js' data-zone='10340134' data-sdk='show_10340134'></script>
     
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- FIREBASE -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script> 
@@ -337,27 +349,7 @@
             box-shadow: var(--card-shadow-hover);
         }
         
-        /* LIST ITEM */
-        .list-item {
-            display: flex;
-            padding: 18px 20px;
-            align-items: center;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.03);
-            cursor: pointer;
-            transition: var(--transition-smooth);
-            position: relative;
-            min-height: auto;
-        }
-        
-        .list-item:last-child {
-            border-bottom: none;
-        }
-        
-        .list-item:active {
-            background: rgba(0, 136, 204, 0.05);
-        }
-        
-        /* PDF ITEM WITHOUT PIN BUTTON */
+        /* PDF ITEM WITH COPY BUTTON */
         .pdf-item {
             display: flex;
             padding: 16px 20px;
@@ -374,6 +366,121 @@
         
         .pdf-item:hover {
             background: rgba(0, 136, 204, 0.05);
+        }
+        
+        /* KOPYALAMA BUTONU STİLLERİ */
+        .copy-button {
+            background: rgba(0, 136, 204, 0.1);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--telegram-blue);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            margin-left: 8px;
+            font-size: 14px;
+        }
+        
+        .copy-button:hover {
+            background: rgba(0, 136, 204, 0.2);
+            transform: scale(1.1);
+        }
+        
+        .copy-button.copied {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .copy-button .fa-download {
+            font-size: 14px;
+        }
+        
+        .copy-button .fa-copy {
+            font-size: 14px;
+        }
+        
+        /* DROPDOWN LINK STYLES */
+        .dropdown-link-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(0, 136, 204, 0.1);
+        }
+        
+        .dropdown-link-label {
+            font-size: 12px;
+            color: var(--hint-color);
+            font-weight: 500;
+        }
+        
+        .link-input-group {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .link-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid rgba(0, 136, 204, 0.2);
+            border-radius: 8px;
+            font-size: 12px;
+            background: white;
+            color: var(--text-color);
+            font-family: monospace;
+        }
+        
+        .link-copy-button {
+            padding: 8px 12px;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .link-copy-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 136, 204, 0.2);
+        }
+        
+        .link-copy-button.copied {
+            background: var(--success-gradient);
+        }
+        
+        /* CONFIRMATION MESSAGE */
+        .confirmation-message {
+            background: rgba(40, 167, 69, 0.1);
+            border: 1px solid rgba(40, 167, 69, 0.2);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .confirmation-message i {
+            color: var(--success-color);
+            font-size: 16px;
+        }
+        
+        .confirmation-text {
+            font-size: 12px;
+            color: var(--text-color);
+            line-height: 1.4;
         }
         
         /* ICONS */
@@ -504,26 +611,6 @@
             gap: 5px;
             word-break: break-word;
             overflow-wrap: break-word;
-        }
-        
-        /* PROFİL SAYFASI BOŞLUK AYARLARI */
-        #page-profile .list-card {
-            margin: 16px;
-        }
-        
-        #page-profile .list-item:nth-child(5) {
-            margin-bottom: 30px;
-        }
-        
-        /* Kayıt tarihi satırından sonra boşluk */
-        #page-profile .list-card .list-item:last-child {
-            margin-bottom: 40px !important;
-            padding-bottom: 20px;
-        }
-        
-        /* Profil sayfası içeriği için genel padding */
-        #page-profile > div {
-            padding-bottom: 50px;
         }
         
         /* BUTTONS */
@@ -944,12 +1031,6 @@
             white-space: nowrap;
         }
         
-        /* PROFILE PAGE - ADMIN VE POPÜLER BUTONLARI KALDIR */
-        .profile-admin-button,
-        .profile-popular-button {
-            display: none !important;
-        }
-        
         /* RESPONSIVE FIXES */
         @media (max-width: 768px) {
             .pinned-grid {
@@ -1048,15 +1129,6 @@
                 font-size: 11px;
             }
             
-            /* Profil sayfası mobil */
-            #page-profile .list-item:nth-child(5) {
-                margin-bottom: 25px;
-            }
-            
-            #page-profile .list-card .list-item:last-child {
-                margin-bottom: 35px !important;
-            }
-            
             /* Mobil search */
             .search-container {
                 margin: 16px;
@@ -1072,6 +1144,12 @@
                 width: 36px;
                 height: 36px;
                 right: 8px;
+            }
+            
+            .copy-button {
+                width: 30px;
+                height: 30px;
+                font-size: 12px;
             }
         }
         
@@ -1113,227 +1191,6 @@
                 padding: 5px 10px;
                 font-size: 10px;
             }
-        }
-
-        /* ADMIN MODAL STYLLER */
-        .modal-overlay .modal-content {
-            animation: scaleIn 0.2s ease-out;
-        }
-
-        /* RANGE INPUT STYLING */
-        input[type="range"] {
-            -webkit-appearance: none;
-            width: 100%;
-            height: 8px;
-            border-radius: 4px;
-            background: rgba(0,136,204,0.1);
-            outline: none;
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: var(--telegram-blue);
-            cursor: pointer;
-            border: 2px solid white;
-            box-shadow: 0 2px 6px rgba(0,136,204,0.3);
-        }
-
-        input[type="range"]::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: var(--telegram-blue);
-            cursor: pointer;
-            border: 2px solid white;
-            box-shadow: 0 2px 6px rgba(0,136,204,0.3);
-        }
-
-        /* CHECKBOX VE RADIO STYLING */
-        input[type="checkbox"], input[type="radio"] {
-            accent-color: var(--telegram-blue);
-            cursor: pointer;
-        }
-
-        /* SELECT STYLING */
-        select {
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230088cc' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 12px center;
-            background-size: 16px;
-            padding-right: 40px !important;
-        }
-
-        /* ANALİZ KARTLARI */
-        .analytics-card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 15px;
-            border: 1px solid rgba(0,136,204,0.1);
-            box-shadow: 0 2px 8px rgba(0,136,204,0.05);
-        }
-
-        .analytics-card h4 {
-            margin: 0 0 15px 0;
-            font-size: 16px;
-            color: var(--telegram-blue);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .analytics-value {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--telegram-blue);
-            margin-bottom: 5px;
-        }
-
-        .analytics-label {
-            font-size: 12px;
-            color: var(--hint-color);
-            margin-bottom: 8px;
-        }
-
-        /* GRAFİK STYLLERİ - DÜZELTİLDİ */
-        .chart-bar {
-            background: var(--primary-gradient);
-            border-radius: 4px 4px 0 0;
-            transition: height 0.3s ease;
-            width: calc(100% / 7 - 8px); /* Ekrandan taşmayı önlemek için */
-        }
-
-        .chart-container {
-            height: 200px;
-            display: flex;
-            align-items: flex-end;
-            gap: 8px;
-            padding: 20px 0;
-            width: 100%;
-            overflow-x: auto;
-            justify-content: space-between;
-        }
-
-        .chart-container::-webkit-scrollbar {
-            height: 6px;
-        }
-
-        .chart-container::-webkit-scrollbar-track {
-            background: rgba(0,136,204,0.05);
-            border-radius: 3px;
-        }
-
-        .chart-container::-webkit-scrollbar-thumb {
-            background: rgba(0,136,204,0.2);
-            border-radius: 3px;
-        }
-
-        .chart-container::-webkit-scrollbar-thumb:hover {
-            background: rgba(0,136,204,0.3);
-        }
-
-        .chart-item {
-            flex: 1;
-            min-width: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: 100%;
-        }
-
-        /* YÖNETİM LİSTE STYLLERİ */
-        .admin-list-container {
-            max-height: 400px;
-            overflow-y: auto;
-            padding-right: 5px;
-        }
-
-        .admin-list-container::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .admin-list-container::-webkit-scrollbar-track {
-            background: rgba(0,136,204,0.05);
-            border-radius: 3px;
-        }
-
-        .admin-list-container::-webkit-scrollbar-thumb {
-            background: rgba(0,136,204,0.2);
-            border-radius: 3px;
-        }
-
-        .admin-list-container::-webkit-scrollbar-thumb:hover {
-            background: rgba(0,136,204,0.3);
-        }
-
-        /* BUTTON GRUPLARI */
-        .button-group {
-            display: flex;
-            gap: 8px;
-            flex-shrink: 0;
-        }
-
-        .action-icon-button {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .action-icon-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        .action-icon-button.edit {
-            background: rgba(33,150,243,0.1);
-            color: #2196F3;
-        }
-
-        .action-icon-button.delete {
-            background: rgba(220,53,69,0.1);
-            color: #dc3545;
-        }
-
-        .action-icon-button.pin {
-            background: rgba(255,193,7,0.1);
-            color: #ffc107;
-        }
-
-        /* YÖNETİM INPUT STYLLERİ */
-        .admin-input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid rgba(0,136,204,0.2);
-            border-radius: 8px;
-            font-size: 14px;
-            background: white;
-            transition: all 0.3s ease;
-        }
-
-        .admin-input:focus {
-            outline: none;
-            border-color: var(--telegram-blue);
-            box-shadow: 0 0 0 3px rgba(0,136,204,0.1);
-        }
-
-        .admin-label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 600;
-            color: var(--text-color);
-            font-size: 14px;
         }
     </style>
 </head>
@@ -1464,68 +1321,6 @@
                     <div style="text-align: center; padding: 40px 20px; color: var(--hint-color);">
                         <i class="fas fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 10px;"></i>
                         <p>Yükleniyor...</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- SADECE BİZDE OLAN EK YAZILARI -->
-        <div style="background: var(--secondary-color); border-radius: var(--border-radius); padding: 25px; margin-top: 20px; border: 1px solid rgba(0, 136, 204, 0.1); box-shadow: var(--card-shadow);">
-            <div class="pinned-header">
-                <div class="pinned-icon" style="background: linear-gradient(135deg, #9C27B0 0%, #E91E63 100%);">
-                    <i class="fas fa-star"></i>
-                </div>
-                <div>
-                    <div class="pinned-title">Özel İçerik Avantajları</div>
-                    <div class="pinned-subtitle">Sadece bizde olan fırsatlar</div>
-                </div>
-            </div>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 20px;">
-                <div style="background: rgba(156, 39, 176, 0.05); padding: 15px; border-radius: 10px; border: 1px solid rgba(156, 39, 176, 0.1);">
-                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-                        <div style="width: 30px; height: 30px; background: linear-gradient(135deg, #9C27B0 0%, #E91E63 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white;">
-                            <i class="fas fa-award"></i>
-                        </div>
-                        <div style="font-weight: 600; color: var(--text-color);">Kalite Garantisi</div>
-                    </div>
-                    <div style="font-size: 13px; color: var(--hint-color); line-height: 1.5;">
-                        Tüm PDF'lerimiz özenle seçilmiş, yüksek kaliteli ve güncel içeriklerden oluşmaktadır.
-                    </div>
-                </div>
-                
-                <div style="background: rgba(255, 87, 34, 0.05); padding: 15px; border-radius: 10px; border: 1px solid rgba(255, 87, 34, 0.1);">
-                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-                        <div style="width: 30px; height: 30px; background: linear-gradient(135deg, #FF5722 0%, #FF9800 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white;">
-                            <i class="fas fa-bolt"></i>
-                        </div>
-                        <div style="font-weight: 600; color: var(--text-color);">Hızlı Erişim</div>
-                    </div>
-                    <div style="font-size: 13px; color: var(--hint-color); line-height: 1.5;">
-                        Dropbox ve Google Drive entegrasyonu ile hızlı ve kesintisiz indirme imkanı.
-                    </div>
-                </div>
-                
-                <div style="background: rgba(76, 175, 80, 0.05); padding: 15px; border-radius: 10px; border: 1px solid rgba(76, 175, 80, 0.1);">
-                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-                        <div style="width: 30px; height: 30px; background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white;">
-                            <i class="fas fa-sync"></i>
-                        </div>
-                        <div style="font-weight: 600; color: var(--text-color);">Sürekli Güncelleme</div>
-                    </div>
-                    <div style="font-size: 13px; color: var(--hint-color); line-height: 1.5;">
-                        İçeriklerimiz düzenli olarak güncellenir ve yeni PDF'ler eklenir.
-                    </div>
-                </div>
-                
-                <div style="background: rgba(33, 150, 243, 0.05); padding: 15px; border-radius: 10px; border: 1px solid rgba(33, 150, 243, 0.1);">
-                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-                        <div style="width: 30px; height: 30px; background: linear-gradient(135deg, #2196F3 0%, #03A9F4 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white;">
-                            <i class="fas fa-shield-alt"></i>
-                        </div>
-                        <div style="font-weight: 600; color: var(--text-color);">Güvenli İndirme</div>
-                    </div>
-                    <div style="font-size: 13px; color: var(--hint-color); line-height: 1.5;">
-                        Tüm dosyalarımız güvenli sunucularda barındırılır ve virüs taramasından geçer.
                     </div>
                 </div>
             </div>
@@ -1785,6 +1580,59 @@
     </div>
 </div>
 
+<!-- PDF LINK KOPYALAMA MODALI -->
+<div class="modal-overlay hidden" id="pdfLinkModal">
+    <div class="modal-content" style="max-width: 500px;">
+        <h3 style="margin: 0 0 20px 0; font-size: 20px; color: var(--telegram-blue); display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-copy"></i>
+            PDF Linki Kopyala
+        </h3>
+        
+        <div class="dropdown-link-container">
+            <div class="dropdown-link-label">
+                <i class="fas fa-link" style="margin-right: 6px;"></i>
+                Tarayıcınıza verilen linki yapıştırın:
+            </div>
+            
+            <div class="link-input-group">
+                <input type="text" id="pdfDirectLink" readonly class="link-input">
+                <button class="link-copy-button" onclick="copyDirectLink()">
+                    <i class="fas fa-copy"></i>
+                    Kopyala
+                </button>
+            </div>
+        </div>
+        
+        <div class="confirmation-message hidden" id="copySuccessMessage">
+            <i class="fas fa-check-circle"></i>
+            <div class="confirmation-text">
+                <strong>Başarılı!</strong> Link kopyalandı. Tarayıcınıza yapıştırın.
+            </div>
+        </div>
+        
+        <div style="margin-top: 20px;">
+            <div style="background: rgba(0, 136, 204, 0.05); padding: 12px; border-radius: 8px; border: 1px solid rgba(0, 136, 204, 0.1);">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                    <i class="fas fa-info-circle" style="color: var(--telegram-blue);"></i>
+                    <span style="font-weight: 600; font-size: 13px;">Not:</span>
+                </div>
+                <p style="font-size: 12px; color: var(--text-color); margin: 0; line-height: 1.5;">
+                    Linki kopyaladıktan sonra tarayıcınızın adres çubuğuna yapıştırın ve PDF'i açın.
+                    <br><br>
+                    <strong>Ödül:</strong> Reklamların hepsini izledikten sonra PDF'i indirebilirsiniz.
+                </p>
+            </div>
+        </div>
+        
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button onclick="closeModal('pdfLinkModal')" class="action-button" style="background: var(--success-gradient); flex: 1;">
+                <i class="fas fa-check" style="margin-right: 8px;"></i>
+                Tamam
+            </button>
+        </div>
+    </div>
+</div>
+
 <!-- MAIN APP -->
 <div class="telegram-app hidden" id="app">
     <!-- HOME PAGE -->
@@ -1979,7 +1827,7 @@
         </div>
     </div>
     
-    <!-- PROFILE PAGE - ADMIN VE POPÜLER BUTONLARI KALDIRILDI -->
+    <!-- PROFILE PAGE -->
     <div class="content-page" id="page-profile">
         <div class="app-header">
             <h1 class="app-header-title">
@@ -2201,7 +2049,7 @@
     <div class="modal-content" style="max-width: 400px; text-align: center;">
         <h3 id="progressModalTitle" style="margin: 0 0 12px 0; font-size: 20px; color: var(--telegram-blue); display: flex; align-items: center; justify-content: center; gap: 10px;">
             <i class="fas fa-download"></i>
-            İndirme
+            PDF İndirme
         </h3>
         <p id="progressModalFileName" style="font-weight: 600; margin-bottom: 12px; font-size: 15px; background: rgba(0,136,204,0.05); padding: 12px; border-radius: 10px;"></p>
         
@@ -2211,14 +2059,27 @@
             <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
         </div>
         
-        <button id="watchAdButton" class="action-button" onclick="handleWatchAdClick()" style="margin-top: 20px; font-size: 15px;">
+        <div id="adInstructions" style="margin-top: 20px; padding: 15px; background: rgba(255, 193, 7, 0.1); border-radius: 10px; border: 1px solid rgba(255, 193, 7, 0.2);">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                <i class="fas fa-ad" style="color: var(--warning-color); font-size: 18px;"></i>
+                <span style="font-weight: 600; color: var(--text-color);">Reklam Sistemi</span>
+            </div>
+            <p style="font-size: 12px; color: var(--text-color); margin: 0; line-height: 1.5;">
+                <strong>Ödül:</strong> Reklamların hepsini izledikten sonra PDF'i kopyalayabilirsiniz.
+                <br><br>
+                <i class="fas fa-info-circle" style="margin-right: 5px;"></i>
+                İlk önce Adexium, sonra Monetag reklamları gösterilecektir.
+            </p>
+        </div>
+        
+        <button id="startAdsButton" class="action-button" onclick="startAdSequence()" style="margin-top: 20px; font-size: 15px;">
             <i class="fas fa-play-circle" style="margin-right: 10px;"></i>
-            Reklam İzle
+            Reklamları İzle ve Ödül Al
         </button>
         
-        <button id="downloadButton" class="action-button hidden" onclick="finalizeDownload()" style="margin-top: 12px; font-size: 15px; background: var(--success-gradient);">
-            <i class="fas fa-download" style="margin-right: 10px;"></i>
-            PDF'i İndir
+        <button id="copyLinkButton" class="action-button hidden" onclick="showPdfLinkModal()" style="margin-top: 12px; font-size: 15px; background: var(--success-gradient);">
+            <i class="fas fa-copy" style="margin-right: 10px;"></i>
+            PDF Linkini Kopyala
         </button>
         
         <button onclick="closeProgressModal()" class="action-button" style="background: var(--warning-gradient); margin-top: 12px; font-size: 14px;">
@@ -2276,6 +2137,10 @@
     let pendingActionData = null;
     let editingPDFKey = null;
     let currentAnalyticsData = null;
+    let currentAdSequence = 0;
+    let totalAdsRequired = 0;
+    let adsWatched = 0;
+    let currentPDFForCopy = null;
     
     // GENİŞLETİLMİŞ KATEGORİLER
     const PDF_CATEGORIES = {
@@ -2574,6 +2439,10 @@
             pendingAction = null;
             pendingActionData = null;
         }
+        
+        if (modalId === 'pdfLinkModal') {
+            document.getElementById('copySuccessMessage').classList.add('hidden');
+        }
     };
     
     // KULLANICI KAYDI
@@ -2593,9 +2462,9 @@
         await userRef.update(updates);
     }
     
-    // PDF İNDİRME SİSTEMİ
+    // PDF KOPYALAMA SİSTEMİ - YENİ
     window.handlePDFDownloadClick = function(key, title, url, requiredAds) {
-        console.log("🚀 PDF indirme hemen başlatılıyor...");
+        console.log("🚀 PDF kopyalama hemen başlatılıyor...");
         
         if (!currentUser) {
             showError("Lütfen önce giriş yapın");
@@ -2624,6 +2493,13 @@
             watched_ads: 0
         };
         
+        currentPDFForCopy = {
+            key: key,
+            title: title,
+            url: finalUrl,
+            required_ads: requiredAds
+        };
+        
         // HEMEN MODAL AÇ
         openProgressModal();
         
@@ -2645,20 +2521,22 @@
         
         const { title, required_ads, watched_ads } = currentPdf;
         const remainingAds = Math.max(0, required_ads - watched_ads);
+        totalAdsRequired = required_ads;
+        adsWatched = watched_ads;
         
         requestAnimationFrame(() => {
-            document.getElementById('progressModalTitle').textContent = "İndirme Gereksinimleri";
+            document.getElementById('progressModalTitle').textContent = "PDF Link Kopyalama";
             document.getElementById('progressModalFileName').textContent = title;
             
             if (remainingAds <= 0) {
-                document.getElementById('progressModalStatus').textContent = "✅ İndirmeye hazır!";
-                document.getElementById('watchAdButton').classList.add('hidden');
-                document.getElementById('downloadButton').classList.remove('hidden');
+                document.getElementById('progressModalStatus').textContent = "✅ Link kopyalamaya hazır!";
+                document.getElementById('startAdsButton').classList.add('hidden');
+                document.getElementById('copyLinkButton').classList.remove('hidden');
             } else {
                 document.getElementById('progressModalStatus').textContent = `📊 Kalan: ${remainingAds} reklam`;
-                document.getElementById('watchAdButton').textContent = `🎬 Reklam İzle (${remainingAds} kaldı)`;
-                document.getElementById('watchAdButton').classList.remove('hidden');
-                document.getElementById('downloadButton').classList.add('hidden');
+                document.getElementById('startAdsButton').textContent = `🎬 Reklamları İzle (${remainingAds} kaldı)`;
+                document.getElementById('startAdsButton').classList.remove('hidden');
+                document.getElementById('copyLinkButton').classList.add('hidden');
             }
             
             updateProgressBar();
@@ -2677,160 +2555,327 @@
     window.closeProgressModal = function() {
         document.getElementById('adProgressModal').classList.add('hidden');
         currentPdf = null;
+        currentAdSequence = 0;
     };
     
-    // REKLAM İZLEME
-    window.handleWatchAdClick = async function() {
+    // REKLAM SIRASI BAŞLATMA
+    async function startAdSequence() {
         playButtonSound();
         
-        const adButton = document.getElementById('watchAdButton');
+        const startButton = document.getElementById('startAdsButton');
         
         if (!currentPdf) {
             showError("PDF bilgisi bulunamadı");
             return;
         }
         
-        adButton.disabled = true;
-        adButton.innerHTML = `<i class="fas fa-spinner fa-spin" style="margin-right: 10px;"></i> Reklam yükleniyor...`;
+        startButton.disabled = true;
+        startButton.innerHTML = `<i class="fas fa-spinner fa-spin" style="margin-right: 10px;"></i> Reklamlar yükleniyor...`;
         
         try {
-            if (typeof show_10340134 === 'undefined') {
-                setTimeout(() => {
-                    if (confirm("Reklam servisi yüklenemedi. Test için ilerleme kaydetmek ister misiniz?")) {
-                        handleTestAd();
-                    } else {
-                        adButton.disabled = false;
-                        adButton.innerHTML = `<i class="fas fa-play-circle" style="margin-right: 12px;"></i> Reklam İzle`;
-                    }
-                }, 100);
-                return;
+            // Reklam sayısını hesapla
+            const { required_ads, watched_ads } = currentPdf;
+            const remainingAds = Math.max(0, required_ads - watched_ads);
+            
+            // Örnek olarak 5 reklam için: 3 Adexium, 2 Monetag
+            // Kalan reklam sayısına göre dağıtım yap
+            let adexiumCount = Math.ceil(remainingAds * 0.6); // %60 Adexium
+            let monetagCount = remainingAds - adexiumCount; // Geri kalan Monetag
+            
+            console.log(`Toplam ${remainingAds} reklam: ${adexiumCount} Adexium, ${monetagCount} Monetag`);
+            
+            // İlk reklam grubunu göster (Adexium)
+            if (adexiumCount > 0) {
+                await showAdexiumAds(adexiumCount);
             }
             
-            await show_10340134();
-            await handleAdSuccess();
+            // İkinci reklam grubunu göster (Monetag)
+            if (monetagCount > 0) {
+                await showMonetagAds(monetagCount);
+            }
+            
+            // Tüm reklamlar izlendi
+            await handleAllAdsCompleted();
             
         } catch (error) {
-            setTimeout(() => {
-                if (confirm("Reklam izlenemedi. Test için ilerleme kaydetmek ister misiniz?")) {
-                    handleTestAd();
-                } else {
-                    adButton.disabled = false;
-                    adButton.innerHTML = `<i class="fas fa-play-circle" style="margin-right: 12px;"></i> Reklam İzle`;
-                    showError("Reklam izlenemedi");
-                }
-            }, 100);
+            console.error("Reklam sırası hatası:", error);
+            startButton.disabled = false;
+            startButton.innerHTML = `<i class="fas fa-play-circle" style="margin-right: 10px;"></i> Reklamları İzle`;
+            showError("Reklamlar izlenemedi: " + error.message);
         }
-    };
-    
-    async function handleTestAd() {
-        if (!currentPdf) return;
-        
-        currentPdf.watched_ads++;
-        
-        const updates = {};
-        updates[`users/${currentUser.id}/pdf_progress/${currentPdf.key}/watched_ads`] = currentPdf.watched_ads;
-        updates[`users/${currentUser.id}/pdf_progress/${currentPdf.key}/last_ad_watch`] = firebase.database.ServerValue.TIMESTAMP;
-        
-        await db.ref().update(updates);
-        
-        updateProgressBar();
-        updateAdButton();
     }
     
-    async function handleAdSuccess() {
-        if (!currentPdf) return;
+    async function showAdexiumAds(count) {
+        return new Promise((resolve, reject) => {
+            try {
+                if (typeof AdexiumWidget === 'undefined') {
+                    console.log("Adexium reklamları test modunda...");
+                    // Test modu
+                    setTimeout(() => {
+                        currentPdf.watched_ads += count;
+                        adsWatched += count;
+                        updateProgressBar();
+                        updateAdButton();
+                        resolve();
+                    }, 2000);
+                    return;
+                }
+                
+                // Gerçek Adexium reklamları
+                let watched = 0;
+                
+                function showNextAd() {
+                    if (watched >= count) {
+                        resolve();
+                        return;
+                    }
+                    
+                    try {
+                        const adexiumWidget = new AdexiumWidget({wid: '77e87d3c-5ac4-47e2-805f-231f60107300', adFormat: 'interstitial'});
+                        
+                        adexiumWidget.showAd().then(() => {
+                            watched++;
+                            currentPdf.watched_ads++;
+                            adsWatched++;
+                            updateProgressBar();
+                            updateAdButton();
+                            
+                            if (watched < count) {
+                                setTimeout(showNextAd, 1000);
+                            } else {
+                                resolve();
+                            }
+                        }).catch(error => {
+                            console.error("Adexium reklam hatası:", error);
+                            // Hata durumunda da ilerleme kaydet
+                            watched++;
+                            currentPdf.watched_ads++;
+                            adsWatched++;
+                            updateProgressBar();
+                            updateAdButton();
+                            
+                            if (watched < count) {
+                                setTimeout(showNextAd, 1000);
+                            } else {
+                                resolve();
+                            }
+                        });
+                        
+                    } catch (error) {
+                        console.error("Adexium widget hatası:", error);
+                        reject(error);
+                    }
+                }
+                
+                showNextAd();
+                
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+    
+    async function showMonetagAds(count) {
+        return new Promise((resolve, reject) => {
+            try {
+                if (typeof show_10340134 === 'undefined') {
+                    console.log("Monetag reklamları test modunda...");
+                    // Test modu
+                    setTimeout(() => {
+                        currentPdf.watched_ads += count;
+                        adsWatched += count;
+                        updateProgressBar();
+                        updateAdButton();
+                        resolve();
+                    }, 2000);
+                    return;
+                }
+                
+                // Gerçek Monetag reklamları
+                let watched = 0;
+                
+                function showNextAd() {
+                    if (watched >= count) {
+                        resolve();
+                        return;
+                    }
+                    
+                    try {
+                        show_10340134().then(() => {
+                            watched++;
+                            currentPdf.watched_ads++;
+                            adsWatched++;
+                            updateProgressBar();
+                            updateAdButton();
+                            
+                            if (watched < count) {
+                                setTimeout(showNextAd, 1000);
+                            } else {
+                                resolve();
+                            }
+                        }).catch(error => {
+                            console.error("Monetag reklam hatası:", error);
+                            // Hata durumunda da ilerleme kaydet
+                            watched++;
+                            currentPdf.watched_ads++;
+                            adsWatched++;
+                            updateProgressBar();
+                            updateAdButton();
+                            
+                            if (watched < count) {
+                                setTimeout(showNextAd, 1000);
+                            } else {
+                                resolve();
+                            }
+                        });
+                        
+                    } catch (error) {
+                        console.error("Monetag widget hatası:", error);
+                        reject(error);
+                    }
+                }
+                
+                showNextAd();
+                
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+    
+    async function handleAllAdsCompleted() {
+        const { key, required_ads } = currentPdf;
         
-        currentPdf.watched_ads++;
-        
+        // Firebase'e kaydet
         const updates = {};
-        updates[`users/${currentUser.id}/pdf_progress/${currentPdf.key}/watched_ads`] = currentPdf.watched_ads;
-        updates[`users/${currentUser.id}/pdf_progress/${currentPdf.key}/last_ad_watch`] = firebase.database.ServerValue.TIMESTAMP;
-        updates['analytics/total_ads_watched'] = firebase.database.ServerValue.increment(1);
+        updates[`users/${currentUser.id}/pdf_progress/${key}/watched_ads`] = required_ads;
+        updates[`users/${currentUser.id}/pdf_progress/${key}/last_ad_watch`] = firebase.database.ServerValue.TIMESTAMP;
+        updates['analytics/total_ads_watched'] = firebase.database.ServerValue.increment(required_ads - adsWatched);
         
         const todayKey = new Date().toISOString().slice(0, 10);
-        updates[`analytics/daily_ads_watched/${todayKey}`] = firebase.database.ServerValue.increment(1);
+        updates[`analytics/daily_ads_watched/${todayKey}`] = firebase.database.ServerValue.increment(required_ads - adsWatched);
         
         await db.ref().update(updates);
         
-        updateProgressBar();
-        updateAdButton();
+        // Butonu güncelle
+        document.getElementById('progressModalStatus').textContent = "🎉 Tebrikler! Tüm reklamları izlediniz.";
+        document.getElementById('startAdsButton').classList.add('hidden');
+        document.getElementById('copyLinkButton').classList.remove('hidden');
+        
+        // İndirme sayacını artır
+        db.ref('pdfs/' + key).child('downloads').transaction(current => {
+            return (current || 0) + 1;
+        });
+        
+        // Kullanıcı istatistiklerini güncelle
+        db.ref(`users/${currentUser.id}/total_downloads`).transaction(current => {
+            return (current || 0) + 1;
+        });
     }
     
     function updateAdButton() {
         const { required_ads, watched_ads } = currentPdf;
         const remainingAds = Math.max(0, required_ads - watched_ads);
-        const adButton = document.getElementById('watchAdButton');
+        const startButton = document.getElementById('startAdsButton');
         
         if (remainingAds <= 0) {
-            document.getElementById('progressModalStatus').textContent = "🎉 Tebrikler! İndirmeye hazır.";
-            document.getElementById('watchAdButton').classList.add('hidden');
-            document.getElementById('downloadButton').classList.remove('hidden');
+            document.getElementById('progressModalStatus').textContent = "🎉 Tebrikler! Link kopyalamaya hazır.";
+            document.getElementById('startAdsButton').classList.add('hidden');
+            document.getElementById('copyLinkButton').classList.remove('hidden');
         } else {
             document.getElementById('progressModalStatus').textContent = `📊 Kalan: ${remainingAds} reklam`;
-            adButton.innerHTML = `<i class="fas fa-play-circle" style="margin-right: 12px;"></i> Reklam İzle (${remainingAds} kaldı)`;
-            adButton.disabled = false;
-            adButton.classList.remove('hidden');
+            startButton.innerHTML = `<i class="fas fa-play-circle" style="margin-right: 10px;"></i> Reklamları İzle (${remainingAds} kaldı)`;
+            startButton.disabled = false;
+            startButton.classList.remove('hidden');
         }
     }
     
-    // PDF İNDİRME
-    window.finalizeDownload = function() {
-        playButtonSound();
-        
-        if (!currentPdf) {
+    // PDF LINK KOPYALAMA MODALINI GÖSTER
+    function showPdfLinkModal() {
+        if (!currentPDFForCopy) {
             showError("PDF bilgisi bulunamadı");
             return;
         }
         
-        const { key, title, url, required_ads, watched_ads } = currentPdf;
+        playButtonSound();
         
-        if (watched_ads < required_ads) {
-            showError(`⚠️ Henüz yeterli reklam izlemediniz. ${required_ads - watched_ads} reklam daha izlemelisiniz.`);
-            return;
-        }
+        const { url, title } = currentPDFForCopy;
         
-        // İndirme sayacını artır
-        if (db) {
-            db.ref('pdfs/' + key).child('downloads').transaction(current => {
-                return (current || 0) + 1;
-            });
-            
-            // Kullanıcı istatistiklerini güncelle
-            db.ref(`users/${currentUser.id}/total_downloads`).transaction(current => {
-                return (current || 0) + 1;
-            });
-        }
-        
-        // Dropbox linkini düzelt (dl=1 yap)
-        let downloadUrl = url;
-        if (downloadUrl.includes('dropbox.com')) {
-            if (downloadUrl.includes('?')) {
-                downloadUrl = downloadUrl.replace('dl=0', 'dl=1');
-                if (!downloadUrl.includes('dl=')) {
-                    downloadUrl += '&dl=1';
+        // Dropbox linkini düzelt
+        let directLink = url;
+        if (directLink.includes('dropbox.com')) {
+            if (directLink.includes('?')) {
+                directLink = directLink.replace('dl=0', 'dl=1');
+                if (!directLink.includes('dl=')) {
+                    directLink += '&dl=1';
                 }
             } else {
-                downloadUrl += '?dl=1';
+                directLink += '?dl=1';
             }
         }
         
-        // Yeni pencere ile indirme başlat
-        setTimeout(() => {
-            const link = document.createElement('a');
-            link.href = downloadUrl;
-            link.download = title + '.pdf';
-            link.target = '_blank';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+        // Linki input'a yerleştir
+        document.getElementById('pdfDirectLink').value = directLink;
+        
+        // Modalı göster
+        document.getElementById('pdfLinkModal').classList.remove('hidden');
+        closeProgressModal();
+    }
+    
+    // LİNK KOPYALAMA
+    function copyDirectLink() {
+        const linkInput = document.getElementById('pdfDirectLink');
+        const copyButton = document.querySelector('.link-copy-button');
+        const successMessage = document.getElementById('copySuccessMessage');
+        
+        if (!linkInput.value) {
+            showError("Kopyalanacak link bulunamadı");
+            return;
+        }
+        
+        playButtonSound();
+        
+        // Linki kopyala
+        linkInput.select();
+        linkInput.setSelectionRange(0, 99999); // Mobil için
+        
+        try {
+            navigator.clipboard.writeText(linkInput.value).then(() => {
+                // Başarılı mesajını göster
+                copyButton.innerHTML = '<i class="fas fa-check"></i> Kopyalandı';
+                copyButton.classList.add('copied');
+                successMessage.classList.remove('hidden');
+                
+                // 3 saniye sonra eski haline dön
+                setTimeout(() => {
+                    copyButton.innerHTML = '<i class="fas fa-copy"></i> Kopyala';
+                    copyButton.classList.remove('copied');
+                }, 3000);
+                
+                // Başarılı haptik feedback
+                if (window.Telegram && Telegram.WebApp) {
+                    Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+                }
+                
+            }).catch(err => {
+                console.error('Clipboard yazma hatası:', err);
+                // Fallback için
+                document.execCommand('copy');
+                copyButton.innerHTML = '<i class="fas fa-check"></i> Kopyalandı';
+                copyButton.classList.add('copied');
+                successMessage.classList.remove('hidden');
+                
+                setTimeout(() => {
+                    copyButton.innerHTML = '<i class="fas fa-copy"></i> Kopyala';
+                    copyButton.classList.remove('copied');
+                }, 3000);
+            });
             
-            closeProgressModal();
-            
-            setTimeout(() => {
-                fetchPDFList();
-            }, 500);
-        }, 100);
-    };
+        } catch (err) {
+            console.error('Kopyalama hatası:', err);
+            showError("Link kopyalanamadı");
+        }
+    }
     
     // SAYFA GEÇİŞLERİ
     window.changeTab = function(tabId) {
@@ -2888,7 +2933,7 @@
         }
     }
     
-    // TOPLAM PDF SAYISINI GÜNCELLE - DÜZELTİLDİ
+    // TOPLAM PDF SAYISINI GÜNCELLE
     function updateTotalPDFCount() {
         if (!allPdfsData) return;
         const totalPDFs = Object.values(allPdfsData).filter(pdf => !pdf.is_deleted).length;
@@ -2930,7 +2975,7 @@
         }
     }
     
-    // 1. YENİ PDF EKLEME SİSTEMİ
+    // YENİ PDF EKLEME SİSTEMİ
     window.adminAddPDF = function() {
         playButtonSound();
         document.getElementById('addPDFModal').classList.remove('hidden');
@@ -3099,7 +3144,7 @@
         }
     }
     
-    // 2. PDF YÖNETİM SİSTEMİ
+    // PDF YÖNETİM SİSTEMİ
     window.adminManagePDFs = async function() {
         playButtonSound();
         document.getElementById('managePDFsModal').classList.remove('hidden');
@@ -3194,7 +3239,7 @@
         container.innerHTML = html;
     }
     
-    // 3. PDF DÜZENLEME
+    // PDF DÜZENLEME
     async function editPDF(pdfKey) {
         playButtonSound();
         editingPDFKey = pdfKey;
@@ -3320,7 +3365,7 @@
         }
     }
     
-    // 4. PDF SİLME
+    // PDF SİLME
     async function deletePDF(pdfKey, pdfTitle) {
         playButtonSound();
         
@@ -3345,7 +3390,7 @@
         }
     }
     
-    // 5. SABİTLEME SEÇENEKLERİ
+    // SABİTLEME SEÇENEKLERİ
     function showPinOptions(pdfKey) {
         playButtonSound();
         pendingAction = 'pinPDF';
@@ -3387,7 +3432,7 @@
         }
     }
     
-    // 6. KULLANICI YÖNETİMİ
+    // KULLANICI YÖNETİMİ
     window.adminViewUsers = async function() {
         playButtonSound();
         document.getElementById('userManagementModal').classList.remove('hidden');
@@ -3481,7 +3526,7 @@
         container.innerHTML = html;
     }
     
-    // 7. DETAYLI ANALİZ - GRAFİK DÜZELTİLDİ
+    // DETAYLI ANALİZ
     window.adminViewAnalytics = async function() {
         playButtonSound();
         document.getElementById('analyticsModal').classList.remove('hidden');
@@ -3635,7 +3680,7 @@
         chartContainer.innerHTML = chartHTML;
     }
     
-    // 8. İSTATİSTİKLERİ SIFIRLA (KULLANICI SAYISI HARİÇ)
+    // İSTATİSTİKLERİ SIFIRLA
     async function resetStatistics() {
         playButtonSound();
         
@@ -3906,11 +3951,11 @@
             let statusColor = '';
             
             if (remainingAds <= 0) {
-                statusText = 'İndirmeye Hazır';
-                statusIcon = 'check-circle';
+                statusText = 'Kopyalamaya Hazır';
+                statusIcon = 'copy';
                 statusColor = 'var(--success-color)';
             } else if (requiredAds > 0) {
-                statusText = `${remainingAds} kaldı`;
+                statusText = `${remainingAds} reklam kaldı`;
                 statusIcon = 'ad';
                 statusColor = 'var(--warning-color)';
             } else {
@@ -3973,6 +4018,9 @@
                             </div>
                         ` : ''}
                     </div>
+                    <button class="copy-button" onclick="handlePDFDownloadClick('${key}', '${safeTitle}', '${safeUrl}', ${requiredAds})">
+                        <i class="fas fa-copy"></i>
+                    </button>
                 </div>
             `;
         });
@@ -4091,7 +4139,8 @@
                 e.target.closest('.list-item') ||
                 e.target.closest('.sort-button') ||
                 e.target.closest('.category-item') ||
-                e.target.closest('.search-button')) {
+                e.target.closest('.search-button') ||
+                e.target.closest('.copy-button')) {
                 playButtonSound();
             }
         });
@@ -4241,4 +4290,4 @@
     });
 </script>
 </body>
-</html>
+</html>yok
