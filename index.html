@@ -732,7 +732,7 @@
             position: relative;
         }
         
-        /* SEARCH */
+        /* SEARCH - MODERN STYLE */
         .search-container {
             position: relative;
             margin: 20px;
@@ -740,29 +740,68 @@
         
         #pdfSearchInput {
             width: 100%;
-            padding: 16px 20px 16px 48px;
-            border: 1px solid rgba(0, 136, 204, 0.2);
-            border-radius: 12px;
-            font-size: 15px;
+            padding: 18px 20px 18px 55px;
+            border: 2px solid rgba(0, 136, 204, 0.2);
+            border-radius: 16px;
+            font-size: 16px;
             background: var(--secondary-color);
             color: var(--text-color);
-            transition: var(--transition-smooth);
-            box-shadow: 0 2px 8px rgba(0, 136, 204, 0.05);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 20px rgba(0, 136, 204, 0.08);
+            backdrop-filter: blur(10px);
         }
         
         #pdfSearchInput:focus {
             outline: none;
             border-color: var(--telegram-blue);
-            box-shadow: 0 4px 12px rgba(0, 136, 204, 0.1);
+            box-shadow: 0 8px 25px rgba(0, 136, 204, 0.15), 0 0 0 4px rgba(0, 136, 204, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        #pdfSearchInput::placeholder {
+            color: var(--hint-color);
+            opacity: 0.7;
         }
         
         .search-icon {
             position: absolute;
-            left: 18px;
+            left: 22px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--hint-color);
-            font-size: 16px;
+            color: var(--telegram-blue);
+            font-size: 18px;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+        
+        /* Search button modern style */
+        .search-button {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 12px rgba(0, 136, 204, 0.2);
+            z-index: 2;
+        }
+        
+        .search-button:hover {
+            transform: translateY(-50%) scale(1.1) rotate(5deg);
+            box-shadow: 0 6px 20px rgba(0, 136, 204, 0.3);
+        }
+        
+        .search-button:active {
+            transform: translateY(-50%) scale(0.95);
         }
         
         /* YATAY KAYDIRILABİLİR KATEGORİLER */
@@ -960,6 +999,17 @@
                 font-size: 12px;
                 padding: 10px;
             }
+            
+            /* Responsive search */
+            #pdfSearchInput {
+                padding: 16px 20px 16px 50px;
+                font-size: 15px;
+            }
+            
+            .search-button {
+                width: 38px;
+                height: 38px;
+            }
         }
         
         @media (max-width: 480px) {
@@ -1039,6 +1089,23 @@
             
             #page-profile .list-card .list-item:last-child {
                 margin-bottom: 35px !important;
+            }
+            
+            /* Mobil search */
+            .search-container {
+                margin: 16px;
+            }
+            
+            #pdfSearchInput {
+                padding: 14px 16px 14px 48px;
+                font-size: 14px;
+                border-radius: 14px;
+            }
+            
+            .search-button {
+                width: 36px;
+                height: 36px;
+                right: 8px;
             }
         }
         
@@ -1168,19 +1235,50 @@
             margin-bottom: 8px;
         }
 
-        /* GRAFİK STYLLERİ */
+        /* GRAFİK STYLLERİ - DÜZELTİLDİ */
         .chart-bar {
             background: var(--primary-gradient);
             border-radius: 4px 4px 0 0;
             transition: height 0.3s ease;
+            width: calc(100% / 7 - 8px); /* Ekrandan taşmayı önlemek için */
         }
 
         .chart-container {
             height: 200px;
             display: flex;
             align-items: flex-end;
-            gap: 10px;
+            gap: 8px;
             padding: 20px 0;
+            width: 100%;
+            overflow-x: auto;
+            justify-content: space-between;
+        }
+
+        .chart-container::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .chart-container::-webkit-scrollbar-track {
+            background: rgba(0,136,204,0.05);
+            border-radius: 3px;
+        }
+
+        .chart-container::-webkit-scrollbar-thumb {
+            background: rgba(0,136,204,0.2);
+            border-radius: 3px;
+        }
+
+        .chart-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(0,136,204,0.3);
+        }
+
+        .chart-item {
+            flex: 1;
+            min-width: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
         }
 
         /* YÖNETİM LİSTE STYLLERİ */
@@ -1400,6 +1498,68 @@
                     <div style="text-align: center; padding: 40px 20px; color: var(--hint-color);">
                         <i class="fas fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 10px;"></i>
                         <p>Yükleniyor...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- SADECE BİZDE OLAN EK YAZILARI -->
+        <div style="background: var(--secondary-color); border-radius: var(--border-radius); padding: 25px; margin-top: 20px; border: 1px solid rgba(0, 136, 204, 0.1); box-shadow: var(--card-shadow);">
+            <div class="pinned-header">
+                <div class="pinned-icon" style="background: linear-gradient(135deg, #9C27B0 0%, #E91E63 100%);">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div>
+                    <div class="pinned-title">Özel İçerik Avantajları</div>
+                    <div class="pinned-subtitle">Sadece bizde olan fırsatlar</div>
+                </div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 20px;">
+                <div style="background: rgba(156, 39, 176, 0.05); padding: 15px; border-radius: 10px; border: 1px solid rgba(156, 39, 176, 0.1);">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                        <div style="width: 30px; height: 30px; background: linear-gradient(135deg, #9C27B0 0%, #E91E63 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white;">
+                            <i class="fas fa-award"></i>
+                        </div>
+                        <div style="font-weight: 600; color: var(--text-color);">Kalite Garantisi</div>
+                    </div>
+                    <div style="font-size: 13px; color: var(--hint-color); line-height: 1.5;">
+                        Tüm PDF'lerimiz özenle seçilmiş, yüksek kaliteli ve güncel içeriklerden oluşmaktadır.
+                    </div>
+                </div>
+                
+                <div style="background: rgba(255, 87, 34, 0.05); padding: 15px; border-radius: 10px; border: 1px solid rgba(255, 87, 34, 0.1);">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                        <div style="width: 30px; height: 30px; background: linear-gradient(135deg, #FF5722 0%, #FF9800 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white;">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <div style="font-weight: 600; color: var(--text-color);">Hızlı Erişim</div>
+                    </div>
+                    <div style="font-size: 13px; color: var(--hint-color); line-height: 1.5;">
+                        Dropbox ve Google Drive entegrasyonu ile hızlı ve kesintisiz indirme imkanı.
+                    </div>
+                </div>
+                
+                <div style="background: rgba(76, 175, 80, 0.05); padding: 15px; border-radius: 10px; border: 1px solid rgba(76, 175, 80, 0.1);">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                        <div style="width: 30px; height: 30px; background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white;">
+                            <i class="fas fa-sync"></i>
+                        </div>
+                        <div style="font-weight: 600; color: var(--text-color);">Sürekli Güncelleme</div>
+                    </div>
+                    <div style="font-size: 13px; color: var(--hint-color); line-height: 1.5;">
+                        İçeriklerimiz düzenli olarak güncellenir ve yeni PDF'ler eklenir.
+                    </div>
+                </div>
+                
+                <div style="background: rgba(33, 150, 243, 0.05); padding: 15px; border-radius: 10px; border: 1px solid rgba(33, 150, 243, 0.1);">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                        <div style="width: 30px; height: 30px; background: linear-gradient(135deg, #2196F3 0%, #03A9F4 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white;">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div style="font-weight: 600; color: var(--text-color);">Güvenli İndirme</div>
+                    </div>
+                    <div style="font-size: 13px; color: var(--hint-color); line-height: 1.5;">
+                        Tüm dosyalarımız güvenli sunucularda barındırılır ve virüs taramasından geçer.
                     </div>
                 </div>
             </div>
@@ -1830,10 +1990,13 @@
             </h1>
         </div>
         
-        <!-- SEARCH AND SORT -->
+        <!-- SEARCH AND SORT - MODERN SEARCH BUTTON EKLENDİ -->
         <div class="search-container">
             <i class="fas fa-search search-icon"></i>
             <input type="search" id="pdfSearchInput" placeholder="PDF adı veya konu ara..." oninput="filterAndSortPDFs()">
+            <button class="search-button" onclick="handleSearchClick()">
+                <i class="fas fa-search"></i>
+            </button>
         </div>
         
         <!-- YATAY KAYDIRILABİLİR SORT BUTTONLARI -->
@@ -2219,6 +2382,33 @@
     function playButtonSound() {
         if (window.Telegram && Telegram.WebApp) {
             Telegram.WebApp.HapticFeedback.selectionChanged();
+        }
+    }
+    
+    // MODERN ARAMA BUTONU FONKSİYONU
+    function handleSearchClick() {
+        playButtonSound();
+        if (window.Telegram && Telegram.WebApp) {
+            Telegram.WebApp.HapticFeedback.impactOccurred('light');
+        }
+        
+        const searchInput = document.getElementById('pdfSearchInput');
+        if (searchInput) {
+            searchInput.focus();
+            
+            // Arama animasyonu
+            const searchButton = document.querySelector('.search-button');
+            if (searchButton) {
+                searchButton.style.transform = 'translateY(-50%) scale(1.2) rotate(15deg)';
+                setTimeout(() => {
+                    searchButton.style.transform = 'translateY(-50%) scale(1) rotate(0deg)';
+                }, 300);
+            }
+            
+            // Arama yap
+            if (searchInput.value.trim() !== '') {
+                filterAndSortPDFs();
+            }
         }
     }
     
@@ -3581,7 +3771,7 @@
         container.innerHTML = html;
     }
     
-    // 7. DETAYLI ANALİZ
+    // 7. DETAYLI ANALİZ - GRAFİK DÜZELTİLDİ
     window.adminViewAnalytics = async function() {
         playButtonSound();
         document.getElementById('analyticsModal').classList.remove('hidden');
@@ -3671,7 +3861,7 @@
                         Son 7 Günün Reklam İstatistikleri
                     </h4>
                     
-                    <div id="weeklyChart" style="height: 200px; display: flex; align-items: flex-end; gap: 10px; padding: 20px 0;">
+                    <div class="chart-container" id="weeklyChart">
                         <!-- Grafik buraya çizilecek -->
                     </div>
                 </div>
@@ -3720,9 +3910,9 @@
             const dayName = new Date(date).toLocaleDateString('tr-TR', { weekday: 'short' });
             
             chartHTML += `
-                <div style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%;">
+                <div class="chart-item">
                     <div style="flex: 1; display: flex; align-items: flex-end; width: 100%;">
-                        <div style="width: 100%; background: var(--primary-gradient); border-radius: 4px 4px 0 0; height: ${heightPercent}%; min-height: ${value > 0 ? '10px' : '0'};"></div>
+                        <div class="chart-bar" style="height: ${heightPercent}%; min-height: ${value > 0 ? '10px' : '0'};"></div>
                     </div>
                     <div style="margin-top: 10px; font-size: 12px; color: var(--hint-color); text-align: center;">
                         <div style="font-weight: 600;">${dayName}</div>
@@ -4093,7 +4283,8 @@
                 e.target.closest('.list-item') ||
                 e.target.closest('.sort-button') ||
                 e.target.closest('.category-item') ||
-                e.target.closest('.pdf-pin-button')) {
+                e.target.closest('.pdf-pin-button') ||
+                e.target.closest('.search-button')) {
                 playButtonSound();
             }
         });
@@ -4229,6 +4420,16 @@
         if (activePage) {
             const pageId = activePage.id.replace('page-', '');
             changeTab(pageId);
+        }
+        
+        // Modern arama input'u için event listener
+        const searchInput = document.getElementById('pdfSearchInput');
+        if (searchInput) {
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    handleSearchClick();
+                }
+            });
         }
     });
 </script>
