@@ -180,7 +180,7 @@
             gap: 10px;
         }
         
-        /* PINNED FRAME */
+        /* FIRSATLAR FRAME (ESKİ PINNED FRAME) */
         .pinned-frame {
             position: fixed;
             top: 0;
@@ -238,7 +238,7 @@
             -webkit-overflow-scrolling: touch;
         }
         
-        /* PINNED SECTIONS GRID */
+        /* FIRSATLAR SECTIONS GRID */
         .pinned-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -357,7 +357,7 @@
             background: rgba(0, 136, 204, 0.05);
         }
         
-        /* PDF ITEM WITH PIN BUTTON */
+        /* PDF ITEM WITHOUT PIN BUTTON */
         .pdf-item {
             display: flex;
             padding: 16px 20px;
@@ -374,34 +374,6 @@
         
         .pdf-item:hover {
             background: rgba(0, 136, 204, 0.05);
-        }
-        
-        /* PIN BUTTON FOR PDF ITEMS */
-        .pdf-pin-button {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 193, 7, 0.1);
-            color: var(--warning-color);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: none;
-            margin-left: 10px;
-            flex-shrink: 0;
-        }
-        
-        .pdf-pin-button:hover {
-            background: var(--warning-gradient);
-            color: white;
-            transform: scale(1.1);
-        }
-        
-        .pdf-pin-button.pinned {
-            background: var(--warning-gradient);
-            color: white;
         }
         
         /* ICONS */
@@ -1049,12 +1021,6 @@
                 min-width: 0;
             }
             
-            .pdf-pin-button {
-                width: 32px;
-                height: 32px;
-                margin-left: 8px;
-            }
-            
             .action-button {
                 padding: 14px 20px;
             }
@@ -1431,12 +1397,12 @@
     </div>
 </div>
 
-<!-- PINNED FRAME -->
+<!-- FIRSATLAR FRAME -->
 <div class="pinned-frame hidden" id="pinnedFrame">
     <div class="pinned-frame-header">
         <div class="pinned-frame-title">
-            <i class="fas fa-thumbtack" style="color: var(--warning-color);"></i>
-            Sabitlenmiş İçerikler
+            <i class="fas fa-star" style="color: var(--warning-color);"></i>
+            Fırsatlar
         </div>
         <div class="pinned-frame-close" onclick="closePinnedFrame()">
             <i class="fas fa-times"></i>
@@ -1642,17 +1608,6 @@
                     Kullanıcı bu kadar reklam izlemeli
                 </p>
             </div>
-            
-            <div>
-                <label style="display: block; margin-bottom: 6px; font-weight: 600; color: var(--text-color);">
-                    <i class="fas fa-star" style="margin-right: 8px;"></i>
-                    Özel İçerik
-                </label>
-                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                    <input type="checkbox" id="pdfExclusiveCheckbox" style="width: 18px; height: 18px;">
-                    <span>Sadece bizde olan içerik olarak işaretle</span>
-                </label>
-            </div>
         </div>
         
         <div style="display: flex; gap: 10px;">
@@ -1677,11 +1632,6 @@
         </h3>
         
         <div style="margin-bottom: 20px;">
-            <div class="search-container" style="margin: 0 0 15px 0;">
-                <i class="fas fa-search search-icon"></i>
-                <input type="search" id="adminPdfSearch" placeholder="PDF ara..." style="width: 100%;">
-            </div>
-            
             <div id="adminPDFsList" style="max-height: 400px; overflow-y: auto;">
                 <!-- PDF listesi buraya yüklenecek -->
             </div>
@@ -1730,11 +1680,6 @@
         </h3>
         
         <div style="margin-bottom: 20px;">
-            <div class="search-container" style="margin: 0 0 15px 0;">
-                <i class="fas fa-search search-icon"></i>
-                <input type="search" id="userSearchInput" placeholder="Kullanıcı adı veya ID ara..." style="width: 100%;">
-            </div>
-            
             <div id="usersList" style="max-height: 400px; overflow-y: auto;">
                 <!-- Kullanıcı listesi buraya yüklenecek -->
             </div>
@@ -1867,14 +1812,14 @@
             </div>
         </div>
         
-        <!-- PIN BUTTON -->
+        <!-- FIRSATLAR BUTTON -->
         <div class="list-card" onclick="openPinnedFrame()">
             <div class="list-item">
                 <div class="list-icon icon-featured">
-                    <i class="fas fa-thumbtack"></i>
+                    <i class="fas fa-star"></i>
                 </div>
                 <div class="list-info">
-                    <div class="list-name">Sabitlenmiş İçerikler</div>
+                    <div class="list-name">Fırsatlar</div>
                     <div class="list-detail">En popüler, en çok aranan ve özel PDF'ler</div>
                 </div>
                 <div class="list-meta" style="color: #FF9800;">
@@ -1918,7 +1863,7 @@
                 </div>
                 <div class="list-info">
                     <div class="list-name">Tüm PDF Dosyaları</div>
-                    <div class="list-detail">Geniş PDF koleksiyonu</div>
+                    <div class="list-detail">Geniş PDF koleksiyonu <span id="total-pdf-count" style="font-weight: 600; color: var(--telegram-blue);"></span></div>
                 </div>
                 <div class="list-meta">
                     <i class="fas fa-chevron-right"></i>
@@ -2095,8 +2040,6 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- PROFİLDEN ADMIN VE POPÜLER BUTONLARI KALDIRILDI -->
         </div>
     </div>
     
@@ -2446,7 +2389,7 @@
         }
     }
     
-    // PINNED FRAME FUNCTIONS
+    // FIRSATLAR FRAME FUNCTIONS
     window.openPinnedFrame = function() {
         playButtonSound();
         if (window.Telegram && Telegram.WebApp) {
@@ -2464,220 +2407,6 @@
         document.getElementById('pinnedFrame').classList.add('hidden');
         document.getElementById('app').classList.remove('hidden');
     };
-    
-    // HER PDF İÇİN SABİTLEME BUTONU
-    window.pinPDF = function(pdfKey, pdfTitle) {
-        playButtonSound();
-        if (window.Telegram && Telegram.WebApp) {
-            Telegram.WebApp.HapticFeedback.impactOccurred('light');
-        }
-        
-        // Bu PDF için frame aç
-        openPinnedFrame();
-        
-        // Bu PDF'i öne çıkar
-        setTimeout(() => {
-            highlightPinnedPDF(pdfKey, pdfTitle);
-        }, 300);
-    };
-    
-    async function highlightPinnedPDF(pdfKey, pdfTitle) {
-        if (!db) return;
-        
-        try {
-            // PDF verilerini al
-            const pdfSnapshot = await db.ref(`pdfs/${pdfKey}`).once('value');
-            const pdfData = pdfSnapshot.val();
-            
-            if (!pdfData) return;
-            
-            // Benzer PDF'leri bul (aynı kategoriden)
-            const allPdfsSnapshot = await db.ref('pdfs').once('value');
-            const allPdfs = allPdfsSnapshot.val() || {};
-            
-            const similarPdfs = Object.entries(allPdfs)
-                .map(([key, pdf]) => ({ key, ...pdf }))
-                .filter(pdf => !pdf.is_deleted && pdf.category === pdfData.category && pdf.key !== pdfKey)
-                .slice(0, 7);
-            
-            // Seçilen PDF'i de ekle
-            const allPdfsToShow = [{ key: pdfKey, ...pdfData }, ...similarPdfs];
-            
-            // Tüm listelerde bu PDF'leri göster
-            renderHighlightedPDF('pinnedPopularList', allPdfsToShow, `"${pdfTitle}" ve Benzer PDF'ler`);
-            renderHighlightedPDF('pinnedSearchedList', allPdfsToShow, `"${pdfTitle}" ve Benzer PDF'ler`);
-            renderHighlightedPDF('pinnedExclusiveList', allPdfsToShow, `"${pdfTitle}" ve Benzer PDF'ler`);
-            
-        } catch (error) {
-            console.error("PDF highlight error:", error);
-        }
-    }
-    
-    function renderHighlightedPDF(containerId, pdfs, title) {
-        const container = document.getElementById(containerId);
-        if (!container) return;
-        
-        if (pdfs.length === 0) {
-            container.innerHTML = `
-                <div style="text-align: center; padding: 40px 20px; color: var(--hint-color);">
-                    <i class="fas fa-inbox" style="font-size: 30px; margin-bottom: 10px; opacity: 0.5;"></i>
-                    <p>PDF bulunamadı</p>
-                </div>
-            `;
-            return;
-        }
-        
-        let html = '';
-        pdfs.forEach((pdf, index) => {
-            const progress = currentUser ? 
-                (currentUser.pdf_progress && currentUser.pdf_progress[pdf.key] ? 
-                 currentUser.pdf_progress[pdf.key].watched_ads || 0 : 0) : 0;
-            
-            const progressPercent = pdf.required_ads > 0 ? 
-                Math.min(100, (progress / pdf.required_ads) * 100) : 100;
-            
-            const isHighlighted = index === 0;
-            
-            // PDF detaylarını al
-            const details = getPDFDetails(pdf);
-            
-            html += `
-                <div class="pdf-item" onclick="handlePDFDownloadClick('${pdf.key}', '${pdf.title.replace(/'/g, "\\'")}', '${pdf.url}', ${pdf.required_ads || 0})" style="padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.03); cursor: pointer; ${isHighlighted ? 'background: rgba(255, 193, 7, 0.05); border-left: 3px solid var(--warning-color);' : ''}">
-                    <div class="pdf-icon">
-                        ${isHighlighted ? '<i class="fas fa-star"></i>' : '<i class="fas fa-file-pdf"></i>'}
-                    </div>
-                    <div class="pdf-info">
-                        <div class="pdf-name" style="${isHighlighted ? 'color: var(--warning-color); font-weight: 700;' : ''}">
-                            ${isHighlighted ? '⭐ ' : ''}${pdf.title}
-                        </div>
-                        <div class="pdf-detail">
-                            <!-- Sınav Tipi -->
-                            ${details.examType ? `
-                                <span class="host-tag" style="background: ${details.examColor.bg}; color: ${details.examColor.color}; border-color: ${details.examColor.color}30;">
-                                    <i class="fas fa-${details.examColor.icon}" style="margin-right: 3px;"></i>
-                                    ${details.examType}
-                                </span>
-                            ` : ''}
-                            
-                            <!-- İndirme Sayısı -->
-                            <span class="host-tag" style="background: rgba(0,136,204,0.1); color: var(--telegram-blue);">
-                                <i class="fas fa-download" style="margin-right: 3px;"></i>
-                                ${details.downloadCount}
-                            </span>
-                            
-                            <!-- Host -->
-                            <span class="host-tag" style="background: rgba(33,150,243,0.1); color: #2196F3;">
-                                <i class="fab fa-${details.hostIcon}" style="margin-right: 3px;"></i>
-                                ${details.hostName}
-                            </span>
-                            
-                            <!-- Reklam -->
-                            <span style="color: ${details.statusColor}; font-weight: 600;">
-                                <i class="fas fa-${details.statusIcon}" style="margin-right: 3px;"></i>
-                                ${details.statusText}
-                            </span>
-                        </div>
-                        ${pdf.required_ads > 0 ? `
-                            <div class="progress-bar" style="margin-top: 6px; height: 4px;">
-                                <div class="progress-fill" style="width: ${progressPercent}%;"></div>
-                            </div>
-                        ` : ''}
-                    </div>
-                    <button class="pdf-pin-button" onclick="event.stopPropagation(); pinPDF('${pdf.key}', '${pdf.title.replace(/'/g, "\\'")}')" title="Bu PDF'i Sabitle">
-                        <i class="fas fa-thumbtack"></i>
-                    </button>
-                </div>
-            `;
-        });
-        
-        container.innerHTML = `
-            <div style="margin-bottom: 15px;">
-                <div style="font-size: 14px; font-weight: 600; color: var(--telegram-blue); margin-bottom: 10px;">
-                    <i class="fas fa-thumbtack" style="margin-right: 8px;"></i>
-                    ${title}
-                </div>
-            </div>
-            ${html}
-        `;
-    }
-    
-    // PDF DETAYLARINI ALMA FONKSİYONU
-    function getPDFDetails(pdf) {
-        const { title, url, required_ads, category, downloads } = pdf;
-        
-        // İndirme sayısı
-        const downloadCount = downloads || 0;
-        
-        // Host tespiti
-        let hostIcon = 'cloud';
-        let hostName = 'Cloud';
-        if (url.includes('dropbox')) {
-            hostIcon = 'dropbox';
-            hostName = 'Dropbox';
-        } else if (url.includes('google') || url.includes('drive')) {
-            hostIcon = 'google-drive';
-            hostName = 'Google Drive';
-        } else if (url.includes('mega') || url.includes('mega.nz')) {
-            hostIcon = 'mega';
-            hostName = 'MEGA';
-        }
-        
-        // TYT/AYT/LGS vs. otomatik algılama
-        let examType = '';
-        let examColor = EXAM_COLORS.TYT;
-        
-        const lowerTitle = title.toLowerCase();
-        if (lowerTitle.includes('tyt') || category === 'tyt') {
-            examType = 'TYT';
-            examColor = EXAM_COLORS.TYT;
-        } else if (lowerTitle.includes('ayt') || category === 'ayt') {
-            examType = 'AYT';
-            examColor = EXAM_COLORS.AYT;
-        } else if (lowerTitle.includes('yks') || category === 'yks') {
-            examType = 'YKS';
-            examColor = EXAM_COLORS.YKS;
-        } else if (lowerTitle.includes('lgs') || category === 'lgs') {
-            examType = 'LGS';
-            examColor = EXAM_COLORS.LGS;
-        } else if (lowerTitle.includes('kpss') || category === 'kpss') {
-            examType = 'KPSS';
-            examColor = EXAM_COLORS.KPSS;
-        } else if (lowerTitle.includes('ales') || category === 'ales') {
-            examType = 'ALES';
-            examColor = EXAM_COLORS.ALES;
-        } else if (lowerTitle.includes('dgs') || category === 'dgs') {
-            examType = 'DGS';
-            examColor = EXAM_COLORS.DGS;
-        }
-        
-        // Durum
-        let statusText = '';
-        let statusIcon = '';
-        let statusColor = '';
-        
-        const requiredAds = parseInt(required_ads) || 0;
-        
-        if (requiredAds <= 0) {
-            statusText = 'Ücretsiz';
-            statusIcon = 'gift';
-            statusColor = 'var(--success-color)';
-        } else {
-            statusText = `${requiredAds} reklam`;
-            statusIcon = 'ad';
-            statusColor = 'var(--warning-color)';
-        }
-        
-        return {
-            downloadCount,
-            hostIcon,
-            hostName,
-            examType,
-            examColor,
-            statusText,
-            statusIcon,
-            statusColor
-        };
-    }
     
     async function loadPinnedContent() {
         if (!db) return;
@@ -2746,6 +2475,9 @@
             // PDF detaylarını al
             const details = getPDFDetails(pdf);
             
+            // Yükleme tarihi
+            const uploadDate = pdf.created_at ? new Date(pdf.created_at).toLocaleDateString('tr-TR') : '-';
+            
             const progress = currentUser ? 
                 (currentUser.pdf_progress && currentUser.pdf_progress[key] ? 
                  currentUser.pdf_progress[key].watched_ads || 0 : 0) : 0;
@@ -2775,6 +2507,12 @@
                                 ${details.downloadCount}
                             </span>
                             
+                            <!-- Yükleme Tarihi -->
+                            <span class="host-tag" style="background: rgba(156,39,176,0.1); color: #9C27B0; font-size: 9px; padding: 2px 6px;">
+                                <i class="fas fa-calendar" style="margin-right: 2px;"></i>
+                                ${uploadDate}
+                            </span>
+                            
                             <!-- Host -->
                             <span class="host-tag" style="background: rgba(33,150,243,0.1); color: #2196F3; font-size: 9px; padding: 2px 6px;">
                                 <i class="fab fa-${details.hostIcon}" style="margin-right: 2px;"></i>
@@ -2793,19 +2531,12 @@
                             </div>
                         ` : ''}
                     </div>
-                    <button class="pdf-pin-button" onclick="event.stopPropagation(); pinPDF('${key}', '${safeTitle}')" title="Bu PDF'i Sabitle" style="width: 32px; height: 32px; font-size: 14px;">
-                        <i class="fas fa-thumbtack"></i>
-                    </button>
                 </div>
             `;
         });
         
         container.innerHTML = html;
     }
-    
-    window.pinCurrentFrame = function() {
-        showError("Bu ekran sabitlendi! (Demo)", false);
-    };
     
     // HATA GÖSTERME
     function showError(message, isError = true) {
@@ -3070,19 +2801,28 @@
             });
         }
         
-        // Linki aç
-        setTimeout(() => {
-            if (window.Telegram && Telegram.WebApp) {
-                Telegram.WebApp.openLink(url);
+        // Dropbox linkini düzelt (dl=1 yap)
+        let downloadUrl = url;
+        if (downloadUrl.includes('dropbox.com')) {
+            if (downloadUrl.includes('?')) {
+                downloadUrl = downloadUrl.replace('dl=0', 'dl=1');
+                if (!downloadUrl.includes('dl=')) {
+                    downloadUrl += '&dl=1';
+                }
             } else {
-                const link = document.createElement('a');
-                link.href = url;
-                link.target = '_blank';
-                link.rel = 'noopener noreferrer';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+                downloadUrl += '?dl=1';
             }
+        }
+        
+        // Yeni pencere ile indirme başlat
+        setTimeout(() => {
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = title + '.pdf';
+            link.target = '_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
             
             closeProgressModal();
             
@@ -3145,6 +2885,16 @@
         if (is_admin) {
             document.getElementById('admin-section').style.display = 'block';
             document.getElementById('admin-card').style.display = 'block';
+        }
+    }
+    
+    // TOPLAM PDF SAYISINI GÜNCELLE - DÜZELTİLDİ
+    function updateTotalPDFCount() {
+        if (!allPdfsData) return;
+        const totalPDFs = Object.values(allPdfsData).filter(pdf => !pdf.is_deleted).length;
+        const countElement = document.getElementById('total-pdf-count');
+        if (countElement) {
+            countElement.textContent = `(${totalPDFs} PDF)`;
         }
     }
     
@@ -3303,7 +3053,6 @@
         const title = document.getElementById('pdfTitleInput').value.trim();
         const category = document.getElementById('pdfCategorySelect').value;
         const adsCount = parseInt(document.getElementById('adsRange').value);
-        const isExclusive = document.getElementById('pdfExclusiveCheckbox').checked;
         
         if (!link || !title) {
             showError("Lütfen link ve başlık girin!");
@@ -3323,7 +3072,7 @@
                 url: link,
                 required_ads: adsCount,
                 category: category || 'diger',
-                is_exclusive: isExclusive,
+                is_exclusive: false,
                 downloads: 0,
                 created_at: firebase.database.ServerValue.TIMESTAMP,
                 last_updated: firebase.database.ServerValue.TIMESTAMP,
@@ -3341,7 +3090,6 @@
             document.getElementById('pdfCategorySelect').value = '';
             document.getElementById('adsRange').value = 5;
             document.getElementById('adsValue').textContent = '5';
-            document.getElementById('pdfExclusiveCheckbox').checked = false;
             
             // Listeyi yenile
             fetchPDFList();
@@ -3362,32 +3110,18 @@
             
             renderAdminPDFsList(pdfs);
             
-            // Arama fonksiyonu
-            document.getElementById('adminPdfSearch').addEventListener('input', function() {
-                const searchText = this.value.toLowerCase();
-                renderAdminPDFsList(pdfs, searchText);
-            });
-            
         } catch (error) {
             showError("PDF'ler yüklenemedi: " + error.message);
         }
     };
     
-    function renderAdminPDFsList(pdfs, searchText = '') {
+    function renderAdminPDFsList(pdfs) {
         const container = document.getElementById('adminPDFsList');
         if (!container) return;
         
         let pdfsArray = Object.entries(pdfs)
             .map(([key, pdf]) => ({ key, ...pdf }))
             .filter(pdf => !pdf.is_deleted);
-        
-        if (searchText) {
-            pdfsArray = pdfsArray.filter(pdf => {
-                const title = (pdf.title || '').toLowerCase();
-                const category = (pdf.category || '').toLowerCase();
-                return title.includes(searchText) || category.includes(searchText);
-            });
-        }
         
         if (pdfsArray.length === 0) {
             container.innerHTML = `
@@ -3404,6 +3138,9 @@
         pdfsArray.forEach(pdf => {
             const { key, title, category, downloads, required_ads, is_exclusive } = pdf;
             
+            // Yükleme tarihi
+            const uploadDate = pdf.created_at ? new Date(pdf.created_at).toLocaleDateString('tr-TR') : '-';
+            
             html += `
                 <div class="list-item" style="border: 1px solid rgba(0,136,204,0.1); border-radius: 8px; padding: 15px; background: white;">
                     <div style="display: flex; align-items: center; gap: 15px; width: 100%;">
@@ -3419,6 +3156,10 @@
                                 <span class="host-tag">
                                     <i class="fas fa-download" style="margin-right: 3px;"></i>
                                     ${downloads || 0} indirme
+                                </span>
+                                <span class="host-tag">
+                                    <i class="fas fa-calendar" style="margin-right: 3px;"></i>
+                                    ${uploadDate}
                                 </span>
                                 <span class="host-tag">
                                     <i class="fas fa-ad" style="margin-right: 3px;"></i>
@@ -3510,17 +3251,6 @@
                     
                     <div>
                         <label style="display: block; margin-bottom: 6px; font-weight: 600; color: var(--text-color);">
-                            <i class="fas fa-star" style="margin-right: 8px;"></i>
-                            Özel İçerik
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                            <input type="checkbox" id="editPdfExclusive" ${pdfData.is_exclusive ? 'checked' : ''} style="width: 18px; height: 18px;">
-                            <span>Sadece bizde olan içerik</span>
-                        </label>
-                    </div>
-                    
-                    <div>
-                        <label style="display: block; margin-bottom: 6px; font-weight: 600; color: var(--text-color);">
                             <i class="fas fa-ban" style="margin-right: 8px;"></i>
                             Durum
                         </label>
@@ -3557,7 +3287,6 @@
         const url = document.getElementById('editPdfUrl').value.trim();
         const category = document.getElementById('editPdfCategory').value;
         const adsCount = parseInt(document.getElementById('editAdsRange').value);
-        const isExclusive = document.getElementById('editPdfExclusive').checked;
         const isDeleted = document.getElementById('editPdfDeleted').checked;
         
         if (!title || !url) {
@@ -3571,7 +3300,6 @@
                 url: url,
                 category: category,
                 required_ads: adsCount,
-                is_exclusive: isExclusive,
                 is_deleted: isDeleted,
                 last_updated: firebase.database.ServerValue.TIMESTAMP
             };
@@ -3670,35 +3398,17 @@
             
             renderUsersList(users);
             
-            // Arama fonksiyonu
-            document.getElementById('userSearchInput').addEventListener('input', function() {
-                const searchText = this.value.toLowerCase();
-                renderUsersList(users, searchText);
-            });
-            
         } catch (error) {
             showError("Kullanıcılar yüklenemedi: " + error.message);
         }
     };
     
-    function renderUsersList(users, searchText = '') {
+    function renderUsersList(users) {
         const container = document.getElementById('usersList');
         if (!container) return;
         
         let usersArray = Object.entries(users)
             .map(([id, user]) => ({ id, ...user }));
-        
-        if (searchText) {
-            usersArray = usersArray.filter(user => {
-                const name = (user.first_name + ' ' + (user.last_name || '')).toLowerCase();
-                const username = (user.username || '').toLowerCase();
-                const idStr = user.id.toString();
-                
-                return name.includes(searchText) || 
-                       username.includes(searchText) || 
-                       idStr.includes(searchText);
-            });
-        }
         
         usersArray.sort((a, b) => (b.last_active || 0) - (a.last_active || 0));
         
@@ -3925,24 +3635,37 @@
         chartContainer.innerHTML = chartHTML;
     }
     
-    // 8. İSTATİSTİKLERİ SIFIRLA
+    // 8. İSTATİSTİKLERİ SIFIRLA (KULLANICI SAYISI HARİÇ)
     async function resetStatistics() {
         playButtonSound();
         
-        if (!confirm("İstatistikleri sıfırlamak istediğinize emin misiniz?\n\n• Reklam istatistikleri sıfırlanacak\n• Kullanıcı istatistikleri KALACAK\n• Toplam kullanıcı sayısı değişmeyecek\n\nBu işlem geri alınamaz!")) {
+        if (!confirm("İstatistikleri sıfırlamak istediğinize emin misiniz?\n\n• Reklam istatistikleri sıfırlanacak\n• PDF indirme sayıları sıfırlanacak\n• Kullanıcı istatistikleri KALACAK\n• Toplam kullanıcı sayısı değişmeyecek\n\nBu işlem geri alınamaz!")) {
             return;
         }
         
         try {
-            // Sadece reklam istatistiklerini sıfırla
+            // Tüm PDF'lerin indirme sayılarını sıfırla
+            const pdfsSnapshot = await db.ref('pdfs').once('value');
+            const pdfs = pdfsSnapshot.val() || {};
+            
             const updates = {
                 'analytics/total_ads_watched': 0,
                 'analytics/daily_ads_watched': {}
             };
             
+            // Her PDF için indirme sayısını sıfırla
+            Object.keys(pdfs).forEach(key => {
+                updates[`pdfs/${key}/downloads`] = 0;
+                updates[`pdfs/${key}/last_searched`] = 0;
+            });
+            
             await db.ref().update(updates);
             
             showError("İstatistikler başarıyla sıfırlandı!", false);
+            
+            // Listeleri yenile
+            fetchPDFList();
+            loadAdminStatistics();
             
             // Analiz modalını kapat ve yenile
             closeModal('analyticsModal');
@@ -4068,6 +3791,7 @@
         
         db.ref('pdfs').once('value').then(snapshot => {
             allPdfsData = snapshot.val() || {};
+            updateTotalPDFCount();
             renderPDFs();
         });
     };
@@ -4160,6 +3884,9 @@
             // PDF detaylarını al
             const details = getPDFDetails(pdf);
             
+            // Yükleme tarihi
+            const uploadDate = pdf.created_at ? new Date(pdf.created_at).toLocaleDateString('tr-TR') : '-';
+            
             // Kategori simgesi
             let categoryIcon = 'folder';
             if (category === 'matematik') categoryIcon = 'calculator';
@@ -4222,6 +3949,12 @@
                                 ${details.downloadCount}
                             </span>
                             
+                            <!-- Yükleme Tarihi -->
+                            <span class="host-tag" style="background: rgba(156,39,176,0.1); color: #9C27B0;">
+                                <i class="fas fa-calendar" style="margin-right: 3px;"></i>
+                                ${uploadDate}
+                            </span>
+                            
                             <!-- Host -->
                             <span class="host-tag" style="background: rgba(33,150,243,0.1); color: #2196F3;">
                                 <i class="fab fa-${details.hostIcon}" style="margin-right: 3px;"></i>
@@ -4240,15 +3973,90 @@
                             </div>
                         ` : ''}
                     </div>
-                    <button class="pdf-pin-button" onclick="event.stopPropagation(); pinPDF('${key}', '${safeTitle}')" title="Bu PDF'i Sabitle">
-                        <i class="fas fa-thumbtack"></i>
-                    </button>
                 </div>
             `;
         });
         
         html += '</div>';
         listContainer.innerHTML = html;
+    }
+    
+    // PDF DETAYLARINI ALMA FONKSİYONU
+    function getPDFDetails(pdf) {
+        const { title, url, required_ads, category, downloads } = pdf;
+        
+        // İndirme sayısı
+        const downloadCount = downloads || 0;
+        
+        // Host tespiti
+        let hostIcon = 'cloud';
+        let hostName = 'Cloud';
+        if (url.includes('dropbox')) {
+            hostIcon = 'dropbox';
+            hostName = 'Dropbox';
+        } else if (url.includes('google') || url.includes('drive')) {
+            hostIcon = 'google-drive';
+            hostName = 'Google Drive';
+        } else if (url.includes('mega') || url.includes('mega.nz')) {
+            hostIcon = 'mega';
+            hostName = 'MEGA';
+        }
+        
+        // TYT/AYT/LGS vs. otomatik algılama
+        let examType = '';
+        let examColor = EXAM_COLORS.TYT;
+        
+        const lowerTitle = title.toLowerCase();
+        if (lowerTitle.includes('tyt') || category === 'tyt') {
+            examType = 'TYT';
+            examColor = EXAM_COLORS.TYT;
+        } else if (lowerTitle.includes('ayt') || category === 'ayt') {
+            examType = 'AYT';
+            examColor = EXAM_COLORS.AYT;
+        } else if (lowerTitle.includes('yks') || category === 'yks') {
+            examType = 'YKS';
+            examColor = EXAM_COLORS.YKS;
+        } else if (lowerTitle.includes('lgs') || category === 'lgs') {
+            examType = 'LGS';
+            examColor = EXAM_COLORS.LGS;
+        } else if (lowerTitle.includes('kpss') || category === 'kpss') {
+            examType = 'KPSS';
+            examColor = EXAM_COLORS.KPSS;
+        } else if (lowerTitle.includes('ales') || category === 'ales') {
+            examType = 'ALES';
+            examColor = EXAM_COLORS.ALES;
+        } else if (lowerTitle.includes('dgs') || category === 'dgs') {
+            examType = 'DGS';
+            examColor = EXAM_COLORS.DGS;
+        }
+        
+        // Durum
+        let statusText = '';
+        let statusIcon = '';
+        let statusColor = '';
+        
+        const requiredAds = parseInt(required_ads) || 0;
+        
+        if (requiredAds <= 0) {
+            statusText = 'Ücretsiz';
+            statusIcon = 'gift';
+            statusColor = 'var(--success-color)';
+        } else {
+            statusText = `${requiredAds} reklam`;
+            statusIcon = 'ad';
+            statusColor = 'var(--warning-color)';
+        }
+        
+        return {
+            downloadCount,
+            hostIcon,
+            hostName,
+            examType,
+            examColor,
+            statusText,
+            statusIcon,
+            statusColor
+        };
     }
     
     // SIRALAMA - GELİŞMİŞ
@@ -4283,7 +4091,6 @@
                 e.target.closest('.list-item') ||
                 e.target.closest('.sort-button') ||
                 e.target.closest('.category-item') ||
-                e.target.closest('.pdf-pin-button') ||
                 e.target.closest('.search-button')) {
                 playButtonSound();
             }
