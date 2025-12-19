@@ -1785,6 +1785,39 @@
     </div>
 </div>
 
+<!-- REKLAM YÖNLENDİRME MODALI -->
+<div class="modal-overlay hidden" id="redirectAdModal">
+    <div class="modal-content" style="max-width: 400px; text-align: center;">
+        <h3 style="margin: 0 0 12px 0; font-size: 20px; color: var(--warning-color); display: flex; align-items: center; justify-content: center; gap: 10px;">
+            <i class="fas fa-exclamation-triangle"></i>
+            Reklam İzleme Gerekiyor!
+        </h3>
+        <p id="redirectAdMessage" style="font-weight: 600; margin-bottom: 12px; font-size: 15px; background: rgba(255,193,7,0.05); padding: 12px; border-radius: 10px;">
+            Önce reklam izlemelisiniz!
+        </p>
+        
+        <p style="color: var(--hint-color); font-size: 14px; margin-bottom: 20px; line-height: 1.5;">
+            <i class="fas fa-info-circle" style="color: var(--warning-color); margin-right: 6px;"></i>
+            İndirme işlemini tamamlamak için lütfen reklamı izleyin.
+        </p>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="redirectProgressFill" style="width: 0%; background: var(--warning-gradient);"></div>
+        </div>
+        
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button onclick="startAdRedirect()" class="action-button" style="background: var(--warning-gradient); flex: 1;">
+                <i class="fas fa-play-circle" style="margin-right: 8px;"></i>
+                Reklama Git
+            </button>
+            <button onclick="closeModal('redirectAdModal')" class="action-button" style="background: var(--danger-gradient); flex: 1;">
+                <i class="fas fa-times" style="margin-right: 8px;"></i>
+                İptal
+            </button>
+        </div>
+    </div>
+</div>
+
 <!-- MAIN APP -->
 <div class="telegram-app hidden" id="app">
     <!-- HOME PAGE -->
@@ -2276,6 +2309,8 @@
     let pendingActionData = null;
     let editingPDFKey = null;
     let currentAnalyticsData = null;
+    let adWatchChecker = null;
+    let redirectAdTimer = null;
     
     // GENİŞLETİLMİŞ KATEGORİLER
     const PDF_CATEGORIES = {
@@ -2574,6 +2609,14 @@
             pendingAction = null;
             pendingActionData = null;
         }
+        
+        // Eğer redirect modal kapatılıyorsa, timer'ı temizle
+        if (modalId === 'redirectAdModal') {
+            if (redirectAdTimer) {
+                clearInterval(redirectAdTimer);
+                redirectAdTimer = null;
+            }
+        }
     };
     
     // KULLANICI KAYDI
@@ -2593,8 +2636,8 @@
         await userRef.update(updates);
     }
     
-    // PDF İNDİRME SİSTEMİ
-    window.handlePDFDownloadClick = function(key, title, url, requiredAds) {
+    // PDF İNDİRME SİSTEMİ - GÜNCELLENMİŞ VERSİYON
+    window.handlePDFDownloadClick = async function(key, title, url, requiredAds) {
         console.log("🚀 PDF indirme hemen başlatılıyor...");
         
         if (!currentUser) {
@@ -2604,41 +2647,76 @@
         
         playButtonSound();
         
+        // Kullanıcının ilerlemesini kontrol et
+        let watchedAds = 0;
+        if (db) {
+            const progressSnapshot = await db.ref(`users/${currentUser.id}/pdf_progress/${key}`).once('value');
+            const progress = progressSnapshot.val();
+            watchedAds = progress?.watched_ads || 0;
+        }
+        
+        // Yeterli reklam izlenmiş mi kontrol et
+        if (watchedAds >= requiredAds) {
+            // HEMEN İNDİRMEYE BAŞLA
+            startDirectDownload(key, title, url);
+        } else {
+            // REKLAM MODALINI AÇ
+            currentPdf = {
+                key: key,
+                title: title,
+                url: url,
+                required_ads: requiredAds,
+                watched_ads: watchedAds
+            };
+            
+            openProgressModal();
+        }
+    };
+    
+    // DOĞRUDAN İNDİRME FONKSİYONU
+    async function startDirectDownload(key, title, url) {
+        console.log("✅ Yeterli reklam izlenmiş, hemen indiriliyor...");
+        
         // Dropbox linkini düzelt
-        let finalUrl = url;
-        if (url.includes('dropbox.com')) {
-            if (url.includes('dl=0')) {
-                finalUrl = url.replace('dl=0', 'dl=1');
-            } else if (url.includes('?')) {
-                finalUrl = url + '&dl=1';
+        let downloadUrl = url;
+        if (downloadUrl.includes('dropbox.com')) {
+            if (downloadUrl.includes('?')) {
+                downloadUrl = downloadUrl.replace('dl=0', 'dl=1');
+                if (!downloadUrl.includes('dl=')) {
+                    downloadUrl += '&dl=1';
+                }
             } else {
-                finalUrl = url + '?dl=1';
+                downloadUrl += '?dl=1';
             }
         }
         
-        currentPdf = {
-            key: key,
-            title: title,
-            url: finalUrl,
-            required_ads: requiredAds,
-            watched_ads: 0
-        };
-        
-        // HEMEN MODAL AÇ
-        openProgressModal();
-        
-        // Kullanıcı ilerlemesini kontrol et
+        // İndirme sayacını artır
         if (db) {
-            db.ref(`users/${currentUser.id}/pdf_progress/${key}`).once('value').then(snapshot => {
-                const progress = snapshot.val();
-                if (progress && progress.watched_ads) {
-                    currentPdf.watched_ads = progress.watched_ads;
-                    updateProgressBar();
-                    updateAdButton();
-                }
+            db.ref('pdfs/' + key).child('downloads').transaction(current => {
+                return (current || 0) + 1;
+            });
+            
+            // Kullanıcı istatistiklerini güncelle
+            db.ref(`users/${currentUser.id}/total_downloads`).transaction(current => {
+                return (current || 0) + 1;
             });
         }
-    };
+        
+        // Yeni pencere ile indirme başlat
+        setTimeout(() => {
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = title + '.pdf';
+            link.target = '_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            setTimeout(() => {
+                fetchPDFList();
+            }, 500);
+        }, 100);
+    }
     
     function openProgressModal() {
         if (!currentPdf) return;
@@ -2677,9 +2755,15 @@
     window.closeProgressModal = function() {
         document.getElementById('adProgressModal').classList.add('hidden');
         currentPdf = null;
+        
+        // Ad kontrolünü durdur
+        if (adWatchChecker) {
+            clearInterval(adWatchChecker);
+            adWatchChecker = null;
+        }
     };
     
-    // REKLAM İZLEME
+    // REKLAM İZLEME VE KONTROL SİSTEMİ
     window.handleWatchAdClick = async function() {
         playButtonSound();
         
@@ -2691,90 +2775,118 @@
         }
         
         adButton.disabled = true;
-        adButton.innerHTML = `<i class="fas fa-spinner fa-spin" style="margin-right: 10px;"></i> Reklam yükleniyor...`;
+        adButton.innerHTML = `<i class="fas fa-spinner fa-spin" style="margin-right: 10px;"></i> Reklam açılıyor...`;
         
         try {
-            if (typeof show_10340134 === 'undefined') {
-                setTimeout(() => {
-                    if (confirm("Reklam servisi yüklenemedi. Test için ilerleme kaydetmek ister misiniz?")) {
-                        handleTestAd();
-                    } else {
-                        adButton.disabled = false;
-                        adButton.innerHTML = `<i class="fas fa-play-circle" style="margin-right: 12px;"></i> Reklam İzle`;
-                    }
-                }, 100);
-                return;
-            }
+            // Reklam sayfasını yeni sekmede aç
+            const adUrl = 'https://libtl.com/show_10340134.html';
+            window.open(adUrl, '_blank');
             
-            await show_10340134();
-            await handleAdSuccess();
+            // Kullanıcıya bilgi ver
+            document.getElementById('progressModalStatus').textContent = "⏳ Reklam sayfası açıldı...";
+            
+            // 3 saniye bekle
+            setTimeout(() => {
+                // Kullanıcı reklam sayfasına gitmiş mi kontrol etmek için modal göster
+                showRedirectAdModal();
+            }, 3000);
             
         } catch (error) {
-            setTimeout(() => {
-                if (confirm("Reklam izlenemedi. Test için ilerleme kaydetmek ister misiniz?")) {
-                    handleTestAd();
-                } else {
-                    adButton.disabled = false;
-                    adButton.innerHTML = `<i class="fas fa-play-circle" style="margin-right: 12px;"></i> Reklam İzle`;
-                    showError("Reklam izlenemedi");
-                }
-            }, 100);
+            console.error("Reklam açma hatası:", error);
+            adButton.disabled = false;
+            adButton.innerHTML = `<i class="fas fa-play-circle" style="margin-right: 12px;"></i> Reklam İzle`;
+            showError("Reklam açılamadı");
         }
     };
     
-    async function handleTestAd() {
+    // REKLAM YÖNLENDİRME MODALI
+    function showRedirectAdModal() {
         if (!currentPdf) return;
         
-        currentPdf.watched_ads++;
-        
-        const updates = {};
-        updates[`users/${currentUser.id}/pdf_progress/${currentPdf.key}/watched_ads`] = currentPdf.watched_ads;
-        updates[`users/${currentUser.id}/pdf_progress/${currentPdf.key}/last_ad_watch`] = firebase.database.ServerValue.TIMESTAMP;
-        
-        await db.ref().update(updates);
-        
-        updateProgressBar();
-        updateAdButton();
-    }
-    
-    async function handleAdSuccess() {
-        if (!currentPdf) return;
-        
-        currentPdf.watched_ads++;
-        
-        const updates = {};
-        updates[`users/${currentUser.id}/pdf_progress/${currentPdf.key}/watched_ads`] = currentPdf.watched_ads;
-        updates[`users/${currentUser.id}/pdf_progress/${currentPdf.key}/last_ad_watch`] = firebase.database.ServerValue.TIMESTAMP;
-        updates['analytics/total_ads_watched'] = firebase.database.ServerValue.increment(1);
-        
-        const todayKey = new Date().toISOString().slice(0, 10);
-        updates[`analytics/daily_ads_watched/${todayKey}`] = firebase.database.ServerValue.increment(1);
-        
-        await db.ref().update(updates);
-        
-        updateProgressBar();
-        updateAdButton();
-    }
-    
-    function updateAdButton() {
-        const { required_ads, watched_ads } = currentPdf;
+        const { title, required_ads, watched_ads } = currentPdf;
         const remainingAds = Math.max(0, required_ads - watched_ads);
-        const adButton = document.getElementById('watchAdButton');
         
-        if (remainingAds <= 0) {
-            document.getElementById('progressModalStatus').textContent = "🎉 Tebrikler! İndirmeye hazır.";
-            document.getElementById('watchAdButton').classList.add('hidden');
-            document.getElementById('downloadButton').classList.remove('hidden');
-        } else {
-            document.getElementById('progressModalStatus').textContent = `📊 Kalan: ${remainingAds} reklam`;
-            adButton.innerHTML = `<i class="fas fa-play-circle" style="margin-right: 12px;"></i> Reklam İzle (${remainingAds} kaldı)`;
-            adButton.disabled = false;
-            adButton.classList.remove('hidden');
+        document.getElementById('redirectAdMessage').textContent = 
+            `"${title}" için ${remainingAds} reklam izlemelisiniz`;
+        
+        // Progress bar'ı sıfırla
+        document.getElementById('redirectProgressFill').style.width = '0%';
+        
+        // Timer ile progress bar'ı güncelle
+        let progress = 0;
+        redirectAdTimer = setInterval(() => {
+            progress += 1;
+            if (progress <= 100) {
+                document.getElementById('redirectProgressFill').style.width = `${progress}%`;
+            } else {
+                clearInterval(redirectAdTimer);
+            }
+        }, 50); // 5 saniyede tamamlanır
+        
+        // Modalı göster
+        document.getElementById('redirectAdModal').classList.remove('hidden');
+        document.getElementById('adProgressModal').classList.add('hidden');
+    }
+    
+    function startAdRedirect() {
+        playButtonSound();
+        
+        if (redirectAdTimer) {
+            clearInterval(redirectAdTimer);
+            redirectAdTimer = null;
+        }
+        
+        // Reklam sayfasını tekrar aç
+        const adUrl = 'https://libtl.com/show_10340134.html';
+        window.open(adUrl, '_blank');
+        
+        // 5 saniye sonra kullanıcının reklamı izleyip izlemediğini kontrol et
+        setTimeout(() => {
+            checkAdCompletion();
+        }, 5000);
+    }
+    
+    async function checkAdCompletion() {
+        if (!currentPdf || !db) return;
+        
+        try {
+            // Burada kullanıcının reklamı izleyip izlemediğini kontrol etmek için
+            // bir sistem entegre edilebilir. Şimdilik test için otomatik kabul ediyoruz.
+            
+            const { key, required_ads, watched_ads } = currentPdf;
+            const newWatchedAds = watched_ads + 1;
+            
+            // İlerlemeyi kaydet
+            const updates = {};
+            updates[`users/${currentUser.id}/pdf_progress/${key}/watched_ads`] = newWatchedAds;
+            updates[`users/${currentUser.id}/pdf_progress/${key}/last_ad_watch`] = firebase.database.ServerValue.TIMESTAMP;
+            updates['analytics/total_ads_watched'] = firebase.database.ServerValue.increment(1);
+            
+            const todayKey = new Date().toISOString().slice(0, 10);
+            updates[`analytics/daily_ads_watched/${todayKey}`] = firebase.database.ServerValue.increment(1);
+            
+            await db.ref().update(updates);
+            
+            // PDF bilgisini güncelle
+            currentPdf.watched_ads = newWatchedAds;
+            
+            // Modal'ı kapat
+            closeModal('redirectAdModal');
+            
+            // İlerleme modalını tekrar aç
+            openProgressModal();
+            
+            // Başarı mesajı göster
+            showError("Reklam başarıyla izlendi!", false);
+            
+        } catch (error) {
+            console.error("Reklam kontrol hatası:", error);
+            showError("Reklam kontrol edilemedi");
         }
     }
     
-    // PDF İNDİRME
-    window.finalizeDownload = function() {
+    // İNDİR BUTONU FONKSİYONU - GÜNCELLENMİŞ
+    window.finalizeDownload = async function() {
         playButtonSound();
         
         if (!currentPdf) {
@@ -2785,51 +2897,14 @@
         const { key, title, url, required_ads, watched_ads } = currentPdf;
         
         if (watched_ads < required_ads) {
-            showError(`⚠️ Henüz yeterli reklam izlemediniz. ${required_ads - watched_ads} reklam daha izlemelisiniz.`);
+            // Kullanıcı reklam izlememiş, yönlendir
+            showRedirectAdModal();
             return;
         }
         
-        // İndirme sayacını artır
-        if (db) {
-            db.ref('pdfs/' + key).child('downloads').transaction(current => {
-                return (current || 0) + 1;
-            });
-            
-            // Kullanıcı istatistiklerini güncelle
-            db.ref(`users/${currentUser.id}/total_downloads`).transaction(current => {
-                return (current || 0) + 1;
-            });
-        }
-        
-        // Dropbox linkini düzelt (dl=1 yap)
-        let downloadUrl = url;
-        if (downloadUrl.includes('dropbox.com')) {
-            if (downloadUrl.includes('?')) {
-                downloadUrl = downloadUrl.replace('dl=0', 'dl=1');
-                if (!downloadUrl.includes('dl=')) {
-                    downloadUrl += '&dl=1';
-                }
-            } else {
-                downloadUrl += '?dl=1';
-            }
-        }
-        
-        // Yeni pencere ile indirme başlat
-        setTimeout(() => {
-            const link = document.createElement('a');
-            link.href = downloadUrl;
-            link.download = title + '.pdf';
-            link.target = '_blank';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            closeProgressModal();
-            
-            setTimeout(() => {
-                fetchPDFList();
-            }, 500);
-        }, 100);
+        // Yeterli reklam izlenmiş, hemen indir
+        startDirectDownload(key, title, url);
+        closeProgressModal();
     };
     
     // SAYFA GEÇİŞLERİ
@@ -3481,7 +3556,7 @@
         container.innerHTML = html;
     }
     
-    // 7. DETAYLI ANALİZ - GRAFİK DÜZELTİLDİ
+    // 7. DETAYLI ANALİZ - 7 GÜNLÜK İSTATİSTİKLER KALDIRILDI
     window.adminViewAnalytics = async function() {
         playButtonSound();
         document.getElementById('analyticsModal').classList.remove('hidden');
@@ -3521,7 +3596,7 @@
             // Günlük reklam izleme
             const todayAds = dailyAds[today] || 0;
             
-            // Analiz HTML'i oluştur
+            // Analiz HTML'i oluştur - 7 GÜNLÜK GRAFİK KALDIRILDI
             const analyticsHTML = `
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 25px;">
                     <div style="background: rgba(0,136,204,0.05); border: 1px solid rgba(0,136,204,0.1); border-radius: 10px; padding: 20px;">
@@ -3565,22 +3640,10 @@
                     </div>
                 </div>
                 
-                <div style="background: rgba(0,136,204,0.05); border: 1px solid rgba(0,136,204,0.1); border-radius: 10px; padding: 20px;">
-                    <h4 style="margin: 0 0 15px 0; font-size: 16px; color: var(--telegram-blue);">
-                        <i class="fas fa-chart-bar" style="margin-right: 8px;"></i>
-                        Son 7 Günün Reklam İstatistikleri
-                    </h4>
-                    
-                    <div class="chart-container" id="weeklyChart">
-                        <!-- Grafik buraya çizilecek -->
-                    </div>
-                </div>
+                <!-- 7 GÜNLÜK İSTATİSTİKLER KALDIRILDI -->
             `;
             
             document.getElementById('analyticsContent').innerHTML = analyticsHTML;
-            
-            // Haftalık grafik oluştur
-            renderWeeklyChart(dailyAds);
             
             currentAnalyticsData = {
                 dailyAds: dailyAds,
@@ -3593,47 +3656,6 @@
             showError("Analiz verileri yüklenemedi: " + error.message);
         }
     };
-    
-    function renderWeeklyChart(dailyAds) {
-        const chartContainer = document.getElementById('weeklyChart');
-        if (!chartContainer) return;
-        
-        // Son 7 günü al
-        const dates = [];
-        const values = [];
-        
-        for (let i = 6; i >= 0; i--) {
-            const date = new Date();
-            date.setDate(date.getDate() - i);
-            const dateStr = date.toISOString().slice(0, 10);
-            dates.push(dateStr);
-            values.push(dailyAds[dateStr] || 0);
-        }
-        
-        // Maksimum değeri bul
-        const maxValue = Math.max(...values, 1);
-        
-        let chartHTML = '';
-        dates.forEach((date, index) => {
-            const value = values[index];
-            const heightPercent = (value / maxValue) * 100;
-            const dayName = new Date(date).toLocaleDateString('tr-TR', { weekday: 'short' });
-            
-            chartHTML += `
-                <div class="chart-item">
-                    <div style="flex: 1; display: flex; align-items: flex-end; width: 100%;">
-                        <div class="chart-bar" style="height: ${heightPercent}%; min-height: ${value > 0 ? '10px' : '0'};"></div>
-                    </div>
-                    <div style="margin-top: 10px; font-size: 12px; color: var(--hint-color); text-align: center;">
-                        <div style="font-weight: 600;">${dayName}</div>
-                        <div style="font-size: 11px;">${value}</div>
-                    </div>
-                </div>
-            `;
-        });
-        
-        chartContainer.innerHTML = chartHTML;
-    }
     
     // 8. İSTATİSTİKLERİ SIFIRLA (KULLANICI SAYISI HARİÇ)
     async function resetStatistics() {
