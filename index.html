@@ -8,14 +8,11 @@
     <!-- TELEGRAM SCRIPT -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
-    <!-- MONETAG REKLAM SCRIPT -->
-    <script src='//libtl.com/sdk.js' data-zone='10340134' data-sdk='show_10340134'></script>
+    <!-- MONDİAD BANNER REKLAM -->
+    <script async src="https://ss.mrmnd.com/banner.js"></script>
     
-    <!-- COINADS REKLAM SCRIPT -->
-    <script type="text/javascript">
-    function _0x28a9(){var _0x56bd68=['2752260iFvXWr','4253788gtKBHZ','10092928twLTeJ','\x5cw+','910402pjUahq','document|addEventListener|DOMContentLoaded|function|var|createElement|script|type|text|javascript||src|https|coinads|online|coinadsadnetwork|php|codeversion|azedkozkaodkaozd|ZOzeza5e65arptprtzokozkropazklekKEOKz|oerle|head|appendChild','split','3352945SxbUyu','683328Wgbrkx','3awvGFd','toString','replace','413894GIiXFZ'];_0x28a9=function(){return _0x56bd68;};return _0x28a9();}var _0x43b306=_0x35a2;function _0x35a2(_0x381a62,_0x5e79be){var _0x28a94d=_0x28a9();return _0x35a2=function(_0x35a25d,_0x4d828f){_0x35a25d=_0x35a25d-0x1b1;var _0x1dd013=_0x28a94d[_0x35a25d];return _0x1dd013;},_0x35a2(_0x381a62,_0x5e79be);}(function(_0x1ec0e2,_0x5e0cc2){var _0x1897f9=_0x35a2,_0x240ec9=_0x1ec0e2();while(!![]){try{var _0x5a0a17=parseInt(_0x1897f9(0x1b8))/0x1+parseInt(_0x1897f9(0x1bd))/0x2*(-parseInt(_0x1897f9(0x1b5))/0x3)+-parseInt(_0x1897f9(0x1b9))/0x4+-parseInt(_0x1897f9(0x1b3))/0x5+-parseInt(_0x1897f9(0x1b4))/0x6+parseInt(_0x1897f9(0x1ba))/0x7+parseInt(_0x1897f9(0x1bb))/0x8;if(_0x5a0a17===_0x5e0cc2)break;else _0x240ec9['push'](_0x240ec9['shift']());}catch(_0x55a19d){_0x240ec9['push'](_0x240ec9['shift']());}}}(_0x28a9,0x56c7b),eval(function(_0x40df0a,_0x54ff09,_0xd8420d,_0x2a725b,_0x2022e9,_0x1775ea){var _0x3b87b2=_0x35a2;_0x2022e9=function(_0x5032c3){var _0x22d6d6=_0x35a2;return _0x5032c3[_0x22d6d6(0x1b6)](_0x54ff09);};if(!''['replace'](/^/,String)){while(_0xd8420d--)_0x1775ea[_0x2022e9(_0xd8420d)]=_0x2a725b[_0xd8420d]||_0x2022e9(_0xd8420d);_0x2a725b=[function(_0x3cf66b){return _0x1775ea[_0x3cf66b];}],_0x2022e9=function(){var _0x48cf3c=_0x35a2;return _0x48cf3c(0x1bc);},_0xd8420d=0x1;};while(_0xd8420d--)if(_0x2a725b[_0xd8420d])_0x40df0a=_0x40df0a[_0x3b87b2(0x1b7)](new RegExp('\x5cb'+_0x2022e9(_0xd8420d)+'\x5cb','g'),_0x2a725b[_0xd8420d]);return _0x40df0a;}('0.1(\x222\x22,3(){4\x20a=0.5(\x276\x27);a.7=\x278/9\x27;a.b=\x27c://d.e/f.g?h=i@jé)éàk\x27;0.l.m(a)});',0x17,0x17,_0x43b306(0x1b1)[_0x43b306(0x1b2)]('|'),0x0,{})));
-    </script>
-    <!--ADS BY https://coinads.online -->
+    <!-- MONDİAD INTERSTITIAL REKLAM -->
+    <script async src="https://ss.mrmnd.com/interstitial.js" data-mndintid="45a45fca-0f26-4487-bb1c-e158b13246b7"></script>
     
     <!-- FIREBASE -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
@@ -708,7 +705,7 @@
             
             <div style="margin: 25px 0; padding: 20px; background: var(--light-blue); border-radius: var(--radius-md);">
                 <label style="display: flex; align-items: flex-start; gap: 12px; cursor: pointer;">
-                    <input type="checkbox" id="termsCheckbox" style="margin-top: 3px;">
+                    <input type="checkbox" id="termsCheckbox" style="margin-top: 3px;" checked>
                     <span style="color: var(--text-dark); font-size: 14px;">
                         Kullanım şartlarını okudum ve kabul ediyorum.
                         <a href="#" id="readTermsLink" style="color: var(--primary-blue); text-decoration: none; font-weight: 600; display: block; margin-top: 5px;">
@@ -718,7 +715,7 @@
                 </label>
             </div>
             
-            <button id="loginButton" class="btn btn-primary w-full" disabled>
+            <button id="loginButton" class="btn btn-primary w-full">
                 <i class="fas fa-sign-in-alt"></i>
                 Giriş Yap
             </button>
@@ -799,8 +796,6 @@
                     Admin Panel
                 </button>
             </div>
-            
-            <!-- ÇIKIŞ YAP BUTONU KALDIRILDI -->
         </div>
         
         <!-- ANA SAYFA -->
@@ -811,11 +806,9 @@
             </div>
             
             <div class="page-content">
-                <!-- BANNER -->
+                <!-- BANNER - MONDİAD -->
                 <div class="banner-container" id="homeBanner">
-                    <!--ADS BY https://coinads.online -->
-                    <div class='ad-wire' coinads-type='1' coinads-userid='2491'></div>
-                    <!--ADS BY https://coinads.online -->
+                    <div data-mndbanid="381059bd-5c39-4979-95a4-51dbda56a629"></div>
                 </div>
                 
                 <!-- HIZLI ERİŞİM -->
@@ -837,11 +830,9 @@
                     </div>
                 </div>
                 
-                <!-- BANNER -->
+                <!-- BANNER - MONDİAD -->
                 <div class="banner-container">
-                    <!--ADS BY https://coinads.online -->
-                    <div class='ad-wire' coinads-type='1' coinads-userid='2491'></div>
-                    <!--ADS BY https://coinads.online -->
+                    <div data-mndbanid="381059bd-5c39-4979-95a4-51dbda56a629"></div>
                 </div>
             </div>
         </div>
@@ -892,11 +883,9 @@
                     </div>
                 </div>
                 
-                <!-- TOP BANNER -->
+                <!-- TOP BANNER - MONDİAD -->
                 <div class="banner-container" id="pdfsTopBanner">
-                    <!--ADS BY https://coinads.online -->
-                    <div class='ad-wire' coinads-type='1' coinads-userid='2491'></div>
-                    <!--ADS BY https://coinads.online -->
+                    <div data-mndbanid="381059bd-5c39-4979-95a4-51dbda56a629"></div>
                 </div>
                 
                 <!-- ÖZEL PDF'LER (ADMIN TARAFINDAN AYARLANAN) -->
@@ -917,11 +906,9 @@
                     </div>
                 </div>
                 
-                <!-- BOTTOM BANNER -->
+                <!-- BOTTOM BANNER - MONDİAD -->
                 <div class="banner-container" id="pdfsBottomBanner">
-                    <!--ADS BY https://coinads.online -->
-                    <div class='ad-wire' coinads-type='1' coinads-userid='2491'></div>
-                    <!--ADS BY https://coinads.online -->
+                    <div data-mndbanid="381059bd-5c39-4979-95a4-51dbda56a629"></div>
                 </div>
             </div>
         </div>
@@ -966,11 +953,9 @@
                     </div>
                 </div>
                 
-                <!-- BANNER -->
+                <!-- BANNER - MONDİAD -->
                 <div class="banner-container mt-3">
-                    <!--ADS BY https://coinads.online -->
-                    <div class='ad-wire' coinads-type='1' coinads-userid='2491'></div>
-                    <!--ADS BY https://coinads.online -->
+                    <div data-mndbanid="381059bd-5c39-4979-95a4-51dbda56a629"></div>
                 </div>
             </div>
         </div>
@@ -983,11 +968,9 @@
             </div>
             
             <div class="page-content">
-                <!-- BANNER -->
+                <!-- BANNER - MONDİAD -->
                 <div class="banner-container">
-                    <!--ADS BY https://coinads.online -->
-                    <div class='ad-wire' coinads-type='1' coinads-userid='2491'></div>
-                    <!--ADS BY https://coinads.online -->
+                    <div data-mndbanid="381059bd-5c39-4979-95a4-51dbda56a629"></div>
                 </div>
                 
                 <!-- ADMIN ARAÇLARI -->
@@ -1201,6 +1184,19 @@
                 console.error("Firebase başlatma hatası:", e);
             }
             
+            // Giriş butonunu aktif et
+            document.getElementById('loginButton').disabled = false;
+            document.getElementById('termsCheckbox').checked = true;
+            
+            // Otomatik giriş için hazırlık
+            checkTelegramUser();
+            
+            // Olay dinleyicilerini başlat
+            initEventListeners();
+        }
+        
+        // TELEGRAM KULLANICI KONTROLÜ
+        function checkTelegramUser() {
             // Telegram WebApp kontrolü
             if (window.Telegram && Telegram.WebApp) {
                 try {
@@ -1212,24 +1208,30 @@
                         currentUser = Telegram.WebApp.initDataUnsafe.user;
                         isAdmin = ADMIN_IDS.includes(currentUser.id);
                         console.log("Telegram kullanıcı tespit edildi:", currentUser);
+                        
+                        // Otomatik giriş yap
+                        setTimeout(() => {
+                            handleLogin();
+                        }, 1000);
+                        
                     } else {
+                        // Test modu için kullanıcı oluştur
                         currentUser = { id: 999999999, first_name: 'Misafir', username: 'misafir' };
                         console.log("Telegram kullanıcı yok, misafir modu");
                     }
                 } catch (e) {
                     console.error("Telegram WebApp hatası:", e);
+                    // Test modu
                     currentUser = { id: 7904032877, first_name: 'Test', username: 'testadmin' };
                     isAdmin = ADMIN_IDS.includes(currentUser.id);
                     console.log("Test kullanıcısı kullanılıyor");
                 }
             } else {
                 console.log("Telegram WebApp bulunamadı, test modu");
+                // Test modu için kullanıcı oluştur
                 currentUser = { id: 7904032877, first_name: 'Test', username: 'testadmin' };
                 isAdmin = ADMIN_IDS.includes(currentUser.id);
             }
-            
-            // Olay dinleyicilerini başlat
-            initEventListeners();
         }
         
         // OLAY DİNLEYİCİLERİ
@@ -1282,12 +1284,6 @@
         async function handleLogin() {
             console.log("Giriş işlemi başlatılıyor...");
             
-            if (!document.getElementById('termsCheckbox').checked) {
-                console.log("Terms onaylanmadı, modal açılıyor");
-                document.getElementById('termsModal').classList.add('active');
-                return;
-            }
-            
             const loginButton = document.getElementById('loginButton');
             loginButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Giriş yapılıyor...';
             loginButton.disabled = true;
@@ -1315,10 +1311,6 @@
                 console.log("Ana sayfa yükleniyor...");
                 loadHomePage();
                 
-                // Reklamları başlat
-                console.log("Reklam sistemleri başlatılıyor...");
-                startAdSystems();
-                
                 console.log("Giriş işlemi başarıyla tamamlandı");
                 
             } catch (error) {
@@ -1326,23 +1318,6 @@
                 loginButton.innerHTML = '<i class="fas fa-sign-in-alt"></i> Giriş Yap';
                 loginButton.disabled = false;
                 alert('Giriş yapılırken bir hata oluştu. Lütfen tekrar deneyin.');
-            }
-        }
-        
-        // REKLAM SİSTEMLERİNİ BAŞLAT
-        function startAdSystems() {
-            console.log("Reklam sistemleri başlatılıyor...");
-            
-            // CoinAds sistemini başlat
-            if (typeof window.coinads !== 'undefined') {
-                console.log("CoinAds sistemi başlatılıyor");
-                window.coinads.init();
-            }
-            
-            // Monetag reklamlarını yenile
-            if (typeof show_10340134 !== 'undefined') {
-                console.log("Monetag reklamları yenileniyor");
-                show_10340134();
             }
         }
         
@@ -1580,9 +1555,7 @@
                     
                     <!-- HER PDF'NİN ALTINDA YATAY BANNER -->
                     <div class="pdf-banner" data-pdf-index="${index}">
-                        <!--ADS BY https://coinads.online -->
-                        <div class='ad-wire' coinads-type='1' coinads-userid='2491'></div>
-                        <!--ADS BY https://coinads.online -->
+                        <div data-mndbanid="381059bd-5c39-4979-95a4-51dbda56a629"></div>
                     </div>
                 `;
             });
@@ -1807,7 +1780,6 @@
                     return;
                 }
                 
-                // Burada ana sayfada gösterilecek özel PDF'leri işleyebilirsiniz
                 console.log("Ana sayfa özel PDF'leri yüklendi:", specialPdfs);
                 
             } catch (error) {
@@ -1924,12 +1896,13 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Reklam yükleniyor...';
             btn.disabled = true;
             
-            // Monetag reklamı göster
-            if (typeof show_10340134 !== 'undefined') {
-                console.log("Monetag reklamı gösteriliyor");
+            // Mondiad interstitial reklam göster
+            if (typeof window.MondiadInterstitial !== 'undefined') {
+                console.log("Mondiad interstitial reklam gösteriliyor");
                 
-                show_10340134().then(() => {
-                    console.log("Monetag reklamı izlendi");
+                // Test için setTimeout kullanıyoruz
+                setTimeout(() => {
+                    console.log("Mondiad reklamı izlendi (test)");
                     currentAdCount++;
                     updateProgress();
                     
@@ -1967,17 +1940,10 @@
                         btn.disabled = false;
                         console.log(`Kalan reklam sayısı: ${totalAdsRequired - currentAdCount}`);
                     }
-                }).catch(error => {
-                    console.error("Reklam hatası:", error);
-                    // Test için hemen tamamla
-                    currentAdCount = totalAdsRequired;
-                    updateProgress();
-                    showCopyButton();
-                    console.log("Test modu: Tüm reklamlar tamamlandı");
-                });
+                }, 2000);
             } else {
                 // Test modu
-                console.log("Monetag bulunamadı, test modu");
+                console.log("Mondiad interstitial bulunamadı, test modu");
                 currentAdCount = totalAdsRequired;
                 updateProgress();
                 showCopyButton();
