@@ -1,2157 +1,320 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" class="h-full">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
-    <title>@Pdf_DershanemBot - PDF Kütüphanesi</title>
-    
-    <!-- TELEGRAM SCRIPT -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PDF DERSHANEM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
-    <!-- MONDİAD BANNER REKLAM -->
-    <script async src="https://ss.mrmnd.com/banner.js"></script>
-    
-    <!-- MONDİAD INTERSTITIAL REKLAM -->
-    <script async src="https://ss.mrmnd.com/interstitial.js" data-mndintid="45a45fca-0f26-4487-bb1c-e158b13246b7"></script>
-    
-    <!-- FIREBASE -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script> 
-    
-    <!-- FONT AWESOME -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <script src="https://ss.mrmnd.com/banner.js" data-id="71742" async></script>
+
     <style>
-        /* MAVİ-BEYAZ TEMA */
-        :root {
-            --primary-blue: #1E88E5;
-            --secondary-blue: #1565C0;
-            --light-blue: #E3F2FD;
-            --dark-blue: #0D47A1;
-            --white: #FFFFFF;
-            --gray-light: #F5F7FA;
-            --gray-medium: #E1E8ED;
-            --gray-dark: #546E7A;
-            --text-dark: #263238;
-            --text-light: #607D8B;
-            --success: #4CAF50;
-            --warning: #FF9800;
-            --danger: #F44336;
-            
-            --radius-lg: 15px;
-            --radius-md: 10px;
-            --radius-sm: 6px;
-            --shadow: 0 4px 12px rgba(30, 136, 229, 0.15);
-            --shadow-hover: 0 6px 20px rgba(30, 136, 229, 0.2);
-            --transition: all 0.25s ease;
-        }
-        
-        /* DARK MODE */
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --white: #1E1E1E;
-                --gray-light: #2D2D2D;
-                --gray-medium: #3D3D3D;
-                --gray-dark: #B0BEC5;
-                --text-dark: #E0E0E0;
-                --text-light: #90A4AE;
-                --light-blue: #0D1B2A;
-            }
-        }
-        
-        /* GENEL STİLLER */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        }
-        
         body {
-            background: var(--light-blue);
-            color: var(--text-dark);
-            min-height: 100vh;
-            line-height: 1.6;
-        }
-        
-        .app-container {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-        
-        /* SPLASH EKRANI */
-        .splash-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--white);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-            padding: 20px;
-            opacity: 1;
-            visibility: visible;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-        
-        .splash-screen.hidden {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
-        
-        .terms-frame {
-            background: var(--white);
-            border-radius: var(--radius-lg);
-            padding: 40px;
-            max-width: 400px;
-            width: 100%;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--gray-medium);
-            text-align: center;
-        }
-        
-        /* SIDEBAR TOGGLE */
-        .sidebar-toggle {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            width: 50px;
-            height: 50px;
-            background: var(--white);
-            border: 1px solid var(--gray-medium);
-            border-radius: var(--radius-md);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 1000;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-        }
-        
-        .sidebar-toggle:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-hover);
-        }
-        
-        .sidebar-toggle i {
-            font-size: 22px;
-            color: var(--primary-blue);
-        }
-        
-        /* SIDEBAR */
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: -300px;
-            width: 280px;
-            height: 100%;
-            background: var(--white);
-            border-right: 1px solid var(--gray-medium);
-            z-index: 999;
-            transition: left 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 5px 0 20px rgba(0,0,0,0.1);
-        }
-        
-        .sidebar.active {
-            left: 0;
-        }
-        
-        .sidebar-header {
-            padding: 40px 20px 30px;
-            background: var(--primary-blue);
-            color: white;
-            position: relative;
-        }
-        
-        .sidebar-avatar {
-            width: 60px;
-            height: 60px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 15px;
-            border: 2px solid white;
-        }
-        
-        .sidebar-avatar i {
-            font-size: 28px;
-            color: white;
-        }
-        
-        .sidebar-user-info {
-            text-align: center;
-        }
-        
-        .sidebar-user-name {
-            font-weight: 600;
-            font-size: 18px;
-            margin-bottom: 5px;
-        }
-        
-        .sidebar-user-status {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-        
-        .sidebar-menu {
-            padding: 20px 0;
-            flex: 1;
-        }
-        
-        .sidebar-item {
-            display: flex;
-            align-items: center;
-            padding: 16px 24px;
-            color: var(--text-dark);
-            text-decoration: none;
-            transition: var(--transition);
-            border-left: 3px solid transparent;
-            cursor: pointer;
-            background: none;
-            border: none;
-            width: 100%;
-            text-align: left;
-        }
-        
-        .sidebar-item:hover {
-            background: var(--light-blue);
-            border-left-color: var(--primary-blue);
-        }
-        
-        .sidebar-item.active {
-            background: var(--light-blue);
-            border-left-color: var(--primary-blue);
-            font-weight: 600;
-            color: var(--primary-blue);
-        }
-        
-        .sidebar-item i {
-            width: 24px;
-            margin-right: 16px;
-            font-size: 18px;
-            color: var(--primary-blue);
-        }
-        
-        /* OVERLAY */
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 998;
-            display: none;
-        }
-        
-        .overlay.active {
-            display: block;
-        }
-        
-        /* SAYFA BAŞLIĞI */
-        .page-header {
-            padding: 100px 25px 30px;
-            background: var(--primary-blue);
-            color: white;
-            border-bottom-left-radius: 25px;
-            border-bottom-right-radius: 25px;
-            margin-bottom: 25px;
-        }
-        
-        .page-title {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-        
-        .page-subtitle {
-            font-size: 15px;
-            opacity: 0.9;
-        }
-        
-        /* SAYFA İÇERİĞİ */
-        .content-page {
-            display: none;
-            flex: 1;
-        }
-        
-        .content-page.active {
-            display: block;
-        }
-        
-        .page-content {
-            padding: 0 25px 25px;
-        }
-        
-        /* ARAMA BÖLÜMÜ */
-        .search-section {
-            background: var(--white);
-            border-radius: var(--radius-lg);
-            padding: 25px;
-            margin-bottom: 25px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--gray-medium);
-        }
-        
-        .search-box {
-            position: relative;
-            margin-bottom: 20px;
-        }
-        
-        .search-input {
-            width: 100%;
-            padding: 15px 20px 15px 50px;
-            border: 2px solid var(--gray-medium);
-            border-radius: var(--radius-md);
-            background: var(--white);
-            color: var(--text-dark);
-            font-size: 16px;
-            transition: var(--transition);
-        }
-        
-        .search-input:focus {
-            outline: none;
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.1);
-        }
-        
-        .search-icon {
-            position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--primary-blue);
-        }
-        
-        /* KATEGORİ FİLTRELERİ */
-        .category-filters {
-            display: flex;
-            gap: 12px;
-            overflow-x: auto;
-            padding: 10px 0;
-            scrollbar-width: none;
-        }
-        
-        .category-filters::-webkit-scrollbar {
-            display: none;
-        }
-        
-        .category-filter {
-            flex-shrink: 0;
-            padding: 12px 24px;
-            background: var(--gray-light);
-            border: 2px solid var(--gray-medium);
-            border-radius: 25px;
-            color: var(--text-dark);
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            white-space: nowrap;
-        }
-        
-        .category-filter:hover {
-            border-color: var(--primary-blue);
-        }
-        
-        .category-filter.active {
-            background: var(--primary-blue);
-            border-color: var(--primary-blue);
-            color: white;
-        }
-        
-        /* PDF KARTLARI */
-        .pdf-card {
-            background: var(--white);
-            border-radius: var(--radius-lg);
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--gray-medium);
-            transition: var(--transition);
-            cursor: pointer;
-        }
-        
-        .pdf-card:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-hover);
-        }
-        
-        .pdf-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        
-        .pdf-icon {
-            width: 50px;
-            height: 50px;
-            background: var(--primary-blue);
-            border-radius: var(--radius-md);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 15px;
-            color: white;
-        }
-        
-        .pdf-info {
-            flex: 1;
-        }
-        
-        .pdf-title {
-            font-weight: 600;
-            font-size: 18px;
-            margin-bottom: 5px;
-            color: var(--text-dark);
-        }
-        
-        .pdf-meta {
-            display: flex;
-            gap: 15px;
-            color: var(--text-light);
-            font-size: 14px;
-        }
-        
-        .pdf-meta span {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .pdf-category {
-            display: inline-block;
-            padding: 5px 12px;
-            background: var(--light-blue);
-            color: var(--primary-blue);
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: 600;
-            margin-top: 10px;
-        }
-        
-        /* YATAY BANNER ALANLARI - PDF ALTINDA */
-        .pdf-banner {
-            width: 100%;
-            min-height: 60px;
-            background: var(--white);
-            border-radius: var(--radius-md);
-            margin: 20px 0;
-            border: 1px solid var(--gray-medium);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc; /* Hafif Gri/Beyaz */
+            color: #1e293b;
             overflow: hidden;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
+
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+            height: calc(100vh - 180px);
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .page.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .btn-active:active { transform: scale(0.95); transition: 0.1s; }
         
-        /* BÜYÜK BANNER ALANLARI */
-        .banner-container {
-            width: 100%;
-            min-height: 90px;
-            background: var(--white);
-            border-radius: var(--radius-md);
-            margin: 25px 0;
-            border: 1px solid var(--gray-medium);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
+        /* Skeleton Mavi Tonlu */
+        .ad-skeleton {
+            background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
         }
+
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .tab-active { color: #2563eb !important; border-top: 2px solid #2563eb; }
         
-        /* BUTONLAR */
-        .btn {
-            padding: 14px 28px;
-            border: none;
-            border-radius: var(--radius-md);
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            font-size: 15px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .btn-primary {
-            background: var(--primary-blue);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background: var(--secondary-blue);
-            transform: translateY(-2px);
-        }
-        
-        .btn-secondary {
-            background: var(--gray-light);
-            color: var(--text-dark);
-            border: 1px solid var(--gray-medium);
-        }
-        
-        .btn-secondary:hover {
-            border-color: var(--primary-blue);
-            color: var(--primary-blue);
-        }
-        
-        .btn-success {
-            background: var(--success);
-            color: white;
-        }
-        
-        .btn-sm {
-            padding: 10px 20px;
-            font-size: 14px;
-        }
-        
-        /* MODAL */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1001;
-            padding: 20px;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-        
-        .modal.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        .modal-content {
-            background: var(--white);
-            border-radius: var(--radius-lg);
-            padding: 30px;
-            max-width: 500px;
-            width: 100%;
-            transform: translateY(20px);
-            transition: transform 0.3s ease;
-            position: relative;
-            z-index: 1002;
-        }
-        
-        .modal.active .modal-content {
-            transform: translateY(0);
-        }
-        
-        /* PROGRESS BAR */
-        .progress-container {
-            margin: 20px 0;
-        }
-        
-        .progress-bar {
-            height: 8px;
-            background: var(--gray-light);
-            border-radius: 4px;
-            overflow: hidden;
-            margin: 10px 0;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: var(--primary-blue);
-            border-radius: 4px;
-            transition: width 0.3s ease;
-        }
-        
-        /* FOOTER */
-        .footer {
-            padding: 25px;
-            text-align: center;
-            color: var(--text-light);
-            font-size: 14px;
-            background: var(--white);
-            border-top: 1px solid var(--gray-medium);
-            margin-top: auto;
-        }
-        
-        /* RESPONSIVE */
-        @media (max-width: 768px) {
-            .page-header {
-                padding: 90px 20px 25px;
-            }
-            
-            .page-title {
-                font-size: 24px;
-            }
-            
-            .page-content {
-                padding: 0 20px 20px;
-            }
-            
-            .search-section {
-                padding: 20px;
-            }
-            
-            .pdf-card {
-                padding: 20px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .sidebar-toggle {
-                top: 15px;
-                left: 15px;
-                width: 45px;
-                height: 45px;
-            }
-            
-            .btn {
-                padding: 12px 24px;
-            }
-        }
-        
-        /* UTILITY */
-        .hidden {
-            display: none !important;
-        }
-        
-        .w-full {
-            width: 100%;
-        }
-        
-        .text-center {
-            text-align: center;
-        }
-        
-        .mb-3 {
-            margin-bottom: 15px;
-        }
-        
-        .mt-3 {
-            margin-top: 15px;
-        }
-        
-        .flex {
-            display: flex;
-        }
-        
-        .gap-2 {
-            gap: 10px;
-        }
-        
-        .flex-1 {
-            flex: 1;
-        }
-        
-        /* SPECIAL TAGS */
-        .special-tag {
-            display: inline-block;
-            padding: 4px 10px;
-            background: #FF9800;
-            color: white;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-            margin-left: 10px;
-        }
-        
-        .special-tag.popular {
-            background: #F44336;
-        }
-        
-        .special-tag.trending {
-            background: #4CAF50;
-        }
-        
-        /* LOADING SPINNER */
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid var(--gray-medium);
-            border-top-color: var(--primary-blue);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        /* Kaydırma çubuğunu gizle */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body>
-    <!-- SPLASH EKRANI -->
-    <div class="splash-screen" id="splashScreen">
-        <div class="terms-frame">
-            <div style="margin-bottom: 30px;">
-                <div style="width: 80px; height: 80px; background: var(--primary-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
-                    <i class="fas fa-book" style="font-size: 36px; color: white;"></i>
-                </div>
-                <h2 style="font-size: 24px; color: var(--primary-blue); margin-bottom: 10px;">PDF Dershanem</h2>
-                <p style="color: var(--text-light);">PDF Kütüphanesi</p>
+<body class="h-full flex flex-col">
+
+    <header class="p-4 flex justify-between items-center bg-white border-b border-gray-100 z-[60]">
+        <div class="flex items-center gap-3">
+            <div id="user-photo" class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center border border-blue-200">
+                <i class="fas fa-user text-blue-600"></i>
             </div>
-            
-            <div style="margin: 25px 0; padding: 20px; background: var(--light-blue); border-radius: var(--radius-md);">
-                <label style="display: flex; align-items: flex-start; gap: 12px; cursor: pointer;">
-                    <input type="checkbox" id="termsCheckbox" style="margin-top: 3px;" checked>
-                    <span style="color: var(--text-dark); font-size: 14px;">
-                        Kullanım şartlarını okudum ve kabul ediyorum.
-                        <a href="#" id="readTermsLink" style="color: var(--primary-blue); text-decoration: none; font-weight: 600; display: block; margin-top: 5px;">
-                            Şartları görüntüle
-                        </a>
-                    </span>
-                </label>
+            <div>
+                <p class="text-[10px] text-gray-400 font-bold uppercase">Öğrenci Paneli</p>
+                <p id="user-name" class="font-bold text-sm text-slate-800">Yükleniyor...</p>
             </div>
-            
-            <button id="loginButton" class="btn btn-primary w-full">
-                <i class="fas fa-sign-in-alt"></i>
-                Giriş Yap
-            </button>
+        </div>
+        <div class="bg-blue-600 text-white text-[10px] px-3 py-1 rounded-lg font-bold">V.2.0</div>
+    </header>
+
+    <div class="px-4 mt-2">
+        <div class="ad-skeleton h-[80px] rounded-2xl flex items-center justify-center text-[10px] text-gray-400 border border-gray-100">
+            <div id="ad-banner-top"></div>
         </div>
     </div>
 
-    <!-- TERMS MODAL -->
-    <div class="modal" id="termsModal">
-        <div class="modal-content">
-            <h3 style="font-size: 20px; margin-bottom: 20px; color: var(--primary-blue);">
-                <i class="fas fa-file-contract"></i>
-                Kullanım Şartları
+    <main class="flex-1 relative overflow-hidden">
+        
+        <section id="home" class="page active">
+            <div class="bg-blue-600 p-6 rounded-3xl mb-6 shadow-lg shadow-blue-200 relative overflow-hidden">
+                <div class="relative z-10">
+                    <h2 class="text-white text-xl font-bold mb-1">Yeni PDF'ler Hazır!</h2>
+                    <p class="text-blue-100 text-xs">Bugün kütüphaneye 5 yeni kaynak eklendi.</p>
+                    <button onclick="switchTab('library')" class="mt-4 bg-white text-blue-600 px-5 py-2 rounded-xl font-bold text-xs btn-active shadow-sm">Kütüphaneye Göz At</button>
+                </div>
+                <i class="fas fa-rocket absolute -right-2 -bottom-2 text-6xl text-white/10 -rotate-12"></i>
+            </div>
+
+            <h3 class="font-bold text-slate-700 mb-4 flex items-center gap-2">
+                <i class="fas fa-star text-yellow-500"></i> Popüler Kaynaklar
             </h3>
-            
-            <div style="margin-bottom: 25px;">
-                <div style="background: var(--light-blue); padding: 15px; border-radius: var(--radius-md); margin-bottom: 10px;">
-                    <p style="color: var(--text-dark);">
-                        PDF'leri kopyalamak için belirtilen sayıda reklam izlemeniz gerekmektedir.
-                    </p>
+            <div id="popular-list" class="space-y-3">
                 </div>
-                <div style="background: var(--light-blue); padding: 15px; border-radius: var(--radius-md);">
-                    <p style="color: var(--text-dark);">
-                        Her PDF için belirli sayıda reklam izlemeniz gerekmektedir.
-                    </p>
+        </section>
+
+        <section id="library" class="page">
+            <div class="flex gap-2 overflow-x-auto pb-4 no-scrollbar">
+                <button class="bg-blue-600 text-white px-4 py-2 rounded-full text-xs font-semibold shrink-0">Tümü</button>
+                <button class="bg-white border border-gray-200 px-4 py-2 rounded-full text-xs font-semibold shrink-0 text-gray-600">Sayısal</button>
+                <button class="bg-white border border-gray-200 px-4 py-2 rounded-full text-xs font-semibold shrink-0 text-gray-600">Sözel</button>
+            </div>
+
+            <div id="pdf-list" class="space-y-4 mt-2">
+                </div>
+        </section>
+
+        <section id="profile" class="page">
+            <div class="bg-white p-6 rounded-3xl border border-gray-100 text-center mb-6 shadow-sm">
+                <div class="w-20 h-20 bg-blue-50 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl border-2 border-blue-100">
+                    <i class="fas fa-graduation-cap text-blue-600"></i>
+                </div>
+                <h2 id="profile-name" class="text-lg font-bold text-slate-800">Kullanıcı</h2>
+                <p id="profile-id" class="text-gray-400 text-xs mt-1">ID: ---</p>
+            </div>
+
+            <div id="admin-button" class="hidden">
+                <button onclick="switchTab('admin')" class="w-full bg-slate-800 text-white p-4 rounded-2xl font-bold flex justify-between items-center btn-active shadow-lg">
+                    <span><i class="fas fa-lock mr-2 text-yellow-400"></i> YÖNETİCİ PANELİ</span>
+                    <i class="fas fa-arrow-right text-xs"></i>
+                </button>
+            </div>
+        </section>
+
+        <section id="admin" class="page">
+            <div class="bg-white p-5 rounded-2xl border border-gray-100 mb-4">
+                <h3 class="text-sm font-bold mb-4 text-blue-600 uppercase tracking-tighter">Hızlı Veri Ekle</h3>
+                <input id="adm-title" type="text" placeholder="PDF Adı" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-sm mb-2 outline-none focus:border-blue-400">
+                <input id="adm-url" type="text" placeholder="URL Link" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-sm mb-2 outline-none">
+                <div class="flex gap-2">
+                    <input id="adm-ads" type="number" placeholder="Reklam" class="w-1/3 bg-gray-50 border border-gray-200 rounded-xl p-3 text-sm outline-none">
+                    <button onclick="addPdf()" class="w-2/3 bg-blue-600 text-white rounded-xl font-bold text-sm btn-active">EKLE</button>
                 </div>
             </div>
-            
-            <div class="flex gap-2">
-                <button id="closeTermsModal" class="btn btn-secondary flex-1">
-                    <i class="fas fa-times"></i>
-                    Kapat
-                </button>
-                <button id="acceptTermsModal" class="btn btn-success flex-1">
-                    <i class="fas fa-check"></i>
-                    Kabul Ediyorum
-                </button>
-            </div>
+            <div id="admin-pdf-list" class="space-y-2"></div>
+        </section>
+
+    </main>
+
+    <div class="px-4 mb-2 z-50">
+        <div class="ad-skeleton h-[50px] rounded-xl border border-gray-100 overflow-hidden">
+            <div id="ad-banner-bottom"></div>
         </div>
     </div>
 
-    <!-- ANA UYGULAMA -->
-    <div class="app-container hidden" id="app">
-        <!-- SIDEBAR TOGGLE -->
-        <div class="sidebar-toggle" id="sidebarToggle">
-            <i class="fas fa-bars"></i>
-        </div>
-        
-        <!-- OVERLAY -->
-        <div class="overlay" id="overlay"></div>
-        
-        <!-- SIDEBAR -->
-        <div class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="sidebar-user-info">
-                    <div class="sidebar-avatar">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <div class="sidebar-user-name" id="userName">Misafir</div>
-                    <div class="sidebar-user-status" id="userStatus">Kullanıcı</div>
-                </div>
-            </div>
-            
-            <div class="sidebar-menu">
-                <button class="sidebar-item active" onclick="changePage('home')">
-                    <i class="fas fa-home"></i>
-                    Ana Sayfa
-                </button>
-                <button class="sidebar-item" onclick="changePage('pdfs')">
-                    <i class="fas fa-book"></i>
-                    PDF'ler
-                </button>
-                <button class="sidebar-item" onclick="changePage('profile')">
-                    <i class="fas fa-user"></i>
-                    Profil
-                </button>
-                <button class="sidebar-item" onclick="changePage('admin')" id="adminMenuItem" style="display: none;">
-                    <i class="fas fa-shield-alt"></i>
-                    Admin Panel
-                </button>
-            </div>
-        </div>
-        
-        <!-- ANA SAYFA -->
-        <div class="content-page active" id="page-home">
-            <div class="page-header">
-                <h1 class="page-title">PDF Dershanem</h1>
-                <p class="page-subtitle">PDF kütüphanesi</p>
-            </div>
-            
-            <div class="page-content">
-                <!-- BANNER - MONDİAD -->
-                <div class="banner-container" id="homeBanner">
-                    <div data-mndbanid="381059bd-5c39-4979-95a4-51dbda56a629"></div>
-                </div>
-                
-                <!-- HIZLI ERİŞİM -->
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 25px;">
-                    <div class="pdf-card" onclick="changePage('pdfs')" style="padding: 20px; text-align: center;">
-                        <div class="pdf-icon" style="margin: 0 auto 15px;">
-                            <i class="fas fa-search"></i>
-                        </div>
-                        <h3 style="font-size: 16px; margin-bottom: 8px;">PDF Ara</h3>
-                        <p style="font-size: 13px; color: var(--text-light);">Binlerce PDF arasında arama yapın</p>
-                    </div>
-                    
-                    <div class="pdf-card" onclick="window.open('https://t.me/KrallarPDF', '_blank')" style="padding: 20px; text-align: center;">
-                        <div class="pdf-icon" style="margin: 0 auto 15px; background: var(--dark-blue);">
-                            <i class="fas fa-crown"></i>
-                        </div>
-                        <h3 style="font-size: 16px; margin-bottom: 8px;">Sponsor</h3>
-                        <p style="font-size: 13px; color: var(--text-light);">Krallar PDF kanalı</p>
-                    </div>
-                </div>
-                
-                <!-- BANNER - MONDİAD -->
-                <div class="banner-container">
-                    <div data-mndbanid="381059bd-5c39-4979-95a4-51dbda56a629"></div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- PDF'LER SAYFASI -->
-        <div class="content-page" id="page-pdfs">
-            <div class="page-header">
-                <h1 class="page-title">PDF Kütüphanesi</h1>
-                <p class="page-subtitle">Tüm PDF dosyaları</p>
-            </div>
-            
-            <div class="page-content">
-                <!-- ARAMA BÖLÜMÜ -->
-                <div class="search-section">
-                    <div class="search-box">
-                        <i class="fas fa-search search-icon"></i>
-                        <input type="text" class="search-input" id="pdfSearch" placeholder="PDF ara...">
-                    </div>
-                    
-                    <div class="category-filters">
-                        <div class="category-filter active" data-category="all">
-                            Tümü
-                        </div>
-                        <div class="category-filter" data-category="tyt">
-                            TYT
-                        </div>
-                        <div class="category-filter" data-category="ayt">
-                            AYT
-                        </div>
-                        <div class="category-filter" data-category="lgs">
-                            LGS
-                        </div>
-                        <div class="category-filter" data-category="kpss">
-                            KPSS
-                        </div>
-                        <div class="category-filter" data-category="matematik">
-                            Matematik
-                        </div>
-                        <div class="category-filter" data-category="fizik">
-                            Fizik
-                        </div>
-                        <div class="category-filter" data-category="kimya">
-                            Kimya
-                        </div>
-                        <div class="category-filter" data-category="biyoloji">
-                            Biyoloji
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- TOP BANNER - MONDİAD -->
-                <div class="banner-container" id="pdfsTopBanner">
-                    <div data-mndbanid="381059bd-5c39-4979-95a4-51dbda56a629"></div>
-                </div>
-                
-                <!-- ÖZEL PDF'LER (ADMIN TARAFINDAN AYARLANAN) -->
-                <div id="specialPdfsSection" style="margin-bottom: 25px;">
-                    <!-- Admin panelinden ayarlanan özel PDF'ler buraya gelecek -->
-                </div>
-                
-                <!-- PDF LİSTESİ -->
-                <div id="pdfListContainer">
-                    <div id="pdfList">
-                        <!-- PDF kartları buraya yüklenecek -->
-                    </div>
-                    
-                    <div id="noResults" class="hidden" style="text-align: center; padding: 40px; color: var(--text-light);">
-                        <i class="fas fa-search" style="font-size: 40px; margin-bottom: 15px;"></i>
-                        <h3>Sonuç bulunamadı</h3>
-                        <p>Arama kriterlerinize uygun PDF bulunamadı.</p>
-                    </div>
-                </div>
-                
-                <!-- BOTTOM BANNER - MONDİAD -->
-                <div class="banner-container" id="pdfsBottomBanner">
-                    <div data-mndbanid="381059bd-5c39-4979-95a4-51dbda56a629"></div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- PROFİL SAYFASI -->
-        <div class="content-page" id="page-profile">
-            <div class="page-header">
-                <h1 class="page-title">Profilim</h1>
-                <p class="page-subtitle">Kişisel bilgileriniz</p>
-            </div>
-            
-            <div class="page-content">
-                <div class="pdf-card" style="max-width: 500px; margin: 0 auto;">
-                    <div style="text-align: center;">
-                        <div class="sidebar-avatar" id="profileAvatar" style="margin: 0 auto 20px;">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <h3 id="profileName" style="font-size: 22px; margin-bottom: 5px;">Misafir Kullanıcı</h3>
-                        <p id="profileRole" style="color: var(--text-light); margin-bottom: 25px;">Kullanıcı</p>
-                    </div>
-                    
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 25px;">
-                        <div style="background: var(--light-blue); padding: 15px; border-radius: var(--radius-md); text-align: center;">
-                            <div style="font-size: 12px; color: var(--text-light); margin-bottom: 5px;">Telegram ID</div>
-                            <div id="profileId" style="font-weight: 600; font-size: 14px;">-</div>
-                        </div>
-                        
-                        <div style="background: var(--light-blue); padding: 15px; border-radius: var(--radius-md); text-align: center;">
-                            <div style="font-size: 12px; color: var(--text-light); margin-bottom: 5px;">Kopyalama</div>
-                            <div id="profileCopies" style="font-weight: 600; font-size: 14px;">0</div>
-                        </div>
-                    </div>
-                    
-                    <div style="background: var(--light-blue); padding: 15px; border-radius: var(--radius-md); margin-bottom: 15px;">
-                        <div style="font-size: 12px; color: var(--text-light); margin-bottom: 5px;">Kullanıcı Adı</div>
-                        <div id="profileUsername" style="font-weight: 600; font-size: 14px;">-</div>
-                    </div>
-                    
-                    <div style="background: var(--light-blue); padding: 15px; border-radius: var(--radius-md);">
-                        <div style="font-size: 12px; color: var(--text-light); margin-bottom: 5px;">Kayıt Tarihi</div>
-                        <div id="profileJoinDate" style="font-weight: 600; font-size: 14px;">-</div>
-                    </div>
-                </div>
-                
-                <!-- BANNER - MONDİAD -->
-                <div class="banner-container mt-3">
-                    <div data-mndbanid="381059bd-5c39-4979-95a4-51dbda56a629"></div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- ADMIN PANEL -->
-        <div class="content-page" id="page-admin">
-            <div class="page-header">
-                <h1 class="page-title">Admin Paneli</h1>
-                <p class="page-subtitle">Sistem yönetimi</p>
-            </div>
-            
-            <div class="page-content">
-                <!-- BANNER - MONDİAD -->
-                <div class="banner-container">
-                    <div data-mndbanid="381059bd-5c39-4979-95a4-51dbda56a629"></div>
-                </div>
-                
-                <!-- ADMIN ARAÇLARI -->
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 25px;">
-                    <div class="pdf-card" onclick="adminAddPDF()" style="padding: 20px; text-align: center; cursor: pointer;">
-                        <div class="pdf-icon" style="margin: 0 auto 15px;">
-                            <i class="fas fa-plus"></i>
-                        </div>
-                        <h3 style="font-size: 16px;">PDF Ekle</h3>
-                    </div>
-                    
-                    <div class="pdf-card" onclick="adminManagePDFs()" style="padding: 20px; text-align: center; cursor: pointer;">
-                        <div class="pdf-icon" style="margin: 0 auto 15px;">
-                            <i class="fas fa-edit"></i>
-                        </div>
-                        <h3 style="font-size: 16px;">PDF'leri Yönet</h3>
-                    </div>
-                    
-                    <div class="pdf-card" onclick="adminSpecialPDFs()" style="padding: 20px; text-align: center; cursor: pointer;">
-                        <div class="pdf-icon" style="margin: 0 auto 15px;">
-                            <i class="fas fa-star"></i>
-                        </div>
-                        <h3 style="font-size: 16px;">Özel PDF'ler</h3>
-                    </div>
-                    
-                    <div class="pdf-card" onclick="adminAnalytics()" style="padding: 20px; text-align: center; cursor: pointer;">
-                        <div class="pdf-icon" style="margin: 0 auto 15px;">
-                            <i class="fas fa-chart-bar"></i>
-                        </div>
-                        <h3 style="font-size: 16px;">İstatistikler</h3>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- FOOTER -->
-        <div class="footer">
-            <p>© 2024 PDF Dershanem - Tüm hakları saklıdır.</p>
-        </div>
-    </div>
+    <nav class="glass-nav h-20 px-8 flex justify-between items-center z-[100]">
+        <button onclick="switchTab('home')" class="nav-btn tab-active h-full flex flex-col justify-center items-center gap-1 flex-1 text-gray-400 transition-all">
+            <i class="fas fa-house text-xl"></i>
+            <span class="text-[9px] font-bold">ANA SAYFA</span>
+        </button>
+        <button onclick="switchTab('library')" class="nav-btn h-full flex flex-col justify-center items-center gap-1 flex-1 text-gray-400 transition-all">
+            <i class="fas fa-layer-group text-xl"></i>
+            <span class="text-[9px] font-bold">KÜTÜPHANE</span>
+        </button>
+        <button onclick="switchTab('profile')" class="nav-btn h-full flex flex-col justify-center items-center gap-1 flex-1 text-gray-400 transition-all">
+            <i class="fas fa-user-ninja text-xl"></i>
+            <span class="text-[9px] font-bold">PROFİL</span>
+        </button>
+    </nav>
 
-    <!-- PDF MODAL -->
-    <div class="modal" id="pdfModal">
-        <div class="modal-content">
-            <h3 id="modalTitle" style="font-size: 20px; margin-bottom: 15px; color: var(--primary-blue);">
-                <i class="fas fa-copy"></i>
-                PDF Kopyala
-            </h3>
-            
-            <p id="modalDescription" style="color: var(--text-dark); margin-bottom: 20px;">
-                Bu PDF'i kopyalamak için reklamları izleyin.
-            </p>
-            
-            <div class="progress-container">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                    <span style="font-weight: 600;">İlerleme</span>
-                    <span id="modalStatus" style="color: var(--primary-blue); font-weight: 600;">0/0</span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="modalProgress" style="width: 0%"></div>
-                </div>
-            </div>
-            
-            <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 25px;">
-                <button class="btn btn-primary" onclick="startAds()" id="startAdsBtn">
-                    <i class="fas fa-play"></i>
-                    Reklamları İzle
-                </button>
-                
-                <button class="btn btn-success" onclick="copyLink()" id="copyLinkBtn" style="display: none;">
-                    <i class="fas fa-copy"></i>
-                    Linki Kopyala
-                </button>
-                
-                <button class="btn btn-secondary" onclick="closeModal('pdfModal')">
-                    <i class="fas fa-times"></i>
-                    Kapat
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ADD PDF MODAL -->
-    <div class="modal" id="addPdfModal">
-        <div class="modal-content">
-            <h3 style="font-size: 20px; margin-bottom: 20px; color: var(--primary-blue);">
-                <i class="fas fa-plus"></i>
-                Yeni PDF Ekle
-            </h3>
-            
-            <div style="margin-bottom: 20px;">
-                <div style="font-weight: 600; margin-bottom: 8px; color: var(--text-dark);">PDF Adı</div>
-                <input type="text" id="pdfName" class="search-input" placeholder="PDF adı giriniz">
-            </div>
-            
-            <div style="margin-bottom: 20px;">
-                <div style="font-weight: 600; margin-bottom: 8px; color: var(--text-dark);">PDF Linki</div>
-                <input type="text" id="pdfLink" class="search-input" placeholder="Dropbox/Google Drive linki">
-            </div>
-            
-            <div style="margin-bottom: 20px;">
-                <div style="font-weight: 600; margin-bottom: 8px; color: var(--text-dark);">Kategori</div>
-                <select id="pdfCategory" class="search-input">
-                    <option value="tyt">TYT</option>
-                    <option value="ayt">AYT</option>
-                    <option value="lgs">LGS</option>
-                    <option value="kpss">KPSS</option>
-                    <option value="matematik">Matematik</option>
-                    <option value="fizik">Fizik</option>
-                    <option value="kimya">Kimya</option>
-                    <option value="biyoloji">Biyoloji</option>
-                </select>
-            </div>
-            
-            <div style="margin-bottom: 25px;">
-                <div style="font-weight: 600; margin-bottom: 10px; color: var(--text-dark);">
-                    Gerekli Reklam Sayısı: <span id="adsValue" style="color: var(--primary-blue);">5</span>
-                </div>
-                <input type="range" id="pdfAds" min="1" max="20" value="5" style="width: 100%; height: 6px; border-radius: 3px; background: var(--gray-medium); outline: none;">
-            </div>
-            
-            <div style="display: flex; gap: 12px;">
-                <button class="btn btn-secondary" onclick="closeModal('addPdfModal')" style="flex: 1;">
-                    İptal
-                </button>
-                <button class="btn btn-success" onclick="savePDF()" style="flex: 1;">
-                    Kaydet
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- SPECIAL PDFS MODAL -->
-    <div class="modal" id="specialPdfsModal">
-        <div class="modal-content">
-            <h3 style="font-size: 20px; margin-bottom: 20px; color: var(--primary-blue);">
-                <i class="fas fa-star"></i>
-                Özel PDF'leri Yönet
-            </h3>
-            
-            <div style="margin-bottom: 20px;">
-                <div style="font-weight: 600; margin-bottom: 8px; color: var(--text-dark);">Özel PDF Türü</div>
-                <select id="specialType" class="search-input" onchange="loadSpecialPDFs()">
-                    <option value="popular">En Popüler PDF'ler</option>
-                    <option value="trending">En Çok Aranan PDF'ler</option>
-                    <option value="featured">Öne Çıkan PDF'ler</option>
-                </select>
-            </div>
-            
-            <div style="margin-bottom: 20px;">
-                <div style="font-weight: 600; margin-bottom: 8px; color: var(--text-dark);">PDF Seç</div>
-                <select id="specialPdfSelect" class="search-input" multiple style="height: 120px;">
-                    <!-- PDF'ler buraya yüklenecek -->
-                </select>
-            </div>
-            
-            <div style="margin-bottom: 25px;">
-                <div style="font-size: 14px; color: var(--text-light);">
-                    <i class="fas fa-info-circle"></i>
-                    Seçtiğiniz PDF'ler ana sayfada özel olarak gösterilecektir.
-                </div>
-            </div>
-            
-            <div style="display: flex; gap: 12px;">
-                <button class="btn btn-secondary" onclick="closeModal('specialPdfsModal')" style="flex: 1;">
-                    İptal
-                </button>
-                <button class="btn btn-success" onclick="saveSpecialPDFs()" style="flex: 1;">
-                    Kaydet
-                </button>
-            </div>
-        </div>
-    </div>
+    <script src="https://ss.mrmnd.com/interstitial.js" data-id="71741" async></script>
 
     <script>
-        // KONFİGÜRASYON
-        const firebaseConfig = {
-            apiKey: "AIzaSyArNeaPYGiPg-K7O19Xg4btYhqfnzvyCtw",
-            authDomain: "pdfdershanem.firebaseapp.com",
-            databaseURL: "https://pdfdershanem-default-rtdb.firebaseio.com",
-            projectId: "pdfdershanem",
-            storageBucket: "pdfdershanem.firebasestorage.app",
-            messagingSenderId: "149337981694",
-            appId: "1:149337981694:web:87ec729568567f43879baf",
-            measurementId: "G-BZB9FD26GT"
-        };
-        
-        const ADMIN_IDS = [7904032877, 8392479231];
-        
-        let db;
-        let currentUser = null;
-        let isAdmin = false;
-        let currentPdf = null;
-        let currentAdCount = 0;
-        let totalAdsRequired = 0;
-        let selectedCategory = 'all';
-        let allPdfs = [];
-        
-        // UYGULAMA BAŞLATMA
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        const ADMIN_IDS = [8392479231, 7904032877];
+        let pdfData = JSON.parse(localStorage.getItem('pdfs_v2')) || [
+            { id: 1, title: 'Matematik Yeni Nesil Sorular', url: 'https://google.com', reqAds: 2, currentAds: 2, cat: 'Sayısal' },
+            { id: 2, title: 'Edebiyat Notları PDF', url: 'https://google.com', reqAds: 1, currentAds: 1, cat: 'Sözel' }
+        ];
+
         function initApp() {
-            console.log("Uygulama başlatılıyor...");
-            
-            try {
-                if (!firebase.apps.length) {
-                    firebase.initializeApp(firebaseConfig);
-                    console.log("Firebase başlatıldı");
-                }
-                db = firebase.database();
-                console.log("Firebase Database bağlantısı kuruldu");
-            } catch (e) {
-                console.error("Firebase başlatma hatası:", e);
-            }
-            
-            // Giriş butonunu aktif et
-            document.getElementById('loginButton').disabled = false;
-            document.getElementById('termsCheckbox').checked = true;
-            
-            // Otomatik giriş için hazırlık
-            checkTelegramUser();
-            
-            // Olay dinleyicilerini başlat
-            initEventListeners();
-        }
-        
-        // TELEGRAM KULLANICI KONTROLÜ
-        function checkTelegramUser() {
-            // Telegram WebApp kontrolü
-            if (window.Telegram && Telegram.WebApp) {
-                try {
-                    Telegram.WebApp.ready();
-                    Telegram.WebApp.expand();
-                    console.log("Telegram WebApp hazır");
-                    
-                    if (Telegram.WebApp.initDataUnsafe?.user) {
-                        currentUser = Telegram.WebApp.initDataUnsafe.user;
-                        isAdmin = ADMIN_IDS.includes(currentUser.id);
-                        console.log("Telegram kullanıcı tespit edildi:", currentUser);
-                        
-                        // Otomatik giriş yap
-                        setTimeout(() => {
-                            handleLogin();
-                        }, 1000);
-                        
-                    } else {
-                        // Test modu için kullanıcı oluştur
-                        currentUser = { id: 999999999, first_name: 'Misafir', username: 'misafir' };
-                        console.log("Telegram kullanıcı yok, misafir modu");
-                    }
-                } catch (e) {
-                    console.error("Telegram WebApp hatası:", e);
-                    // Test modu
-                    currentUser = { id: 7904032877, first_name: 'Test', username: 'testadmin' };
-                    isAdmin = ADMIN_IDS.includes(currentUser.id);
-                    console.log("Test kullanıcısı kullanılıyor");
+            const user = tg.initDataUnsafe?.user;
+            if (user) {
+                document.getElementById('user-name').innerText = user.first_name;
+                document.getElementById('profile-name').innerText = user.first_name;
+                document.getElementById('profile-id').innerText = 'ID: ' + user.id;
+                
+                if (ADMIN_IDS.includes(user.id)) {
+                    document.getElementById('admin-button').classList.remove('hidden');
                 }
             } else {
-                console.log("Telegram WebApp bulunamadı, test modu");
-                // Test modu için kullanıcı oluştur
-                currentUser = { id: 7904032877, first_name: 'Test', username: 'testadmin' };
-                isAdmin = ADMIN_IDS.includes(currentUser.id);
+                document.getElementById('user-name').innerText = "Ziyaretçi";
             }
+            renderPdfs();
         }
-        
-        // OLAY DİNLEYİCİLERİ
-        function initEventListeners() {
-            console.log("Olay dinleyicileri başlatılıyor...");
+
+        function switchTab(tabId) {
+            // Sayfaları gizle/göster
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            const targetPage = document.getElementById(tabId);
+            if(targetPage) targetPage.classList.add('active');
             
-            // Sidebar toggle
-            document.getElementById('sidebarToggle').addEventListener('click', function() {
-                document.getElementById('sidebar').classList.add('active');
-                document.getElementById('overlay').classList.add('active');
-            });
-            
-            // Overlay click
-            document.getElementById('overlay').addEventListener('click', closeSidebar);
-            
-            // Terms checkbox
-            document.getElementById('termsCheckbox').addEventListener('change', function() {
-                document.getElementById('loginButton').disabled = !this.checked;
-                console.log("Terms checkbox durumu:", this.checked);
-            });
-            
-            // Terms link
-            document.getElementById('readTermsLink').addEventListener('click', function(e) {
-                e.preventDefault();
-                console.log("Terms modal açılıyor");
-                document.getElementById('termsModal').classList.add('active');
-            });
-            
-            // Close terms modal
-            document.getElementById('closeTermsModal').addEventListener('click', function() {
-                console.log("Terms modal kapatılıyor");
-                document.getElementById('termsModal').classList.remove('active');
-                document.getElementById('termsCheckbox').checked = false;
-                document.getElementById('loginButton').disabled = true;
-            });
-            
-            // Accept terms modal
-            document.getElementById('acceptTermsModal').addEventListener('click', function() {
-                console.log("Terms kabul edildi");
-                document.getElementById('termsModal').classList.remove('active');
-                document.getElementById('termsCheckbox').checked = true;
-                document.getElementById('loginButton').disabled = false;
-            });
-            
-            // Login button
-            document.getElementById('loginButton').addEventListener('click', handleLogin);
+            // Navigasyon stilini güncelle
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('tab-active'));
+            const btns = document.querySelectorAll('.nav-btn');
+            if(tabId === 'home') btns[0].classList.add('tab-active');
+            if(tabId === 'library') btns[1].classList.add('tab-active');
+            if(tabId === 'profile' || tabId === 'admin') btns[2].classList.add('tab-active');
+
+            tg.HapticFeedback.impactOccurred('light');
         }
-        
-        // GİRİŞ YAPMA İŞLEMİ
-        async function handleLogin() {
-            console.log("Giriş işlemi başlatılıyor...");
+
+        function renderPdfs() {
+            const list = document.getElementById('pdf-list');
+            const popular = document.getElementById('popular-list');
+            const adminList = document.getElementById('admin-pdf-list');
             
-            const loginButton = document.getElementById('loginButton');
-            loginButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Giriş yapılıyor...';
-            loginButton.disabled = true;
-            
-            try {
-                console.log("Kullanıcı veritabanına kaydediliyor...");
-                await saveUserToDatabase(currentUser);
-                
-                console.log("Kullanıcı bilgileri güncelleniyor...");
-                updateUserInfo();
-                
-                if (isAdmin) {
-                    console.log("Admin kullanıcısı, admin menüsü gösteriliyor");
-                    document.getElementById('adminMenuItem').style.display = 'flex';
-                }
-                
-                console.log("Splash ekranı kapatılıyor, ana uygulama gösteriliyor...");
-                // Splash ekranını kapat
-                document.getElementById('splashScreen').classList.add('hidden');
-                
-                // Ana uygulamayı göster
-                document.getElementById('app').classList.remove('hidden');
-                
-                // Ana sayfayı yükle
-                console.log("Ana sayfa yükleniyor...");
-                loadHomePage();
-                
-                console.log("Giriş işlemi başarıyla tamamlandı");
-                
-            } catch (error) {
-                console.error("Giriş işlemi hatası:", error);
-                loginButton.innerHTML = '<i class="fas fa-sign-in-alt"></i> Giriş Yap';
-                loginButton.disabled = false;
-                alert('Giriş yapılırken bir hata oluştu. Lütfen tekrar deneyin.');
-            }
-        }
-        
-        async function saveUserToDatabase(user) {
-            if (!db) {
-                console.log("Firebase Database bağlantısı yok");
-                return;
-            }
-            
-            try {
-                const userRef = db.ref('users/' + user.id);
-                const updates = {
-                    first_name: user.first_name || '',
-                    last_name: user.last_name || '',
-                    username: user.username || '',
-                    last_active: firebase.database.ServerValue.TIMESTAMP,
-                    is_admin: isAdmin,
-                    created_at: firebase.database.ServerValue.TIMESTAMP,
-                    total_copies: 0
-                };
-                
-                console.log("Kullanıcı verileri Firebase'e kaydediliyor:", updates);
-                await userRef.update(updates);
-                console.log("Kullanıcı verileri başarıyla kaydedildi");
-                
-            } catch (error) {
-                console.error("Kullanıcı verileri kaydedilirken hata:", error);
-                throw error;
-            }
-        }
-        
-        // KULLANICI BİLGİLERİNİ GÜNCELLE
-        function updateUserInfo() {
-            console.log("Kullanıcı bilgileri güncelleniyor...");
-            
-            const firstName = currentUser.first_name || '';
-            const lastName = currentUser.last_name || '';
-            const fullName = `${firstName} ${lastName}`.trim() || 'Misafir';
-            
-            // Kullanıcı adını güncelle
-            document.getElementById('userName').textContent = fullName;
-            document.getElementById('profileName').textContent = fullName;
-            
-            // Durumu güncelle
-            if (isAdmin) {
-                document.getElementById('userStatus').innerHTML = '<i class="fas fa-crown"></i> Yönetici';
-                document.getElementById('profileRole').innerHTML = '<i class="fas fa-crown"></i> Yönetici';
-            } else {
-                document.getElementById('userStatus').textContent = 'Kullanıcı';
-                document.getElementById('profileRole').textContent = 'Kullanıcı';
-            }
-            
-            // Diğer bilgiler
-            document.getElementById('profileId').textContent = currentUser.id;
-            document.getElementById('profileUsername').textContent = currentUser.username ? '@' + currentUser.username : '-';
-            
-            // Avatar güncelle
-            const avatars = document.querySelectorAll('.sidebar-avatar, #profileAvatar');
-            avatars.forEach(avatar => {
-                if (firstName) {
-                    avatar.innerHTML = firstName.charAt(0).toUpperCase();
-                }
-            });
-            
-            // Kullanıcı istatistiklerini yükle
-            if (db) {
-                db.ref('users/' + currentUser.id).once('value').then(snapshot => {
-                    const userData = snapshot.val();
-                    if (userData) {
-                        if (userData.created_at) {
-                            const date = new Date(userData.created_at);
-                            document.getElementById('profileJoinDate').textContent = 
-                                date.toLocaleDateString('tr-TR');
-                        }
-                        
-                        const copies = userData.total_copies || userData.total_downloads || 0;
-                        document.getElementById('profileCopies').textContent = copies;
-                    }
-                }).catch(error => {
-                    console.error("Kullanıcı istatistikleri yüklenirken hata:", error);
-                });
-            }
-        }
-        
-        // SAYFA DEĞİŞTİRME
-        function changePage(pageId) {
-            console.log("Sayfa değiştiriliyor:", pageId);
-            
-            // Tüm sayfaları gizle
-            document.querySelectorAll('.content-page').forEach(page => {
-                page.classList.remove('active');
-            });
-            
-            // Tüm sidebar öğelerini pasif yap
-            document.querySelectorAll('.sidebar-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            
-            // Aktif sayfayı göster
-            const page = document.getElementById('page-' + pageId);
-            if (page) {
-                page.classList.add('active');
-                
-                // Sidebar öğesini aktif yap
-                const sidebarItem = document.querySelector(`.sidebar-item[onclick*="${pageId}"]`);
-                if (sidebarItem) {
-                    sidebarItem.classList.add('active');
-                }
-                
-                // Sayfa yükleme
-                switch(pageId) {
-                    case 'home':
-                        loadHomePage();
-                        break;
-                    case 'pdfs':
-                        loadPDFsPage();
-                        break;
-                    case 'profile':
-                        loadProfilePage();
-                        break;
-                    case 'admin':
-                        loadAdminPage();
-                        break;
-                }
-            }
-            
-            // Sidebar'ı kapat
-            closeSidebar();
-        }
-        
-        function closeSidebar() {
-            document.getElementById('sidebar').classList.remove('active');
-            document.getElementById('overlay').classList.remove('active');
-        }
-        
-        // SAYFA YÜKLEME FONKSİYONLARI
-        async function loadHomePage() {
-            console.log("Ana sayfa yükleniyor");
-            // Özel PDF'leri yükle
-            await loadSpecialPdfsToPage();
-        }
-        
-        async function loadPDFsPage() {
-            console.log("PDF'ler sayfası yükleniyor");
-            
-            if (!db) {
-                console.log("Firebase Database bağlantısı yok");
-                return;
-            }
-            
-            try {
-                const pdfsSnapshot = await db.ref('pdfs').once('value');
-                const pdfs = pdfsSnapshot.val() || {};
-                
-                // Tüm PDF'leri al
-                allPdfs = Object.entries(pdfs)
-                    .map(([key, pdf]) => ({
-                        key,
-                        ...pdf
-                    }))
-                    .filter(pdf => !pdf.is_deleted);
-                
-                console.log("Toplam PDF sayısı:", allPdfs.length);
-                
-                // PDF'leri göster
-                displayPdfs(allPdfs);
-                
-                // Arama ve filtrelemeyi kur
-                setupSearchAndFilter();
-                
-                // Özel PDF'leri yükle
-                await loadSpecialPdfsToSection();
-                
-            } catch (error) {
-                console.error("PDF'ler yüklenirken hata:", error);
-                document.getElementById('pdfList').innerHTML = `
-                    <div style="text-align: center; padding: 40px; color: var(--text-light);">
-                        <div class="spinner"></div>
-                        <p>PDF'ler yükleniyor...</p>
-                    </div>
-                `;
-            }
-        }
-        
-        function displayPdfs(pdfs) {
-            const pdfList = document.getElementById('pdfList');
-            const noResults = document.getElementById('noResults');
-            
-            if (!pdfList) {
-                console.log("PDF listesi elementi bulunamadı");
-                return;
-            }
-            
-            if (pdfs.length === 0) {
-                console.log("Gösterilecek PDF yok");
-                pdfList.innerHTML = '';
-                noResults.classList.remove('hidden');
-                return;
-            }
-            
-            noResults.classList.add('hidden');
-            
-            let html = '';
-            pdfs.forEach((pdf, index) => {
-                const title = pdf.title || 'PDF Dosyası';
-                const category = pdf.category || 'genel';
-                const ads = pdf.required_ads || 0;
-                const copies = pdf.copies || pdf.downloads || 0;
-                
-                // Özel tag'ler (admin tarafından belirlenen)
-                const specialTags = getSpecialTags(pdf.key);
-                
-                html += `
-                    <div class="pdf-card" onclick="openPdfModal('${pdf.key}', '${title.replace(/'/g, "\\'")}', ${ads})">
-                        <div class="pdf-header">
-                            <div class="pdf-icon">
-                                <i class="fas fa-file-pdf"></i>
-                            </div>
-                            <div class="pdf-info">
-                                <div class="pdf-title">
-                                    ${title}
-                                    ${specialTags}
-                                </div>
-                                <div class="pdf-meta">
-                                    <span><i class="fas fa-tag"></i> ${category.toUpperCase()}</span>
-                                    <span><i class="fas fa-ad"></i> ${ads} reklam</span>
-                                    <span><i class="fas fa-copy"></i> ${copies} kopyalama</span>
-                                </div>
-                                <div class="pdf-category">
-                                    ${category.toUpperCase()}
-                                </div>
-                            </div>
+            list.innerHTML = '';
+            popular.innerHTML = '';
+            adminList.innerHTML = '';
+
+            pdfData.forEach(pdf => {
+                const cardHtml = `
+                <div class="bg-white p-4 rounded-2xl border border-gray-100 flex items-center justify-between shadow-sm">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600">
+                            <i class="fas fa-file-pdf"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-bold text-slate-800">${pdf.title}</h4>
+                            <p class="text-[9px] text-gray-400 font-semibold">${pdf.cat} • ${pdf.reqAds} Reklam</p>
                         </div>
                     </div>
-                    
-                    <!-- HER PDF'NİN ALTINDA YATAY BANNER -->
-                    <div class="pdf-banner" data-pdf-index="${index}">
-                        <div data-mndbanid="381059bd-5c39-4979-95a4-51dbda56a629"></div>
+                    <div>
+                        ${pdf.currentAds <= 0 ? 
+                            `<button onclick="downloadPdf('${pdf.url}')" class="bg-green-500 text-white px-4 py-2 rounded-xl text-[10px] font-bold btn-active shadow-md shadow-green-100">İNDİR</button>` :
+                            `<button onclick="watchAd(${pdf.id})" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold btn-active shadow-md shadow-blue-100">İZLE (${pdf.currentAds})</button>`
+                        }
                     </div>
-                `;
+                </div>`;
+                
+                list.innerHTML += cardHtml;
+                
+                // Admin tarafı
+                adminList.innerHTML += `
+                <div class="flex justify-between items-center bg-white p-3 rounded-xl text-[10px] border border-gray-100">
+                    <span class="font-bold text-slate-600">${pdf.title}</span>
+                    <button onclick="deletePdf(${pdf.id})" class="text-red-500 font-bold">SİL</button>
+                </div>`;
             });
-            
-            pdfList.innerHTML = html;
-            console.log("PDF'ler gösterildi, toplam:", pdfs.length);
+
+            if(pdfData.length > 0) popular.innerHTML = list.innerHTML;
         }
-        
-        function getSpecialTags(pdfKey) {
-            // Bu fonksiyon admin tarafından belirlenen özel tag'leri döndürür
-            return '';
-        }
-        
-        function setupSearchAndFilter() {
-            console.log("Arama ve filtreleme sistemi kuruluyor");
-            
-            // Arama input'u
-            const searchInput = document.getElementById('pdfSearch');
-            searchInput.addEventListener('input', function() {
-                console.log("Arama yapılıyor:", this.value);
-                filterPdfs();
-            });
-            
-            // Kategori filtreleri
-            const filters = document.querySelectorAll('.category-filter');
-            filters.forEach(filter => {
-                filter.addEventListener('click', function() {
-                    console.log("Kategori filtresi seçildi:", this.dataset.category);
-                    filters.forEach(f => f.classList.remove('active'));
-                    this.classList.add('active');
-                    selectedCategory = this.dataset.category;
-                    filterPdfs();
+
+        function watchAd(pdfId) {
+            // Gerçek reklam fonksiyonu çağrısı
+            if (typeof show_71741 === 'function') {
+                show_71741().then(() => {
+                    completeAd(pdfId);
+                }).catch(() => {
+                    tg.showAlert("Reklam hazır değil, lütfen bekleyin.");
                 });
-            });
-        }
-        
-        function filterPdfs() {
-            const searchTerm = document.getElementById('pdfSearch').value.toLowerCase();
-            console.log("PDF'ler filtreleniyor, kategori:", selectedCategory, "arama terimi:", searchTerm);
-            
-            let filtered = allPdfs;
-            
-            // Kategoriye göre filtrele
-            if (selectedCategory !== 'all') {
-                filtered = filtered.filter(pdf => pdf.category === selectedCategory);
-            }
-            
-            // Arama terimine göre filtrele
-            if (searchTerm) {
-                filtered = filtered.filter(pdf => 
-                    pdf.title.toLowerCase().includes(searchTerm) ||
-                    pdf.category.toLowerCase().includes(searchTerm)
-                );
-            }
-            
-            console.log("Filtrelenmiş PDF sayısı:", filtered.length);
-            displayPdfs(filtered);
-        }
-        
-        async function loadSpecialPdfsToSection() {
-            console.log("Özel PDF'ler bölüme yükleniyor");
-            
-            if (!db) return;
-            
-            try {
-                const specialPdfsRef = await db.ref('special_pdfs').once('value');
-                const specialPdfs = specialPdfsRef.val();
-                
-                if (!specialPdfs) {
-                    console.log("Özel PDF'ler bulunamadı");
-                    return;
-                }
-                
-                const section = document.getElementById('specialPdfsSection');
-                let html = '';
-                
-                // En Popüler PDF'ler
-                if (specialPdfs.popular && specialPdfs.popular.length > 0) {
-                    const popularPdfs = await getPdfsByKeys(specialPdfs.popular);
-                    if (popularPdfs.length > 0) {
-                        html += `
-                            <div style="margin-bottom: 25px;">
-                                <h3 style="font-size: 18px; margin-bottom: 15px; color: var(--text-dark); display: flex; align-items: center; gap: 10px;">
-                                    <i class="fas fa-fire" style="color: #F44336;"></i>
-                                    En Popüler PDF'ler
-                                </h3>
-                                <div style="display: flex; flex-direction: column; gap: 15px;">
-                        `;
-                        
-                        popularPdfs.forEach(pdf => {
-                            html += `
-                                <div class="pdf-card" onclick="openPdfModal('${pdf.key}', '${pdf.title.replace(/'/g, "\\'")}', ${pdf.required_ads || 0})">
-                                    <div class="pdf-header">
-                                        <div class="pdf-icon" style="background: #F44336;">
-                                            <i class="fas fa-fire"></i>
-                                        </div>
-                                        <div class="pdf-info">
-                                            <div class="pdf-title">
-                                                ${pdf.title}
-                                                <span class="special-tag popular">POPÜLER</span>
-                                            </div>
-                                            <div class="pdf-meta">
-                                                <span><i class="fas fa-copy"></i> ${pdf.copies || pdf.downloads || 0} kopyalama</span>
-                                                <span><i class="fas fa-ad"></i> ${pdf.required_ads || 0} reklam</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
-                        });
-                        
-                        html += `
-                                </div>
-                            </div>
-                        `;
-                    }
-                }
-                
-                // En Çok Aranan PDF'ler
-                if (specialPdfs.trending && specialPdfs.trending.length > 0) {
-                    const trendingPdfs = await getPdfsByKeys(specialPdfs.trending);
-                    if (trendingPdfs.length > 0) {
-                        html += `
-                            <div style="margin-bottom: 25px;">
-                                <h3 style="font-size: 18px; margin-bottom: 15px; color: var(--text-dark); display: flex; align-items: center; gap: 10px;">
-                                    <i class="fas fa-chart-line" style="color: #4CAF50;"></i>
-                                    En Çok Aranan PDF'ler
-                                </h3>
-                                <div style="display: flex; flex-direction: column; gap: 15px;">
-                        `;
-                        
-                        trendingPdfs.forEach(pdf => {
-                            html += `
-                                <div class="pdf-card" onclick="openPdfModal('${pdf.key}', '${pdf.title.replace(/'/g, "\\'")}', ${pdf.required_ads || 0})">
-                                    <div class="pdf-header">
-                                        <div class="pdf-icon" style="background: #4CAF50;">
-                                            <i class="fas fa-chart-line"></i>
-                                        </div>
-                                        <div class="pdf-info">
-                                            <div class="pdf-title">
-                                                ${pdf.title}
-                                                <span class="special-tag trending">TRENDING</span>
-                                            </div>
-                                            <div class="pdf-meta">
-                                                <span><i class="fas fa-copy"></i> ${pdf.copies || pdf.downloads || 0} kopyalama</span>
-                                                <span><i class="fas fa-ad"></i> ${pdf.required_ads || 0} reklam</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
-                        });
-                        
-                        html += `
-                                </div>
-                            </div>
-                        `;
-                    }
-                }
-                
-                // Öne Çıkan PDF'ler
-                if (specialPdfs.featured && specialPdfs.featured.length > 0) {
-                    const featuredPdfs = await getPdfsByKeys(specialPdfs.featured);
-                    if (featuredPdfs.length > 0) {
-                        html += `
-                            <div style="margin-bottom: 25px;">
-                                <h3 style="font-size: 18px; margin-bottom: 15px; color: var(--text-dark); display: flex; align-items: center; gap: 10px;">
-                                    <i class="fas fa-star" style="color: #FF9800;"></i>
-                                    Öne Çıkan PDF'ler
-                                </h3>
-                                <div style="display: flex; flex-direction: column; gap: 15px;">
-                        `;
-                        
-                        featuredPdfs.forEach(pdf => {
-                            html += `
-                                <div class="pdf-card" onclick="openPdfModal('${pdf.key}', '${pdf.title.replace(/'/g, "\\'")}', ${pdf.required_ads || 0})">
-                                    <div class="pdf-header">
-                                        <div class="pdf-icon" style="background: #FF9800;">
-                                            <i class="fas fa-star"></i>
-                                        </div>
-                                        <div class="pdf-info">
-                                            <div class="pdf-title">
-                                                ${pdf.title}
-                                                <span class="special-tag">ÖNE ÇIKAN</span>
-                                            </div>
-                                            <div class="pdf-meta">
-                                                <span><i class="fas fa-copy"></i> ${pdf.copies || pdf.downloads || 0} kopyalama</span>
-                                                <span><i class="fas fa-ad"></i> ${pdf.required_ads || 0} reklam</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
-                        });
-                        
-                        html += `
-                                </div>
-                            </div>
-                        `;
-                    }
-                }
-                
-                section.innerHTML = html;
-                console.log("Özel PDF'ler bölüme yüklendi");
-                
-            } catch (error) {
-                console.error("Özel PDF'ler yüklenirken hata:", error);
-            }
-        }
-        
-        async function loadSpecialPdfsToPage() {
-            console.log("Ana sayfa için özel PDF'ler yükleniyor");
-            
-            if (!db) return;
-            
-            try {
-                const specialPdfsRef = await db.ref('special_pdfs').once('value');
-                const specialPdfs = specialPdfsRef.val();
-                
-                if (!specialPdfs) {
-                    console.log("Ana sayfa için özel PDF'ler bulunamadı");
-                    return;
-                }
-                
-                console.log("Ana sayfa özel PDF'leri yüklendi:", specialPdfs);
-                
-            } catch (error) {
-                console.error("Ana sayfa özel PDF'leri yüklenirken hata:", error);
-            }
-        }
-        
-        async function getPdfsByKeys(pdfKeys) {
-            console.log("PDF'ler anahtarlara göre yükleniyor:", pdfKeys);
-            
-            if (!db || !pdfKeys || pdfKeys.length === 0) return [];
-            
-            const pdfs = [];
-            for (const key of pdfKeys) {
-                try {
-                    const pdfRef = await db.ref(`pdfs/${key}`).once('value');
-                    const pdfData = pdfRef.val();
-                    if (pdfData && !pdfData.is_deleted) {
-                        pdfs.push({ key, ...pdfData });
-                    }
-                } catch (error) {
-                    console.error(`PDF ${key} yüklenirken hata:`, error);
-                }
-            }
-            
-            console.log("Yüklenen PDF sayısı:", pdfs.length);
-            return pdfs;
-        }
-        
-        function loadProfilePage() {
-            console.log("Profil sayfası yükleniyor");
-        }
-        
-        function loadAdminPage() {
-            console.log("Admin sayfası yükleniyor");
-            
-            if (!isAdmin) {
-                console.log("Kullanıcı admin değil, ana sayfaya yönlendiriliyor");
-                changePage('home');
-                return;
-            }
-            
-            console.log("Admin sayfası yüklendi");
-        }
-        
-        // PDF MODAL FONKSİYONLARI
-        function openPdfModal(pdfKey, pdfTitle, requiredAds) {
-            console.log("PDF modal açılıyor:", pdfTitle);
-            
-            currentPdf = { key: pdfKey, title: pdfTitle, required_ads: requiredAds };
-            currentAdCount = 0;
-            totalAdsRequired = requiredAds;
-            
-            document.getElementById('modalTitle').textContent = pdfTitle;
-            document.getElementById('modalDescription').textContent = 
-                `Bu PDF'i kopyalamak için ${requiredAds} reklam izlemeniz gerekiyor.`;
-            document.getElementById('modalStatus').textContent = `0/${requiredAds}`;
-            document.getElementById('modalProgress').style.width = '0%';
-            document.getElementById('startAdsBtn').style.display = 'block';
-            document.getElementById('copyLinkBtn').style.display = 'none';
-            document.getElementById('startAdsBtn').innerHTML = '<i class="fas fa-play"></i> Reklamları İzle';
-            
-            // Kullanıcı ilerlemesini kontrol et
-            if (db && currentUser) {
-                db.ref(`users/${currentUser.id}/pdf_progress/${pdfKey}`).once('value').then(snapshot => {
-                    const progress = snapshot.val();
-                    if (progress && progress.watched_ads) {
-                        currentAdCount = progress.watched_ads;
-                        updateProgress();
-                        
-                        if (currentAdCount >= requiredAds) {
-                            showCopyButton();
-                        }
-                    }
-                }).catch(error => {
-                    console.error("Kullanıcı ilerlemesi yüklenirken hata:", error);
-                });
-            }
-            
-            document.getElementById('pdfModal').classList.add('active');
-            console.log("PDF modal açıldı");
-        }
-        
-        function closeModal(modalId) {
-            console.log("Modal kapatılıyor:", modalId);
-            document.getElementById(modalId).classList.remove('active');
-        }
-        
-        function updateProgress() {
-            const progress = (currentAdCount / totalAdsRequired) * 100;
-            document.getElementById('modalProgress').style.width = `${progress}%`;
-            document.getElementById('modalStatus').textContent = 
-                `${currentAdCount}/${totalAdsRequired}`;
-            
-            console.log("İlerleme güncellendi:", progress + "%");
-        }
-        
-        function showCopyButton() {
-            console.log("Kopyalama butonu gösteriliyor");
-            document.getElementById('startAdsBtn').style.display = 'none';
-            document.getElementById('copyLinkBtn').style.display = 'block';
-        }
-        
-        // REKLAM SİSTEMİ
-        function startAds() {
-            console.log("Reklamlar başlatılıyor");
-            
-            if (!currentPdf) {
-                console.log("PDF bilgisi yok");
-                return;
-            }
-            
-            const btn = document.getElementById('startAdsBtn');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Reklam yükleniyor...';
-            btn.disabled = true;
-            
-            // Mondiad interstitial reklam göster
-            if (typeof window.MondiadInterstitial !== 'undefined') {
-                console.log("Mondiad interstitial reklam gösteriliyor");
-                
-                // Test için setTimeout kullanıyoruz
-                setTimeout(() => {
-                    console.log("Mondiad reklamı izlendi (test)");
-                    currentAdCount++;
-                    updateProgress();
-                    
-                    // Firebase'e kaydet
-                    if (db && currentUser) {
-                        const updates = {};
-                        updates[`users/${currentUser.id}/pdf_progress/${currentPdf.key}/watched_ads`] = currentAdCount;
-                        updates[`users/${currentUser.id}/pdf_progress/${currentPdf.key}/last_watch`] = 
-                            firebase.database.ServerValue.TIMESTAMP;
-                        
-                        db.ref().update(updates)
-                            .then(() => console.log("İlerleme Firebase'e kaydedildi"))
-                            .catch(error => console.error("Firebase kayıt hatası:", error));
-                    }
-                    
-                    // Tüm reklamlar izlendi mi?
-                    if (currentAdCount >= totalAdsRequired) {
-                        console.log("Tüm reklamlar izlendi");
-                        showCopyButton();
-                        
-                        // Kopyalama sayacını artır
-                        if (db) {
-                            // PDF kopyalama sayısını artır
-                            db.ref(`pdfs/${currentPdf.key}/copies`).transaction(current => {
-                                return (current || 0) + 1;
-                            }).then(() => console.log("PDF kopyalama sayısı artırıldı"));
-                            
-                            // Kullanıcı istatistiklerini güncelle
-                            db.ref(`users/${currentUser.id}/total_copies`).transaction(current => {
-                                return (current || 0) + 1;
-                            }).then(() => console.log("Kullanıcı kopyalama sayısı artırıldı"));
-                        }
-                    } else {
-                        btn.innerHTML = `<i class="fas fa-play"></i> Reklam İzle (${totalAdsRequired - currentAdCount} kaldı)`;
-                        btn.disabled = false;
-                        console.log(`Kalan reklam sayısı: ${totalAdsRequired - currentAdCount}`);
-                    }
-                }, 2000);
             } else {
-                // Test modu
-                console.log("Mondiad interstitial bulunamadı, test modu");
-                currentAdCount = totalAdsRequired;
-                updateProgress();
-                showCopyButton();
-            }
-        }
-        
-        // LİNK KOPYALAMA
-        async function copyLink() {
-            console.log("Link kopyalanıyor");
-            
-            if (!currentPdf || !db) {
-                console.log("PDF veya database bağlantısı yok");
-                alert('PDF linki bulunamadı!');
-                return;
-            }
-            
-            try {
-                // PDF linkini al
-                const pdfSnapshot = await db.ref(`pdfs/${currentPdf.key}`).once('value');
-                const pdfData = pdfSnapshot.val();
-                
-                if (!pdfData || !pdfData.url) {
-                    console.log("PDF linki bulunamadı");
-                    alert('PDF linki bulunamadı!');
-                    return;
-                }
-                
-                // Linki kopyala
-                let link = pdfData.url;
-                if (link.includes('dropbox.com') && link.includes('dl=0')) {
-                    link = link.replace('dl=0', 'dl=1');
-                }
-                
-                console.log("Kopyalanacak link:", link);
-                
-                // Kopyala işlemi
-                if (navigator.clipboard) {
-                    await navigator.clipboard.writeText(link);
-                    alert('✓ Link kopyalandı!');
-                    console.log("Link clipboard'a kopyalandı");
-                } else {
-                    // Fallback
-                    const textArea = document.createElement('textarea');
-                    textArea.value = link;
-                    document.body.appendChild(textArea);
-                    textArea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(textArea);
-                    alert('✓ Link kopyalandı!');
-                    console.log("Link fallback yöntemiyle kopyalandı");
-                }
-                
-                // Modal'ı kapat
-                closeModal('pdfModal');
-                
-            } catch (error) {
-                console.error('Kopyalama hatası:', error);
-                alert('✗ Kopyalama başarısız!');
-            }
-        }
-        
-        // ADMIN FONKSİYONLARI
-        function adminAddPDF() {
-            console.log("PDF ekleme modalı açılıyor");
-            document.getElementById('addPdfModal').classList.add('active');
-            
-            const adsRange = document.getElementById('pdfAds');
-            const adsValue = document.getElementById('adsValue');
-            
-            adsRange.addEventListener('input', function() {
-                adsValue.textContent = this.value;
-            });
-        }
-        
-        async function savePDF() {
-            console.log("PDF kaydediliyor");
-            
-            const name = document.getElementById('pdfName').value;
-            const link = document.getElementById('pdfLink').value;
-            const category = document.getElementById('pdfCategory').value;
-            const ads = document.getElementById('pdfAds').value;
-            
-            if (!name || !link) {
-                alert('Lütfen PDF adı ve linki girin!');
-                return;
-            }
-            
-            try {
-                const pdfKey = 'pdf_' + Date.now();
-                const pdfData = {
-                    key: pdfKey,
-                    title: name,
-                    url: link,
-                    category: category,
-                    required_ads: parseInt(ads),
-                    copies: 0,
-                    downloads: 0,
-                    created_at: firebase.database.ServerValue.TIMESTAMP,
-                    is_deleted: false
-                };
-                
-                console.log("PDF verileri:", pdfData);
-                
-                await db.ref(`pdfs/${pdfKey}`).set(pdfData);
-                
-                closeModal('addPdfModal');
-                alert('✓ PDF başarıyla eklendi!');
-                console.log("PDF başarıyla eklendi");
-                
-                // Formu temizle
-                document.getElementById('pdfName').value = '';
-                document.getElementById('pdfLink').value = '';
-                
-                // PDF listesini yenile
-                if (document.getElementById('page-pdfs').classList.contains('active')) {
-                    console.log("PDF listesi yenileniyor");
-                    loadPDFsPage();
-                }
-                
-            } catch (error) {
-                console.error('PDF ekleme hatası:', error);
-                alert('✗ PDF eklenemedi!');
-            }
-        }
-        
-        function adminManagePDFs() {
-            console.log("PDF yönetimi açılıyor");
-            alert('PDF yönetimi yakında eklenecek!');
-        }
-        
-        function adminSpecialPDFs() {
-            console.log("Özel PDF'ler modalı açılıyor");
-            document.getElementById('specialPdfsModal').classList.add('active');
-            loadSpecialPDFs();
-        }
-        
-        async function loadSpecialPDFs() {
-            console.log("Özel PDF'ler yükleniyor");
-            
-            if (!db) return;
-            
-            try {
-                // Tüm PDF'leri yükle
-                const pdfsSnapshot = await db.ref('pdfs').once('value');
-                const pdfs = pdfsSnapshot.val() || {};
-                
-                const select = document.getElementById('specialPdfSelect');
-                select.innerHTML = '';
-                
-                Object.entries(pdfs).forEach(([key, pdf]) => {
-                    if (!pdf.is_deleted) {
-                        const option = document.createElement('option');
-                        option.value = key;
-                        option.textContent = pdf.title || 'PDF Dosyası';
-                        select.appendChild(option);
-                    }
+                // Test Modu
+                tg.showConfirm("Reklam izlendi sayılsın mı? (Test Modu)", (ok) => {
+                    if(ok) completeAd(pdfId);
                 });
-                
-                console.log("Özel PDF seçimi yüklendi");
-                
-            } catch (error) {
-                console.error("Özel PDF'ler yüklenirken hata:", error);
             }
         }
-        
-        async function saveSpecialPDFs() {
-            console.log("Özel PDF'ler kaydediliyor");
-            
-            if (!db) return;
-            
-            try {
-                const select = document.getElementById('specialPdfSelect');
-                const selectedOptions = Array.from(select.selectedOptions).map(option => option.value);
-                const specialType = document.getElementById('specialType').value;
-                
-                console.log("Kaydedilen özel PDF'ler:", selectedOptions, "tür:", specialType);
-                
-                const updates = {};
-                updates[`special_pdfs/${specialType}`] = selectedOptions;
-                
-                await db.ref().update(updates);
-                
-                closeModal('specialPdfsModal');
-                alert('✓ Özel PDF'ler kaydedildi!');
-                console.log("Özel PDF'ler başarıyla kaydedildi");
-                
-                // Sayfayı yenile
-                if (document.getElementById('page-pdfs').classList.contains('active')) {
-                    console.log("PDF sayfası yenileniyor");
-                    loadPDFsPage();
-                }
-                
-            } catch (error) {
-                console.error("Özel PDF'ler kaydedilirken hata:", error);
-                alert('✗ Kaydetme başarısız!');
+
+        function completeAd(pdfId) {
+            const pdf = pdfData.find(p => p.id === pdfId);
+            if (pdf && pdf.currentAds > 0) {
+                pdf.currentAds--;
+                tg.HapticFeedback.notificationOccurred('success');
+                saveAndRefresh();
             }
         }
-        
-        function adminAnalytics() {
-            console.log("İstatistikler açılıyor");
-            alert('İstatistikler yakında eklenecek!');
+
+        function downloadPdf(url) {
+            tg.openLink(url);
+            tg.HapticFeedback.impactOccurred('medium');
         }
-        
-        // UYGULAMA YÜKLENİNCE
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log("DOM yüklendi, uygulama başlatılıyor");
-            initApp();
-        });
+
+        function addPdf() {
+            const title = document.getElementById('adm-title').value;
+            const url = document.getElementById('adm-url').value;
+            const ads = document.getElementById('adm-ads').value || 1;
+
+            if(!title || !url) return tg.showAlert("Eksik bilgi!");
+
+            pdfData.push({
+                id: Date.now(),
+                title: title,
+                url: url,
+                reqAds: parseInt(ads),
+                currentAds: parseInt(ads),
+                cat: 'Genel'
+            });
+
+            saveAndRefresh();
+            tg.showAlert("Eklendi!");
+            document.getElementById('adm-title').value = '';
+            document.getElementById('adm-url').value = '';
+        }
+
+        function deletePdf(id) {
+            pdfData = pdfData.filter(p => p.id !== id);
+            saveAndRefresh();
+        }
+
+        function saveAndRefresh() {
+            localStorage.setItem('pdfs_v2', JSON.stringify(pdfData));
+            renderPdfs();
+        }
+
+        initApp();
     </script>
 </body>
 </html>
