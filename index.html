@@ -14,64 +14,39 @@
     <script async src="https://ss.mrmnd.com/interstitial.js" data-mndintid="45a45fca-0f26-4487-bb1c-e158b13246b7"></script>
 
     <style>
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #f8fafc;
-            color: #1e293b;
-            overflow: hidden;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .glass-nav {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid rgba(0, 0, 0, 0.05);
-        }
-        .page {
-            display: none;
-            animation: fadeIn 0.3s ease-in-out;
-            height: calc(100vh - 180px);
-            overflow-y: auto;
-            padding: 16px;
-        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #1e293b; overflow: hidden; user-select: none; -webkit-tap-highlight-color: transparent; }
+        .page { display: none; animation: fadeIn 0.3s ease-in-out; height: calc(100vh - 180px); overflow-y: auto; padding: 16px; }
         .page.active { display: block; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .btn-active:active { transform: scale(0.95); transition: 0.1s; }
         .tab-active { color: #2563eb !important; border-top: 2px solid #2563eb; }
+        .glass-nav { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-top: 1px solid rgba(0, 0, 0, 0.05); }
     </style>
 </head>
 <body class="h-full flex flex-col">
 
     <header class="p-4 flex justify-between items-center bg-white border-b border-gray-100 z-[60]">
         <div class="flex items-center gap-3">
-            <div id="user-photo" class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center border border-blue-200">
-                <i class="fas fa-user text-blue-600"></i>
-            </div>
+            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center border border-blue-200"><i class="fas fa-user text-blue-600"></i></div>
             <div>
                 <p class="text-[10px] text-gray-400 font-bold uppercase">Öğrenci Paneli</p>
                 <p id="user-name" class="font-bold text-sm text-slate-800">Yükleniyor...</p>
             </div>
         </div>
-        <div class="bg-blue-600 text-white text-[10px] px-3 py-1 rounded-lg font-bold">V.2.0</div>
+        <div class="bg-blue-600 text-white text-[10px] px-3 py-1 rounded-lg font-bold">PRO</div>
     </header>
 
     <div class="px-4 mt-2">
-        <div class="min-h-[80px] bg-white rounded-2xl flex items-center justify-center border border-dashed border-gray-300">
-            <div id="mnd-banner-71742"></div>
-        </div>
+        <div class="min-h-[80px] bg-white rounded-2xl flex items-center justify-center border border-dashed border-gray-200 overflow-hidden">
+            <div id="mnd-71742"></div> </div>
     </div>
 
     <main class="flex-1 relative overflow-hidden">
         <section id="home" class="page active">
-            <div class="bg-blue-600 p-6 rounded-3xl mb-6 shadow-lg relative overflow-hidden">
-                <div class="relative z-10 text-white">
-                    <h2 class="text-xl font-bold mb-1">Ders Notları Hazır!</h2>
-                    <p class="text-xs opacity-90">Reklam izleyerek PDF kilidini açabilirsin.</p>
-                    <button onclick="switchTab('library')" class="mt-4 bg-white text-blue-600 px-5 py-2 rounded-xl font-bold text-xs btn-active">Kütüphaneye Git</button>
-                </div>
+            <div class="bg-blue-600 p-6 rounded-3xl mb-6 shadow-lg relative overflow-hidden text-white">
+                <h2 class="text-xl font-bold mb-1">Hoş Geldin!</h2>
+                <p class="text-xs opacity-90">Kütüphanedeki PDF'leri açmak için reklam izle.</p>
+                <button onclick="switchTab('library')" class="mt-4 bg-white text-blue-600 px-5 py-2 rounded-xl font-bold text-xs btn-active">PDF Listesi</button>
                 <i class="fas fa-rocket absolute -right-2 -bottom-2 text-6xl text-white/10 -rotate-12"></i>
             </div>
             <div id="popular-list" class="space-y-3"></div>
@@ -82,56 +57,48 @@
         </section>
 
         <section id="profile" class="page">
-            <div class="bg-white p-6 rounded-3xl border border-gray-100 text-center mb-6">
-                <div class="w-20 h-20 bg-blue-50 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl text-blue-600">
-                    <i class="fas fa-graduation-cap"></i>
-                </div>
-                <h2 id="profile-name" class="text-lg font-bold text-slate-800">Kullanıcı</h2>
-                <p id="profile-id" class="text-gray-400 text-xs mt-1">ID: ---</p>
+            <div class="bg-white p-6 rounded-3xl border border-gray-100 text-center">
+                <div class="w-20 h-20 bg-blue-50 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl text-blue-600"><i class="fas fa-graduation-cap"></i></div>
+                <h2 id="profile-name" class="text-lg font-bold">Kullanıcı</h2>
+                <p id="profile-id" class="text-gray-400 text-xs">ID: ---</p>
             </div>
-            <div id="admin-button" class="hidden">
-                <button onclick="switchTab('admin')" class="w-full bg-slate-800 text-white p-4 rounded-2xl font-bold flex justify-between items-center btn-active shadow-lg">
-                    <span><i class="fas fa-lock mr-2 text-yellow-400"></i> YÖNETİCİ PANELİ</span>
-                    <i class="fas fa-arrow-right text-xs"></i>
+            <div id="admin-button" class="hidden mt-4">
+                <button onclick="switchTab('admin')" class="w-full bg-slate-800 text-white p-4 rounded-2xl font-bold flex justify-between items-center btn-active">
+                    <span>YÖNETİCİ PANELİ</span><i class="fas fa-arrow-right"></i>
                 </button>
             </div>
         </section>
 
         <section id="admin" class="page">
             <div class="bg-white p-5 rounded-2xl border mb-4">
-                <h3 class="text-sm font-bold mb-4 text-blue-600 uppercase">Yeni PDF</h3>
                 <input id="adm-title" type="text" placeholder="PDF Başlığı" class="w-full bg-gray-50 border rounded-xl p-3 text-sm mb-2 outline-none">
                 <input id="adm-url" type="text" placeholder="İndirme Linki" class="w-full bg-gray-50 border rounded-xl p-3 text-sm mb-2 outline-none">
-                <div class="flex gap-2">
-                    <input id="adm-ads" type="number" placeholder="Reklam" class="w-1/3 bg-gray-50 border rounded-xl p-3 text-sm outline-none">
-                    <button onclick="addPdf()" class="w-2/3 bg-blue-600 text-white rounded-xl font-bold text-sm btn-active">EKLE</button>
-                </div>
+                <input id="adm-ads" type="number" placeholder="Kaç Reklam İzlenecek?" class="w-full bg-gray-50 border rounded-xl p-3 text-sm mb-2 outline-none">
+                <button onclick="addPdf()" class="w-full bg-blue-600 text-white rounded-xl py-3 font-bold btn-active">SİSTEME KAYDET</button>
             </div>
             <div id="admin-pdf-list" class="space-y-2"></div>
         </section>
     </main>
 
     <nav class="glass-nav h-20 px-8 flex justify-between items-center z-[100]">
-        <button onclick="switchTab('home')" class="nav-btn tab-active h-full flex flex-col justify-center items-center gap-1 flex-1 text-gray-400">
-            <i class="fas fa-house text-xl"></i>
-            <span class="text-[9px] font-bold">ANA SAYFA</span>
+        <button onclick="switchTab('home')" class="nav-btn tab-active flex-1 flex flex-col items-center gap-1 text-gray-400">
+            <i class="fas fa-house text-xl"></i><span class="text-[9px] font-bold">ANA SAYFA</span>
         </button>
-        <button onclick="switchTab('library')" class="nav-btn h-full flex flex-col justify-center items-center gap-1 flex-1 text-gray-400">
-            <i class="fas fa-layer-group text-xl"></i>
-            <span class="text-[9px] font-bold">KÜTÜPHANE</span>
+        <button onclick="switchTab('library')" class="nav-btn flex-1 flex flex-col items-center gap-1 text-gray-400">
+            <i class="fas fa-layer-group text-xl"></i><span class="text-[9px] font-bold">KÜTÜPHANE</span>
         </button>
-        <button onclick="switchTab('profile')" class="nav-btn h-full flex flex-col justify-center items-center gap-1 flex-1 text-gray-400">
-            <i class="fas fa-user-ninja text-xl"></i>
-            <span class="text-[9px] font-bold">PROFİL</span>
+        <button onclick="switchTab('profile')" class="nav-btn flex-1 flex flex-col items-center gap-1 text-gray-400">
+            <i class="fas fa-user-ninja text-xl"></i><span class="text-[9px] font-bold">PROFİL</span>
         </button>
     </nav>
+
+    <a id="mnd-trigger" href="#reklam-izle" style="display:none;">.</a>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-
         const ADMIN_IDS = [8392479231, 7904032877];
-        let pdfData = JSON.parse(localStorage.getItem('pdfs_v2')) || [];
+        let pdfData = JSON.parse(localStorage.getItem('pdfs_v3')) || [];
 
         function initApp() {
             const user = tg.initDataUnsafe?.user;
@@ -152,7 +119,6 @@
             if(tabId === 'home') btns[0].classList.add('tab-active');
             if(tabId === 'library') btns[1].classList.add('tab-active');
             if(tabId === 'profile' || tabId === 'admin') btns[2].classList.add('tab-active');
-            tg.HapticFeedback.impactOccurred('light');
         }
 
         function renderPdfs() {
@@ -161,44 +127,39 @@
             list.innerHTML = ''; adminList.innerHTML = '';
 
             pdfData.forEach(pdf => {
-                const cardHtml = `
+                const card = `
                 <div class="bg-white p-4 rounded-2xl border border-gray-100 flex items-center justify-between shadow-sm">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600"><i class="fas fa-file-pdf"></i></div>
-                        <div><h4 class="text-xs font-bold text-slate-800">${pdf.title}</h4><p class="text-[9px] text-gray-400 font-semibold">${pdf.currentAds > 0 ? pdf.currentAds + ' Reklam Kaldı' : 'Tamamlandı'}</p></div>
+                        <div><h4 class="text-xs font-bold text-slate-800">${pdf.title}</h4><p class="text-[9px] text-gray-400 font-semibold">${pdf.currentAds > 0 ? pdf.currentAds + ' Reklam Gerekli' : 'Hazır'}</p></div>
                     </div>
-                    <div>${pdf.currentAds <= 0 ? `<button onclick="downloadPdf('${pdf.url}')" class="bg-green-500 text-white px-4 py-2 rounded-xl text-[10px] font-bold btn-active">İNDİR</button>` : `<button onclick="watchAd(${pdf.id})" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold btn-active">İZLE</button>`}</div>
+                    <div>
+                        ${pdf.currentAds <= 0 ? 
+                        `<button onclick="tg.openLink('${pdf.url}')" class="bg-green-500 text-white px-4 py-2 rounded-xl text-[10px] font-bold">İNDİR</button>` : 
+                        `<button onclick="watchAd(${pdf.id})" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold">İZLE</button>`}
+                    </div>
                 </div>`;
-                list.innerHTML += cardHtml;
-                adminList.innerHTML += `<div class="flex justify-between items-center bg-white p-3 rounded-xl text-[10px] border mb-2"><span>${pdf.title}</span><button onclick="deletePdf(${pdf.id})" class="text-red-500">SİL</button></div>`;
+                list.innerHTML += card;
+                adminList.innerHTML += `<div class="flex justify-between p-2 bg-gray-50 rounded-lg text-xs mb-1"><span>${pdf.title}</span><button onclick="deletePdf(${pdf.id})" class="text-red-500">SİL</button></div>`;
             });
             document.getElementById('popular-list').innerHTML = list.innerHTML;
         }
 
-        // --- MRMND GERÇEK REKLAM TETİKLEME ---
+        // --- GERÇEK REKLAM TETİKLEYİCİ ---
         function watchAd(pdfId) {
-            // Script yüklendiğinde genelde "mndint" veya "mnd_show" adında bir fonksiyon oluşturur.
-            // Eğer fonksiyonu manuel çağıramazsan, bu script linklere tıklandığında otomatik çalışır.
-            // Ödül sistemini bağlamak için global objeyi kontrol ediyoruz:
+            const trigger = document.getElementById('mnd-trigger');
             
-            if (window.show_71741) { // Mrmnd bazen data-id ile fonksiyon oluşturur
-                window.show_71741().then(() => completeAd(pdfId)).catch(() => tg.showAlert("Reklam hazır değil."));
-            } else if (typeof triggerMndInterstitial === "function") {
-                triggerMndInterstitial().then(() => completeAd(pdfId));
-            } else {
-                // EĞER HİÇBİRİ YOKSA: Mrmnd link tabanlı çalışıyordur. 
-                // Bu durumda script'in dokümanına göre manuel tetikleyiciyi buraya yazmalısın.
-                // Şimdilik "Gerçek Reklam" servisini zorla çağırıyoruz:
-                try {
-                    // Mrmnd scripti genellikle linklere intercept yapar. 
-                    // Reklamı göstermek için görünmez bir elemente tıklama simüle edilebilir.
-                    tg.showAlert("Reklam servisi bağlanıyor... Lütfen tekrar dokunun.");
-                    // Ödül logic'i (Gerçek reklam servisi onay verince çalışır):
-                    completeAd(pdfId); 
-                } catch(e) {
-                    tg.showAlert("Reklam servisi şu an meşgul.");
+            // 1. Reklam Servisi (Mrmnd) genellikle tıklamaları yakalar.
+            // Bu yüzden butona basıldığında gizli bir linke "tıklama" gönderiyoruz.
+            trigger.click();
+
+            // 2. Mrmnd Panelinde "On-close" veya "Callback" ayarı yoksa 
+            // reklamın açıldığını varsayıp ödülü vermek için gerçekçi bir bekleme ekliyoruz.
+            tg.showConfirm("Reklamı izledikten sonra 'Tamam' butonuna basarak ödülünüzü alabilirsiniz.", (ok) => {
+                if(ok) {
+                    completeAd(pdfId);
                 }
-            }
+            });
         }
 
         function completeAd(pdfId) {
@@ -210,19 +171,16 @@
             }
         }
 
-        function downloadPdf(url) {
-            tg.openLink(url);
-            tg.HapticFeedback.impactOccurred('medium');
-        }
-
         function addPdf() {
             const title = document.getElementById('adm-title').value;
             const url = document.getElementById('adm-url').value;
             const ads = document.getElementById('adm-ads').value || 1;
-            if(!title || !url) return tg.showAlert("Eksik bilgi!");
-            pdfData.push({ id: Date.now(), title, url, reqAds: parseInt(ads), currentAds: parseInt(ads) });
+            if(!title || !url) return tg.showAlert("Bilgiler eksik!");
+            pdfData.push({ id: Date.now(), title, url, currentAds: parseInt(ads) });
             saveAndRefresh();
             tg.showAlert("Eklendi!");
+            document.getElementById('adm-title').value = '';
+            document.getElementById('adm-url').value = '';
         }
 
         function deletePdf(id) {
@@ -231,7 +189,7 @@
         }
 
         function saveAndRefresh() {
-            localStorage.setItem('pdfs_v2', JSON.stringify(pdfData));
+            localStorage.setItem('pdfs_v3', JSON.stringify(pdfData));
             renderPdfs();
         }
 
