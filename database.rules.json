@@ -1,0 +1,49 @@
+{
+  "rules": {
+    "pdf_dershanem": {
+      "state": {
+        // Allow anyone to read the shared state (PDF list, stats)
+        ".read": true,
+        // Writes allowed only for authenticated admin accounts listed under /admins
+        ".write": "auth != null && root.child('pdf_dershanem').child('admins').child(auth.uid).val() === true",
+
+        // Structure constraints for safety
+        "users": {
+          "$uid": {
+            // Allow reading user records
+            ".read": true,
+            // Allow a user to write only their own record (e.g., save profile, download counters)
+            ".write": "auth != null && auth.uid === $uid",
+            "name": { ".validate": "newData.isString()" },
+            "avatar": { ".validate": "newData.isString()" },
+            "downloads": { ".validate": "newData.isNumber()" }
+          }
+        },
+
+        "pdfs": {
+          "$pdfId": {
+            ".read": true,
+            // Only admins may create/update/delete PDFs
+            ".write": "auth != null && root.child('pdf_dershanem').child('admins').child(auth.uid).val() === true",
+            "id": { ".validate": "newData.isString()" },
+            "title": { ".validate": "newData.isString()" },
+            "url": { ".validate": "newData.isString()" },
+            "category": { ".validate": "newData.isString()" },
+            "addedAt": { ".validate": "newData.isString()" },
+            "downloads": { ".validate": "newData.isNumber()" },
+            "requiredAds": { ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 100" }
+          }
+        },
+
+        "admins": {
+          // Admin list is managed by server-side or a privileged account; reading admin list is allowed, writing requires existing admin
+          ".read": true,
+          ".write": "auth != null && root.child('pdf_dershanem').child('admins').child(auth.uid).val() === true",
+          "$adminUid": {
+            ".validate": "newData.isBoolean()"
+          }
+        }
+      }
+    }
+  }
+}

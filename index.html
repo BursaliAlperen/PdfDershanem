@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>PDF DERSHANEM</title>
+
+  <!-- Ad provider snippets (paste into head as requested) -->
+  <script async src="https://ss.mrmnd.com/banner.js"></script>
+  <script async src="https://ss.mrmnd.com/interstitial.js" data-mndintid="45a45fca-0f26-4487-bb1c-e158b13246b7"></script>
+
+  <!-- esm.sh import map (for small helper lib + firebase) -->
+  <script type="importmap">
+  {
+    "imports": {
+      "dayjs": "https://esm.sh/dayjs@1.11.9",
+      "firebase/app": "https://esm.sh/firebase@9.23.0/app",
+      "firebase/firestore": "https://esm.sh/firebase@9.23.0/firestore",
+      "firebase/database": "https://esm.sh/firebase@9.23.0/database"
+    }
+  }
+  </script>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Banner ad (everywhere) -->
+    <div id="banner-ad" class="banner">
+      <div data-mndbanid="381059bd-5c39-4979-95a4-51dbda56a629"></div>
+    </div>
+
+    <!-- App screens -->
+    <main id="screen" class="screen"></main>
+
+    <!-- Bottom navigation -->
+    <nav class="bottom-nav" role="navigation" aria-label="Ana navigasyon">
+      <button data-screen="home" class="nav-btn active" aria-label="Ana sayfa">
+        <span>Ana</span>
+      </button>
+      <button data-screen="pdfs" class="nav-btn" aria-label="PDF'ler">
+        <span>PDF'LER</span>
+      </button>
+      <button data-screen="profile" class="nav-btn" aria-label="Profil">
+        <span>Profil</span>
+      </button>
+    </nav>
+
+    <!-- Admin modal (hidden) -->
+    <div id="admin-modal" class="modal hidden" aria-hidden="true">
+      <div class="modal-content">
+        <h3>Admin Panel</h3>
+        <div class="admin-grid">
+          <div>
+            <h4>PDF Ekle (Dropbox link yapıştır)</h4>
+            <input id="admin-dropbox" placeholder="Dropbox paylaşım linki (.pdf)" />
+            <label>Kategori (otomatik öneri varsa boş bırak)</label>
+            <input id="admin-category" placeholder="TYT, AYT, KPSS, MATEMATİK..." />
+            <label>Görüntülenmesi gereken reklam sayısı (1-100)</label>
+            <input id="admin-adcount" type="number" min="1" max="100" value="1" />
+            <button id="admin-add">Ekle</button>
+          </div>
+
+          <div>
+            <h4>Mevcut PDF'ler</h4>
+            <div id="admin-list" class="admin-list"></div>
+          </div>
+
+          <div>
+            <h4>İstatistikler</h4>
+            <div id="admin-stats"></div>
+            <h4>Kullanıcılar</h4>
+            <div id="admin-users"></div>
+          </div>
+        </div>
+
+        <button id="admin-close" class="btn-close">Kapat</button>
+      </div>
+    </div>
+
+    <!-- Simple toast -->
+    <div id="toast" class="toast hidden"></div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
