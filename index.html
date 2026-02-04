@@ -5,83 +5,728 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>PDF DERSHANEM</title>
 
-  <!-- Ad provider snippets (paste into head as requested) -->
   <script async src="https://ss.mrmnd.com/banner.js"></script>
   <script async src="https://ss.mrmnd.com/interstitial.js" data-mndintid="45a45fca-0f26-4487-bb1c-e158b13246b7"></script>
 
-  <!-- esm.sh import map (for small helper lib + firebase) -->
   <script type="importmap">
   {
     "imports": {
-      "dayjs": "https://esm.sh/dayjs@1.11.9",
       "firebase/app": "https://esm.sh/firebase@9.23.0/app",
-      "firebase/firestore": "https://esm.sh/firebase@9.23.0/firestore",
-      "firebase/database": "https://esm.sh/firebase@9.23.0/database"
+      "firebase/firestore": "https://esm.sh/firebase@9.23.0/firestore"
     }
   }
   </script>
 
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    :root{
+      --bg: #f7f8fb;
+      --card: #ffffff;
+      --muted: #6b7280;
+      --accent: #0b6cff;
+      --danger: #ef4444;
+      --glass: rgba(255,255,255,0.7);
+    }
+    *{box-sizing:border-box;font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
+    html,body,#app{height:100%;margin:0;background:var(--bg);color:#111;}
+    body{user-select:none;-webkit-user-select:none;}
+    input, textarea, button{user-select:text;-webkit-user-select:text;}
+    .screen{padding:12px;padding-bottom:80px;height:calc(100vh - 72px);overflow:auto;}
+    .banner{position:sticky;top:0;background:var(--card);padding:8px;border-bottom:1px solid #eee;z-index:10;display:flex;justify-content:center;align-items:center;}
+    .card{background:var(--card);border-radius:14px;padding:12px;margin-bottom:12px;box-shadow:0 1px 8px rgba(10,10,10,0.04);}
+    .header-row{display:flex;align-items:center;gap:12px;}
+    .avatar{width:56px;height:56px;border-radius:50%;object-fit:cover;background:linear-gradient(135deg,#e6eefc,#fff);display:inline-block;}
+    .h1{font-size:18px;margin:0;font-weight:700;}
+    .muted{color:var(--muted);font-size:13px;}
+    .search{display:flex;gap:8px;margin-top:10px;}
+    .input{flex:1;padding:10px;border-radius:10px;border:1px solid #e6e9ef;background:#fff;}
+    .small{font-size:13px;}
+    .small-note{font-size:12px;color:var(--muted);margin-top:6px;}
+    .categories{display:flex;gap:8px;overflow:auto;padding:8px 2px 8px 2px;}
+    .cat{min-width:110px;padding:10px;border-radius:10px;background:linear-gradient(180deg,#fff,#f8fbff);box-shadow:0 1px 4px rgba(12,12,12,0.04);text-align:center;cursor:pointer;font-weight:600;}
+    .cat.active{border:1px solid var(--accent);color:var(--accent);}
+    .pdf-list{display:flex;flex-direction:column;gap:10px;}
+    .pdf-item{display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:10px;background:var(--card);border:1px solid #f1f5f9;gap:12px;}
+    .pdf-meta{display:flex;gap:10px;align-items:center;}
+    .pdf-title{font-weight:600;}
+    .pdf-cat{font-size:12px;color:var(--muted);}
+    .btn{padding:8px 12px;border-radius:8px;border:0;background:var(--accent);color:white;cursor:pointer;font-weight:600;}
+    .btn-ghost{background:transparent;border:1px solid #e6e9ef;color:var(--muted);padding:8px 10px;border-radius:8px;cursor:pointer;}
+    .btn-danger{background:var(--danger);color:white;border:0;padding:8px 10px;border-radius:8px;cursor:pointer;}
+    .bottom-nav{position:fixed;left:0;right:0;bottom:0;height:64px;background:var(--card);display:flex;justify-content:space-around;align-items:center;border-top:1px solid #eee;z-index:20;}
+    .nav-btn{background:transparent;border:0;padding:10px 12px;border-radius:10px;color:var(--muted);font-weight:600;display:flex;flex-direction:column;align-items:center;cursor:pointer;}
+    .nav-btn.active{color:var(--accent);}
+    .modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.35);z-index:100;}
+    .hidden{display:none;}
+    .modal-content{width:92%;max-width:980px;background:var(--card);padding:16px;border-radius:12px;max-height:90vh;overflow:auto;}
+    .admin-grid{display:grid;grid-template-columns:1fr;gap:12px;}
+    @media(min-width:900px){.admin-grid{grid-template-columns:1fr 1fr 1fr;}}
+    .admin-list{max-height:260px;overflow:auto;border:1px dashed #eee;padding:8px;border-radius:8px;display:flex;flex-direction:column;gap:8px;}
+    .admin-row{display:flex;flex-direction:column;gap:6px;padding:8px;border:1px solid #f3f4f6;border-radius:8px;}
+    .admin-row .row-actions{display:flex;gap:8px;align-items:center;}
+    .admin-input{width:100%;padding:8px;border-radius:8px;border:1px solid #e6e9ef;}
+    .btn-close{margin-top:12px;background:transparent;border:1px solid #e6e9ef;padding:8px;border-radius:8px;cursor:pointer;}
+    .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:80px;background:#111;color:white;padding:8px 12px;border-radius:10px;z-index:110;}
+    .inline-banner{margin-top:8px;border-radius:8px;background:linear-gradient(180deg,#fafbff,#fff);padding:6px;border:1px solid #f1f5f9;display:flex;justify-content:center;align-items:center;}
+    .inline-banner small{color:var(--muted);font-size:12px;}
+    .stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+    @media(max-width:720px){.stats-grid{grid-template-columns:1fr 1fr;}}
+    .stat-card{background:var(--bg);border-radius:10px;padding:10px;border:1px solid #eef2f7;}
+    .ad-modal{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:120;}
+    .ad-card{width:90%;max-width:360px;background:#fff;border-radius:12px;padding:16px;text-align:center;}
+    .ad-progress{font-weight:700;margin:8px 0;}
+    .tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:4px 8px;border-radius:999px;background:#eef2ff;color:#4f46e5;}
+  </style>
 </head>
 <body>
   <div id="app">
-    <!-- Banner ad (everywhere) -->
     <div id="banner-ad" class="banner">
       <div data-mndbanid="381059bd-5c39-4979-95a4-51dbda56a629"></div>
     </div>
 
-    <!-- App screens -->
     <main id="screen" class="screen"></main>
 
-    <!-- Bottom navigation -->
     <nav class="bottom-nav" role="navigation" aria-label="Ana navigasyon">
-      <button data-screen="home" class="nav-btn active" aria-label="Ana sayfa">
-        <span>Ana</span>
-      </button>
-      <button data-screen="pdfs" class="nav-btn" aria-label="PDF'ler">
-        <span>PDF'LER</span>
-      </button>
-      <button data-screen="profile" class="nav-btn" aria-label="Profil">
-        <span>Profil</span>
-      </button>
+      <button data-screen="home" class="nav-btn active" aria-label="Ana sayfa">Ana</button>
+      <button data-screen="pdfs" class="nav-btn" aria-label="PDF'ler">PDF'ler</button>
+      <button data-screen="profile" class="nav-btn" aria-label="Profil">Profil</button>
     </nav>
 
-    <!-- Admin modal (hidden) -->
-    <div id="admin-modal" class="modal hidden" aria-hidden="true">
-      <div class="modal-content">
-        <h3>Admin Panel</h3>
-        <div class="admin-grid">
-          <div>
-            <h4>PDF Ekle (Dropbox link yapıştır)</h4>
-            <input id="admin-dropbox" placeholder="Dropbox paylaşım linki (.pdf)" />
-            <label>Kategori (otomatik öneri varsa boş bırak)</label>
-            <input id="admin-category" placeholder="TYT, AYT, KPSS, MATEMATİK..." />
-            <label>Görüntülenmesi gereken reklam sayısı (1-100)</label>
-            <input id="admin-adcount" type="number" min="1" max="100" value="1" />
-            <button id="admin-add">Ekle</button>
-          </div>
+    <div id="admin-modal" class="modal hidden" aria-hidden="true"></div>
 
-          <div>
-            <h4>Mevcut PDF'ler</h4>
-            <div id="admin-list" class="admin-list"></div>
-          </div>
+    <div id="toast" class="toast hidden"></div>
 
-          <div>
-            <h4>İstatistikler</h4>
-            <div id="admin-stats"></div>
-            <h4>Kullanıcılar</h4>
-            <div id="admin-users"></div>
-          </div>
-        </div>
-
-        <button id="admin-close" class="btn-close">Kapat</button>
+    <div id="ad-modal" class="ad-modal hidden" aria-hidden="true">
+      <div class="ad-card">
+        <div class="tag">Reklam</div>
+        <h3>Interstitial Reklam</h3>
+        <div class="ad-progress" id="ad-progress">1 / 1</div>
+        <div class="small muted">Reklamı kapatmak için bekleyin.</div>
+        <button id="ad-close" class="btn" disabled>Reklamı Kapat</button>
       </div>
     </div>
-
-    <!-- Simple toast -->
-    <div id="toast" class="toast hidden"></div>
   </div>
 
-  <script type="module" src="app.js"></script>
+  <script type="module">
+    import { initializeApp } from "firebase/app";
+    import {
+      getFirestore,
+      collection,
+      doc,
+      getDoc,
+      getDocs,
+      addDoc,
+      setDoc,
+      updateDoc,
+      deleteDoc,
+      query,
+      orderBy,
+      limit,
+      serverTimestamp,
+      increment
+    } from "firebase/firestore";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyArNeaPYGiPg-K7O19Xg4btYhqfnzvyCtw",
+      authDomain: "pdfdershanem.firebaseapp.com",
+      databaseURL: "https://pdfdershanem-default-rtdb.firebaseio.com",
+      projectId: "pdfdershanem",
+      storageBucket: "pdfdershanem.firebasestorage.app",
+      messagingSenderId: "149337981694",
+      appId: "1:149337981694:web:87ec729568567f43879baf",
+      measurementId: "G-BZB9FD26GT"
+    };
+
+    const ADMIN_IDS = ["8392479231","7904032877"];
+    const CATEGORY_LIST = ["TYT","AYT","KPSS","MATEMATİK","GEOMETRİ","DİĞER"];
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const SCR = document.getElementById("screen");
+    const NAV_BTNS = document.querySelectorAll(".nav-btn");
+    const ADMIN_MODAL = document.getElementById("admin-modal");
+    const AD_MODAL = document.getElementById("ad-modal");
+    const AD_PROGRESS = document.getElementById("ad-progress");
+    const AD_CLOSE = document.getElementById("ad-close");
+
+    let currentUser = null;
+    let pdfs = [];
+    let users = [];
+    let stats = { totalDownloads: 0, dailyDownloads: {} };
+    let isAdmin = false;
+
+    document.addEventListener("contextmenu", (event) => event.preventDefault());
+    document.addEventListener("selectstart", (event) => {
+      if (event.target.closest("input, textarea")) return;
+      event.preventDefault();
+    });
+
+    NAV_BTNS.forEach((btn) => btn.addEventListener("click", () => {
+      NAV_BTNS.forEach((b) => b.classList.toggle("active", b === btn));
+      setScreen(btn.dataset.screen);
+    }));
+
+    function showToast(message, timeout = 2200) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.remove("hidden");
+      setTimeout(() => toast.classList.add("hidden"), timeout);
+    }
+
+    function formatTimestamp(ts) {
+      if (!ts) return "-";
+      if (ts.toDate) return ts.toDate().toLocaleDateString("tr-TR");
+      try { return new Date(ts).toLocaleDateString("tr-TR"); } catch (e) { return "-"; }
+    }
+
+    function getTelegramUser() {
+      const tg = window.Telegram?.WebApp;
+      const tgUser = tg?.initDataUnsafe?.user || {};
+      if (tg?.ready) tg.ready();
+      if (tg?.expand) tg.expand();
+
+      const storedGuest = localStorage.getItem("pdfders_guest_id") || "";
+      const guestId = storedGuest || `guest_${Math.random().toString(36).slice(2,10)}`;
+      if (!storedGuest) localStorage.setItem("pdfders_guest_id", guestId);
+
+      const tgId = tgUser.id ? String(tgUser.id) : guestId;
+      const name = [tgUser.first_name, tgUser.last_name].filter(Boolean).join(" ") || tgUser.username || "Telegram Kullanıcı";
+      const photo = tgUser.photo_url || "";
+      return {
+        tgId,
+        name,
+        username: tgUser.username || "",
+        photo,
+        raw: tgUser
+      };
+    }
+
+    async function ensureUser() {
+      const tgUser = getTelegramUser();
+      const userRef = doc(db, "users", tgUser.tgId);
+      const snap = await getDoc(userRef);
+      if (!snap.exists()) {
+        await setDoc(userRef, {
+          name: tgUser.name,
+          photo: tgUser.photo,
+          totalDownloads: 0,
+          firstLogin: serverTimestamp(),
+          lastLogin: serverTimestamp()
+        });
+        return { ...tgUser, totalDownloads: 0, firstLogin: new Date(), lastLogin: new Date() };
+      }
+      const data = snap.data();
+      await updateDoc(userRef, {
+        name: tgUser.name,
+        photo: tgUser.photo,
+        lastLogin: serverTimestamp()
+      });
+      return {
+        ...tgUser,
+        totalDownloads: data.totalDownloads || 0,
+        firstLogin: data.firstLogin,
+        lastLogin: data.lastLogin
+      };
+    }
+
+    async function loadPdfs() {
+      const snap = await getDocs(query(collection(db, "pdfs"), orderBy("createdAt", "desc")));
+      pdfs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    }
+
+    async function loadUsers() {
+      const snap = await getDocs(collection(db, "users"));
+      users = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    }
+
+    async function loadStats() {
+      const snap = await getDoc(doc(db, "stats", "global"));
+      stats = snap.exists() ? snap.data() : { totalDownloads: 0, dailyDownloads: {} };
+    }
+
+    function setScreen(name) {
+      if (name === "home") renderHome();
+      if (name === "pdfs") renderPDFs();
+      if (name === "profile") renderProfile();
+    }
+
+    function renderHome() {
+      SCR.innerHTML = "";
+      const header = document.createElement("div");
+      header.className = "card";
+      header.innerHTML = `
+        <div class="header-row">
+          <img class="avatar" src="${currentUser.photo || "https://cdn.jsdelivr.net/gh/edent/SuperTinyIcons/images/svg/telegram.svg"}" alt="avatar" />
+          <div>
+            <div class="h1">Hoş geldin, ${currentUser.name}</div>
+            <div class="muted small">PDF DERSHANEM'e hoş geldiniz</div>
+          </div>
+          ${isAdmin ? "<button id=\"open-admin\" class=\"btn-ghost small\">Admin</button>" : ""}
+        </div>
+      `;
+      SCR.appendChild(header);
+
+      if (isAdmin) {
+        header.querySelector("#open-admin").addEventListener("click", openAdminPanel);
+      }
+
+      const statsCard = document.createElement("div");
+      statsCard.className = "card";
+      const totalPdf = pdfs.length;
+      const totalDownloads = pdfs.reduce((sum, pdf) => sum + (pdf.downloads || 0), 0);
+      const activeUsers = users.length;
+      statsCard.innerHTML = `
+        <div class="h1">PDF DERSHANEM</div>
+        <div class="stats-grid" style="margin-top:10px;">
+          <div class="stat-card">
+            <div class="small muted">Toplam PDF</div>
+            <div class="h1">${totalPdf}</div>
+          </div>
+          <div class="stat-card">
+            <div class="small muted">Toplam indirme</div>
+            <div class="h1">${totalDownloads}</div>
+          </div>
+          <div class="stat-card">
+            <div class="small muted">Aktif kullanıcı</div>
+            <div class="h1">${activeUsers}</div>
+          </div>
+        </div>
+      `;
+      SCR.appendChild(statsCard);
+
+      const infoCard = document.createElement("div");
+      infoCard.className = "card";
+      infoCard.innerHTML = `
+        <div class="small muted">Hızlı kategoriler</div>
+        <div class="categories" id="home-categories"></div>
+      `;
+      SCR.appendChild(infoCard);
+
+      const catEl = infoCard.querySelector("#home-categories");
+      CATEGORY_LIST.forEach((cat) => {
+        const el = document.createElement("div");
+        el.className = "cat";
+        el.textContent = cat;
+        el.addEventListener("click", () => {
+          setActiveNav("pdfs");
+          renderPDFs(cat);
+        });
+        catEl.appendChild(el);
+      });
+
+      const recentCard = document.createElement("div");
+      recentCard.className = "card";
+      const recent = [...pdfs].slice(0, 4);
+      recentCard.innerHTML = `
+        <div class="small muted">Son eklenenler</div>
+        <div class="pdf-list" id="recent-list"></div>
+      `;
+      SCR.appendChild(recentCard);
+
+      const list = recentCard.querySelector("#recent-list");
+      if (recent.length === 0) {
+        list.innerHTML = `<div class="small muted">Henüz PDF yok</div>`;
+      } else {
+        recent.forEach((pdf) => list.appendChild(buildPdfItem(pdf)));
+      }
+    }
+
+    function renderPDFs(preferredCategory = "", queryText = "") {
+      SCR.innerHTML = "";
+      const header = document.createElement("div");
+      header.className = "card";
+      header.innerHTML = `<div class="h1">PDF'ler</div><div class="muted small">Arama yap, kategori seç, indir</div>`;
+      SCR.appendChild(header);
+
+      const searchCard = document.createElement("div");
+      searchCard.className = "card";
+      searchCard.innerHTML = `
+        <div class="search">
+          <input id="pdf-search" class="input" placeholder="PDF ara" value="${queryText}" />
+          <button id="pdf-search-btn" class="btn">Ara</button>
+        </div>
+        <div class="categories" id="category-bar"></div>
+      `;
+      SCR.appendChild(searchCard);
+
+      const catBar = searchCard.querySelector("#category-bar");
+      CATEGORY_LIST.forEach((cat) => {
+        const el = document.createElement("div");
+        el.className = `cat ${cat === preferredCategory ? "active" : ""}`;
+        el.textContent = cat;
+        el.addEventListener("click", () => renderPDFs(cat, document.getElementById("pdf-search").value));
+        catBar.appendChild(el);
+      });
+
+      searchCard.querySelector("#pdf-search-btn").addEventListener("click", () => {
+        renderPDFs(preferredCategory, document.getElementById("pdf-search").value);
+      });
+
+      const listCard = document.createElement("div");
+      listCard.className = "card";
+      listCard.innerHTML = `<div id="pdf-list" class="pdf-list"></div>`;
+      SCR.appendChild(listCard);
+
+      const list = listCard.querySelector("#pdf-list");
+      const filtered = pdfs.filter((pdf) => {
+        const matchesCategory = !preferredCategory || pdf.category === preferredCategory;
+        const matchesQuery = !queryText || pdf.name?.toLowerCase().includes(queryText.toLowerCase());
+        return matchesCategory && matchesQuery;
+      });
+
+      if (filtered.length === 0) {
+        list.innerHTML = `<div class="small muted">Eşleşen PDF bulunamadı</div>`;
+      } else {
+        filtered.forEach((pdf) => list.appendChild(buildPdfItem(pdf)));
+      }
+    }
+
+    function renderProfile() {
+      SCR.innerHTML = "";
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <div class="header-row">
+          <img class="avatar" src="${currentUser.photo || "https://cdn.jsdelivr.net/gh/edent/SuperTinyIcons/images/svg/telegram.svg"}" alt="avatar" />
+          <div>
+            <div class="h1">${currentUser.name}</div>
+            <div class="muted small">Telegram ID: ${currentUser.tgId}</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;">
+          <div class="card" style="padding:10px;">
+            <div class="small muted">Toplam indirme</div>
+            <div class="h1" style="font-size:16px;margin-top:6px;">${currentUser.totalDownloads || 0}</div>
+          </div>
+          <div class="card" style="padding:10px;">
+            <div class="small muted">İlk giriş</div>
+            <div class="h1" style="font-size:16px;margin-top:6px;">${formatTimestamp(currentUser.firstLogin)}</div>
+          </div>
+        </div>
+      `;
+      SCR.appendChild(card);
+    }
+
+    function buildPdfItem(pdf) {
+      const item = document.createElement("div");
+      item.className = "pdf-item";
+      item.innerHTML = `
+        <div style="flex:1;display:flex;flex-direction:column;gap:8px;">
+          <div class="pdf-meta">
+            <div>
+              <div class="pdf-title">${pdf.name || "PDF"}</div>
+              <div class="pdf-cat">${pdf.category} • İndirme: ${pdf.downloads || 0}</div>
+            </div>
+          </div>
+          <div class="inline-banner"><small>Banner reklam alanı</small></div>
+          <div class="small muted">Gerekli reklam: ${pdf.requiredAds || 1}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button class="btn" data-id="${pdf.id}">İndir</button>
+          ${isAdmin ? `<button class=\"btn-ghost\" data-edit="${pdf.id}">Düzenle</button>` : ""}
+        </div>
+      `;
+      item.querySelector(".btn").addEventListener("click", () => handleDownload(pdf.id));
+      if (isAdmin) {
+        item.querySelector("[data-edit]").addEventListener("click", () => openAdminPanel(pdf.id));
+      }
+      return item;
+    }
+
+    async function handleDownload(pdfId) {
+      const pdf = pdfs.find((p) => p.id === pdfId);
+      if (!pdf) return showToast("PDF bulunamadı");
+
+      const progressId = `${currentUser.tgId}_${pdfId}`;
+      const progressRef = doc(db, "ad_progress", progressId);
+      const progressSnap = await getDoc(progressRef);
+      const progress = progressSnap.exists() ? progressSnap.data() : { watched: 0, required: pdf.requiredAds || 1 };
+      const now = Date.now();
+
+      if (progress.lastAttemptAt && now - progress.lastAttemptAt < 1200) {
+        return showToast("Lütfen biraz bekleyin");
+      }
+
+      await setDoc(progressRef, { lastAttemptAt: now, required: pdf.requiredAds || 1 }, { merge: true });
+
+      const remaining = (pdf.requiredAds || 1) - (progress.watched || 0);
+      if (remaining > 0) {
+        const watched = await showAds(remaining);
+        if (!watched) return;
+        await setDoc(progressRef, { watched: (progress.watched || 0) + remaining, required: pdf.requiredAds || 1 }, { merge: true });
+      }
+
+      await finalizeDownload(pdf);
+    }
+
+    function showAds(count) {
+      return new Promise((resolve) => {
+        let watched = 0;
+        const runAd = () => {
+          watched += 1;
+          AD_PROGRESS.textContent = `${watched} / ${count}`;
+          AD_CLOSE.disabled = true;
+          AD_MODAL.classList.remove("hidden");
+          AD_MODAL.setAttribute("aria-hidden", "false");
+
+          try {
+            if (typeof window.mndShowInterstitial === "function") {
+              window.mndShowInterstitial();
+            } else if (typeof window.showAd === "function") {
+              window.showAd();
+            }
+          } catch (e) {
+            // ignore
+          }
+
+          setTimeout(() => {
+            AD_CLOSE.disabled = false;
+          }, 1600);
+
+          AD_CLOSE.onclick = () => {
+            if (watched >= count) {
+              AD_MODAL.classList.add("hidden");
+              AD_MODAL.setAttribute("aria-hidden", "true");
+              resolve(true);
+            } else {
+              runAd();
+            }
+          };
+        };
+
+        runAd();
+      });
+    }
+
+    async function finalizeDownload(pdf) {
+      try {
+        const pdfRef = doc(db, "pdfs", pdf.id);
+        const userRef = doc(db, "users", currentUser.tgId);
+        await updateDoc(pdfRef, { downloads: increment(1) });
+        await updateDoc(userRef, { totalDownloads: increment(1) });
+
+        const todayKey = new Date().toISOString().slice(0, 10);
+        await setDoc(doc(db, "stats", "global"), {
+          totalDownloads: increment(1),
+          [`dailyDownloads.${todayKey}`]: increment(1)
+        }, { merge: true });
+
+        currentUser.totalDownloads = (currentUser.totalDownloads || 0) + 1;
+        pdf.downloads = (pdf.downloads || 0) + 1;
+
+        showToast("İndirme başlatılıyor...");
+        window.open(pdf.link, "_blank");
+        renderPDFs();
+      } catch (e) {
+        showToast("İndirme sırasında hata oluştu");
+      }
+    }
+
+    function inferTitleFromUrl(url) {
+      try {
+        const u = new URL(url);
+        let name = decodeURIComponent((u.pathname.split("/").pop() || "").split("?")[0]);
+        name = name.replace(/\.(pdf|docx?)$/i, "").replace(/[_\-.]/g, " ").replace(/\s+/g, " ").trim();
+        return name || "PDF";
+      } catch (e) {
+        return "PDF";
+      }
+    }
+
+    function inferCategoryFromTitle(title) {
+      const t = (title || "").toUpperCase();
+      if (t.includes("TYT")) return "TYT";
+      if (t.includes("AYT")) return "AYT";
+      if (t.includes("KPSS")) return "KPSS";
+      if (t.includes("GEO")) return "GEOMETRİ";
+      if (t.includes("MAT")) return "MATEMATİK";
+      return "DİĞER";
+    }
+
+    function sanitizeDropboxLink(link) {
+      if (!link) return "";
+      try {
+        const url = new URL(link.trim());
+        if (url.hostname.includes("dropbox.com")) {
+          url.searchParams.set("dl", "1");
+          return url.toString();
+        }
+        return url.toString();
+      } catch (e) {
+        return "";
+      }
+    }
+
+    async function openAdminPanel(editPdfId = "") {
+      if (!isAdmin) return;
+      await loadPdfs();
+      await loadUsers();
+      await loadStats();
+
+      const pdfToEdit = editPdfId ? pdfs.find((p) => p.id === editPdfId) : null;
+
+      ADMIN_MODAL.innerHTML = `
+        <div class="modal-content">
+          <h3>Admin Panel</h3>
+          <div class="admin-grid">
+            <div>
+              <h4>PDF Ekle</h4>
+              <input id="admin-dropbox" class="admin-input" placeholder="Dropbox paylaşım linki (.pdf)" />
+              <label class="small-note">Kategori (boşsa otomatik)</label>
+              <input id="admin-category" class="admin-input" placeholder="TYT, AYT, KPSS, MATEMATİK, GEOMETRİ, DİĞER" />
+              <label class="small-note">Reklam sayısı (1-100)</label>
+              <input id="admin-adcount" class="admin-input" type="range" min="1" max="100" value="1" />
+              <div class="small" id="admin-adcount-value">1</div>
+              <button id="admin-add" class="btn">Ekle</button>
+            </div>
+
+            <div>
+              <h4>Mevcut PDF'ler</h4>
+              <div id="admin-list" class="admin-list"></div>
+            </div>
+
+            <div>
+              <h4>İstatistikler</h4>
+              <div id="admin-stats"></div>
+              <h4>Kullanıcılar</h4>
+              <div id="admin-users"></div>
+            </div>
+          </div>
+          <button id="admin-close" class="btn-close">Kapat</button>
+        </div>
+      `;
+
+      ADMIN_MODAL.classList.remove("hidden");
+      ADMIN_MODAL.setAttribute("aria-hidden", "false");
+
+      const adRange = ADMIN_MODAL.querySelector("#admin-adcount");
+      const adValue = ADMIN_MODAL.querySelector("#admin-adcount-value");
+      adRange.addEventListener("input", () => {
+        adValue.textContent = adRange.value;
+      });
+
+      ADMIN_MODAL.querySelector("#admin-close").addEventListener("click", () => {
+        ADMIN_MODAL.classList.add("hidden");
+        ADMIN_MODAL.setAttribute("aria-hidden", "true");
+      });
+
+      ADMIN_MODAL.querySelector("#admin-add").addEventListener("click", async () => {
+        const raw = ADMIN_MODAL.querySelector("#admin-dropbox").value.trim();
+        const link = sanitizeDropboxLink(raw);
+        if (!link) return showToast("Geçerli Dropbox linki girin");
+
+        const title = inferTitleFromUrl(link);
+        const categoryInput = ADMIN_MODAL.querySelector("#admin-category").value.trim();
+        const category = (categoryInput || inferCategoryFromTitle(title)).toUpperCase();
+        const requiredAds = Number(adRange.value || 1);
+
+        await addDoc(collection(db, "pdfs"), {
+          name: title,
+          category,
+          link,
+          downloads: 0,
+          requiredAds,
+          createdAt: serverTimestamp()
+        });
+
+        showToast("PDF eklendi");
+        openAdminPanel();
+      });
+
+      const listEl = ADMIN_MODAL.querySelector("#admin-list");
+      listEl.innerHTML = "";
+      if (pdfs.length === 0) {
+        listEl.innerHTML = `<div class="small muted">PDF yok</div>`;
+      } else {
+        pdfs.forEach((pdf) => {
+          const row = document.createElement("div");
+          row.className = "admin-row";
+          row.innerHTML = `
+            <input class="admin-input" value="${pdf.name || "PDF"}" data-field="name" />
+            <input class="admin-input" value="${pdf.category || ""}" data-field="category" />
+            <input class="admin-input" value="${pdf.link || ""}" data-field="link" />
+            <label class="small">Reklam sayısı: <span data-value>${pdf.requiredAds || 1}</span></label>
+            <input type="range" min="1" max="100" value="${pdf.requiredAds || 1}" data-field="requiredAds" />
+            <div class="row-actions">
+              <button class="btn" data-save>Kaydet</button>
+              <button class="btn-danger" data-delete>Sil</button>
+            </div>
+          `;
+          const range = row.querySelector("input[type='range']");
+          const rangeValue = row.querySelector("[data-value]");
+          range.addEventListener("input", () => { rangeValue.textContent = range.value; });
+
+          row.querySelector("[data-save]").addEventListener("click", async () => {
+            const fields = {};
+            row.querySelectorAll("[data-field]").forEach((input) => {
+              const key = input.dataset.field;
+              const value = input.value.trim();
+              fields[key] = key === "requiredAds" ? Number(value || 1) : value;
+            });
+            fields.requiredAds = Number(range.value || 1);
+            await updateDoc(doc(db, "pdfs", pdf.id), fields);
+            showToast("PDF güncellendi");
+            openAdminPanel();
+          });
+
+          row.querySelector("[data-delete]").addEventListener("click", async () => {
+            if (!confirm("PDF silinsin mi?")) return;
+            await deleteDoc(doc(db, "pdfs", pdf.id));
+            showToast("PDF silindi");
+            openAdminPanel();
+          });
+
+          listEl.appendChild(row);
+        });
+      }
+
+      const totalDownloads = pdfs.reduce((sum, pdf) => sum + (pdf.downloads || 0), 0);
+      const todayKey = new Date().toISOString().slice(0, 10);
+      const topPdfs = [...pdfs].sort((a, b) => (b.downloads || 0) - (a.downloads || 0)).slice(0, 5);
+      const topUsers = [...users].sort((a, b) => (b.totalDownloads || 0) - (a.totalDownloads || 0)).slice(0, 5);
+      ADMIN_MODAL.querySelector("#admin-stats").innerHTML = `
+        <div class="small">PDF sayısı: ${pdfs.length}</div>
+        <div class="small">Toplam indirme: ${totalDownloads}</div>
+        <div class="small">Günlük indirme (bugün): ${stats.dailyDownloads?.[todayKey] || 0}</div>
+        <div class="small" style="margin-top:8px;font-weight:600;">En çok indirilen PDF'ler</div>
+        <ol class="small">
+          ${topPdfs.map((pdf) => `<li>${pdf.name || "PDF"} • ${pdf.downloads || 0}</li>`).join("") || "<li>Veri yok</li>"}
+        </ol>
+        <div class="small" style="margin-top:8px;font-weight:600;">En aktif kullanıcılar</div>
+        <ol class="small">
+          ${topUsers.map((user) => `<li>${user.name || user.id} • ${user.totalDownloads || 0}</li>`).join("") || "<li>Veri yok</li>"}
+        </ol>
+      `;
+
+      const usersEl = ADMIN_MODAL.querySelector("#admin-users");
+      usersEl.innerHTML = "";
+      if (users.length === 0) {
+        usersEl.innerHTML = `<div class="small muted">Kullanıcı yok</div>`;
+      } else {
+        users.forEach((user) => {
+          const div = document.createElement("div");
+          div.className = "small";
+          div.textContent = `${user.id} • ${user.name || "-"} • İndirme: ${user.totalDownloads || 0} • Son giriş: ${formatTimestamp(user.lastLogin)}`;
+          usersEl.appendChild(div);
+        });
+      }
+
+      if (pdfToEdit) {
+        showToast(`Seçili PDF düzenleniyor: ${pdfToEdit.name}`);
+      }
+    }
+
+    function setActiveNav(name) {
+      NAV_BTNS.forEach((btn) => btn.classList.toggle("active", btn.dataset.screen === name));
+    }
+
+    async function init() {
+      currentUser = await ensureUser();
+      isAdmin = ADMIN_IDS.includes(currentUser.tgId);
+      await Promise.all([loadPdfs(), loadUsers(), loadStats()]);
+      renderHome();
+    }
+
+    init();
+  </script>
 </body>
 </html>
