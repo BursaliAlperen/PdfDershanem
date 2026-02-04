@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { initRealtime, fetchRemoteState, saveRemoteState, autoInitIfConfigured } from "./firestore.js";
+import { initRealtime, fetchRemoteState, saveRemoteState, autoInitIfConfigured } from "./rtdb.js";
 
 const ADMIN_IDS = ["8392479231","7904032877"];
 const STORAGE_KEY = "pdf_dershanem_v1";
@@ -55,19 +55,32 @@ function sanitizeDropboxLink(link){
 }
 
 function inferTitleFromUrl(url){
+  // try to produce a readable title from a URL or filename: decode, strip query, remove extension and extra chars
   try{
     const u = new URL(url);
-    const name = (u.pathname.split("/").pop() || "").replace(/%20/g," ").replace(/[-_]/g," ");
-    return name || "PDF";
+    let name = (u.pathname.split("/").pop() || "").split("?")[0];
+    // decode percent-encoding
+    name = decodeURIComponent(name.replace(/\+/g," "));
+    // remove common file extensions
+    name = name.replace(/\.(pdf|docx?|pptx?)$/i, "");
+    // replace separators with space and collapse multiple spaces
+    name = name.replace(/[_\-\.]/g," ").replace(/\s+/g," ").trim();
+    // remove leading numbers like "01 - " or "2023_"
+    name = name.replace(/^[0-9\-\_\.]+\s*/,"");
+    // fallback
+    if(!name) name = "PDF";
+    return name;
   }catch(e){ return "PDF"; }
 }
 
 function inferCategoryFromTitle(title){
-  const t = title.toUpperCase();
-  if(t.includes("TYT")) return "TYT";
-  if(t.includes("AYT")) return "AYT";
-  if(t.includes("KPSS")) return "KPSS";
-  if(t.includes("MATEM") || t.includes("MAT")) return "MATEMATİK";
+  const t = (title||"").toUpperCase();
+  // stronger checks with common keywords
+  if(/TYT/.test(t) || /\bTEMEL\b/.test(t) || /\bYETENEK\b/.test(t)) return "TYT";
+  if(/AYT/.test(t) || /\bALAN\b/.test(t) || /\bYÜKSEK\b/.test(t)) return "AYT";
+  if(/\bKPSS\b/.test(t) || /\bKAMU\b/.test(t)) return "KPSS";
+  if(/MATEM|MAT\b|GEOMETR|ANALIZ|KALKÜL/.test(t)) return "MATEMATİK";
+  if(/FİZİK|KİMYA|BİYOLOJİ|TARİH|COĞRAFYA|EDEBİYAT|İNGİLİZCE|DİN/.test(t)) return "GENEL";
   // fallback
   return "GENEL";
 }
@@ -140,10 +153,15 @@ function renderRecent(){
   pdfs.forEach(p=>{
     const row = el("div","pdf-item");
     row.innerHTML = `
-      <div class="pdf-meta">
-        <div>
-          <div class="pdf-title">${p.title}</div>
-          <div class="pdf-cat">${p.category} • ${dayjs(p.addedAt).format("YYYY-MM-DD")}</div>
+      <div>
+        <div class="pdf-meta">
+          <div>
+            <div class="pdf-title">${p.title}</div>
+            <div class="pdf-cat">${p.category} • ${dayjs(p.addedAt).format("YYYY-MM-DD")} • İndirme: ${p.downloads || 0}</div>
+          </div>
+        </div>
+        <div class="inline-banner" data-banner-for="${p.id}">
+          <small>Banner alanı • reklam burada görünecek</small>
         </div>
       </div>
       <div>
@@ -189,12 +207,19 @@ function renderPDFs(category=null, query=""){
   filtered.sort((a,b)=> new Date(b.addedAt)-new Date(a.addedAt)).forEach(p=>{
     const item = el("div","pdf-item");
     item.innerHTML = `
-      <div class="pdf-meta">
-        <div>
-          <div class="pdf-title">${p.title}</div>
-          <div class="pdf-cat">${p.category} • İndirme: ${p.downloads || 0}</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div class="pdf-meta">
+          <div>
+            <div class="pdf-title">${p.title}</div>
+            <div class="pdf-cat">${p.category} • İndirme: ${p.downloads || 0}</div>
+          </div>
+        </div>
+
+        <div class="inline-banner" data-banner-for="${p.id}">
+          <small>Banner alanı • reklam burada görünecek</small>
         </div>
       </div>
+
       <div style="display:flex;gap:8px;align-items:center">
         <button class="btn-ghost small" data-id="${p.id}" data-admin-remove>Sil</button>
         <button class="btn" data-id="${p.id}">İndir</button>
@@ -213,25 +238,59 @@ function renderPDFs(category=null, query=""){
 
 /* Profile */
 function getCurrentUser(){
-  // lightweight simulated TG profile stored in localStorage users keyed by "me"
-  // Now supports optional Telegram id (tgId) so admin detection can be automatic.
-  let u = JSON.parse(localStorage.getItem("pdf_dershanem_user")||"null");
-  if(!u){
-    u = { id: "me", name: "Misafir", avatar: "", tgId: "" };
-    localStorage.setItem("pdf_dershanem_user", JSON.stringify(u));
-  } else {
-    // ensure fields exist
-    if(!u.id) u.id = "me";
-    if(!("tgId" in u)) u.tgId = "";
-    if(!("avatar" in u)) u.avatar = "";
+  // persistent, non-editable user id plus lightweight profile stored in localStorage
+  // try to read tgId from URL param once (so Telegram web can pass ?tgid=...)
+  function readUrlParam(name){
+    try{ const p = new URLSearchParams(window.location.search); return p.get(name); }catch(e){return null;}
   }
-  return u;
+  const existing = JSON.parse(localStorage.getItem("pdf_dershanem_user")||"null");
+  // stable internal id stored separately to ensure immutability across sessions
+  let stableId = localStorage.getItem("pdf_dershanem_user_id");
+  if(!stableId){
+    stableId = uid();
+    localStorage.setItem("pdf_dershanem_user_id", stableId);
+  }
+  if(!existing){
+    // generate default name and avatar automatically using stable id
+    const autoName = "Telegram Kullanıcı";
+    const tgFromUrl = readUrlParam("tgid") || "";
+    const avatar = `https://api.dicebear.com/6.x/identicon/svg?seed=${encodeURIComponent(stableId)}`;
+    const user = { id: stableId, name: autoName, avatar, tgId: tgFromUrl };
+    localStorage.setItem("pdf_dershanem_user", JSON.stringify(user));
+    return user;
+  } else {
+    // ensure fields exist and keep id immutable (use stableId)
+    existing.id = stableId;
+    if(!("name" in existing) || !existing.name) existing.name = "Telegram Kullanıcı";
+    if(!("avatar" in existing) || !existing.avatar) existing.avatar = `https://api.dicebear.com/6.x/identicon/svg?seed=${encodeURIComponent(stableId)}`;
+    if(!("tgId" in existing)) existing.tgId = readUrlParam("tgid") || "";
+    // if URL provided tgId and not previously set, store it
+    const maybeTg = readUrlParam("tgid");
+    if(maybeTg && maybeTg !== existing.tgId){
+      existing.tgId = maybeTg;
+      localStorage.setItem("pdf_dershanem_user", JSON.stringify(existing));
+    }
+    return existing;
+  }
 }
-function saveCurrentUser(u){ localStorage.setItem("pdf_dershanem_user", JSON.stringify(u)); }
+function saveCurrentUser(u){
+  // preserve immutable id and stable stored id
+  const stableId = localStorage.getItem("pdf_dershanem_user_id") || uid();
+  const cur = JSON.parse(localStorage.getItem("pdf_dershanem_user")||"null") || {};
+  const sanitized = {
+    id: stableId,
+    name: u.name || cur.name || "Telegram Kullanıcı",
+    avatar: u.avatar || cur.avatar || `https://api.dicebear.com/6.x/identicon/svg?seed=${encodeURIComponent(stableId)}`,
+    tgId: cur.tgId || u.tgId || ""
+  };
+  localStorage.setItem("pdf_dershanem_user", JSON.stringify(sanitized));
+}
 
 function renderProfile(){
   SCR.innerHTML = "";
   const user = getCurrentUser();
+  const totalDownloadsAll = state.pdfs.reduce((s,p)=>s + (p.downloads||0),0);
+  const userDownloads = aggregateDownloadsForUser(user.id);
   const p = el("div","card");
   p.innerHTML = `
     <div class="header-row">
@@ -239,21 +298,33 @@ function renderProfile(){
       <div>
         <div class="h1">${user.name}</div>
         <div class="muted small">PDF DERSHANEM profili</div>
+        <div class="small muted">ID: ${user.id}</div>
       </div>
       <div style="margin-left:auto;">
         <button id="edit-profile" class="btn-ghost small">Düzenle</button>
       </div>
     </div>
-    <div class="small-note">Toplam indirme sayısı: ${aggregateDownloadsForUser(user.id)}</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;">
+      <div class="card" style="padding:10px;">
+        <div class="small muted">Sizin indirmeler</div>
+        <div class="h1" style="font-size:16px;margin-top:6px;">${userDownloads}</div>
+      </div>
+      <div class="card" style="padding:10px;">
+        <div class="small muted">Toplam indirme (tüm PDF'ler)</div>
+        <div class="h1" style="font-size:16px;margin-top:6px;">${totalDownloadsAll}</div>
+      </div>
+    </div>
+
+    <div class="small-note" style="margin-top:8px;">Kullanıcı bilgilerini düzenlerken ID değiştirilemez.</div>
   `;
   SCR.appendChild(p);
 
-  // edit modal simple
+  // edit modal simple (only name/avatar editable; id is fixed)
   document.getElementById("edit-profile").addEventListener("click", ()=>{
     const name = prompt("Profil ismi", user.name) || user.name;
     const avatar = prompt("Avatar URL (TG profil fotoğrafı linki)", user.avatar || "") || user.avatar;
-    const newU = {...user, name, avatar};
-    saveCurrentUser(newU);
+    saveCurrentUser({ ...user, name, avatar });
     showToast("Profil kaydedildi");
     renderProfile();
   });
