@@ -1,162 +1,112 @@
-import json
-import time
-import os
-from datetime import datetime, timedelta
-from getpass import getpass
 from instagrapi import Client
-from instagrapi.exceptions import LoginRequired, ClientError
+import time
+import json
+from datetime import datetime, timedelta
 
-# ----- AYARLAR -----
-TARGET_USERNAME = "ssekwr"        # takipçileri takip edilecek hesap
-FOLLOW_DELAY = 30                 # her takip arası saniye
-UNFOLLOW_AFTER_HOURS = 12         # kaç saat sonra takipten çıkılacak
-DATA_FILE = "follow_data.json"    # takip bilgilerinin saklanacağı dosya
-FOLLOW_LIMIT_PER_CYCLE = 10       # her döngüde en fazla kaç kişi takip edilecek
-CONFIG_FILE = "config.json"       # hesap bilgileri (otomatik oluşturulur)
-# ------------------
+USERNAME = "leylaaszk"
+TARGET_INFLUENCER = "ssekwr"
+CHECK_INTERVAL = 30  # saniye
+UNFOLLOW_AFTER_HOURS = 12
+FOLLOW_LIMIT_PER_CYCLE = 5
+
+DATA_FILE = "followed_users.json"
+
+cl = Client()
+
 
 def load_data():
-    if os.path.exists(DATA_FILE):
+    try:
         with open(DATA_FILE, "r") as f:
             return json.load(f)
-    return {}
+    except:
+        return {}
+
 
 def save_data(data):
     with open(DATA_FILE, "w") as f:
-        json.dump(data, f, indent=2)
+        json.dump(data, f)
 
-def load_config():
-    """config.json varsa kullanıcı adı/şifreyi ordan al, yoksa None döndür."""
-    if os.path.exists(CONFIG_FILE):
-        try:
-            with open(CONFIG_FILE, "r") as f:
-                cfg = json.load(f)
-                return cfg.get("username"), cfg.get("password")
-        except:
-            pass
-    return None, None
 
-def save_config(username, password):
-    """Başarılı girişten sonra config.json oluştur."""
+print("Instagram giriş")
+password = input("Şifre: ")
+
+try:
+    cl.login(USERNAME, password)
+    print("Giriş başarılı")
+except Exception as e:
+    print("Giriş hatası:", e)
+    exit()
+
+followed_data = load_data()
+
+try:
+    target_id = cl.user_id_from_username(TARGET_INFLUENCER)
+except Exception as e:
+    print("Hedef kullanıcı bulunamadı:", e)
+    exit()
+
+print(f"{TARGET_INFLUENCER} takipçileri alınıyor...")
+
+while True:
     try:
-        with open(CONFIG_FILE, "w") as f:
-            json.dump({"username": username, "password": password}, f, indent=2)
-        print(f"💾 Hesap bilgileri {CONFIG_FILE} dosyasına kaydedildi.")
-    except Exception as e:
-        print(f"⚠️ config.json kaydedilemedi: {e}")
+        followers = cl.user_followers(target_id)
+        my_followers = cl.user_followers(cl.user_id)
 
-def login_client():
-    cl = Client()
-    username, password = load_config()
-    auto_login = bool(username and password)  # config var mı?
+        my_follower_ids = set(my_followers.keys())
 
-    if not auto_login:
-        # İlk çalıştırma: kullanıcıya sor
-        username = input("Instagram kullanıcı adı: ")
-        password = getpass("Şifre: ")
-    else:
-        print(f"🔑 config.json’dan hesap bilgisi okundu ({username})")
+        # Yeni kişileri takip et
+        count = 0
+        for user_id, user in followers.items():
+            if count >= FOLLOW_LIMIT_PER_CYCLE:
+                break
 
-    try:
-        cl.login(username, password)
-        print("✅ Giriş başarılı.\n")
+            if str(user_id) in followed_data:
+                continue
 
-        # Eğer config yoksa ve giriş başarılıysa, otomatik oluştur
-        if not auto_login:
-            save_config(username, password)
+            try:
+                cl.user_follow(user_id)
+                followed_data[str(user_id)] = {
+                    "username": user.username,
+                    "time": datetime.now().isoformat()
+                }
+                save_data(followed_data)
 
-        return cl
-    except Exception as e:
-        print(f"❌ Giriş başarısız: {e}")
-        # Hatalı girişte config varsa silmek ister misin? Şimdilik çık.
-        exit(1)
+                print(f"Takip edildi: {user.username}")
+                count += 1
 
-def unfollow_if_needed(cl, followed_data):
-    """Süresi dolmuş ve geri takip etmeyenleri unfollow yapar."""
-    now = datetime.utcnow()
-    threshold = now - timedelta(hours=UNFOLLOW_AFTER_HOURS)
-    to_unfollow = []
-    
-    for user_id, info in followed_data.items():
-        followed_at = datetime.fromisoformat(info["followed_at"])
-        if followed_at < threshold:
-            to_unfollow.append((user_id, info["username"]))
-    
-    for user_id, username in to_unfollow:
-        try:
-            friendship = cl.user_friendship(user_id)
-            if not friendship.get("followed_by", False):
-                cl.user_unfollow(user_id)
-                del followed_data[user_id]
-                print(f"❎ Takipten çıkıldı (geri takip etmedi): {username}")
-            else:
-                del followed_data[user_id]
-                print(f"✅ Geri takip etti, kayıt silindi: {username}")
-        except ClientError as e:
-            print(f"⚠️ {username} unfollow hatası: {e}")
-        time.sleep(2)
+                time.sleep(10)
 
-def follow_target_followers(cl, followed_data):
-    """Hedef hesabın takipçilerinden yeni kişileri takip et."""
-    try:
-        target_id = cl.user_id_from_username(TARGET_USERNAME)
-    except Exception as e:
-        print(f"❌ Hedef kullanıcı bulunamadı: {e}")
-        return
+            except Exception as e:
+                print(f"Takip hatası {user.username}: {e}")
 
-    try:
-        followers = cl.user_followers(target_id, amount=200)
-    except Exception as e:
-        print(f"❌ Takipçiler alınamadı: {e}")
-        return
+        # 12 saat sonra geri takip etmeyenleri çıkar
+        remove_list = []
 
-    already_following = set(cl.user_following(cl.user_id).keys())
-    followed_count = 0
+        for user_id, info in followed_data.items():
+            followed_time = datetime.fromisoformat(info["time"])
 
-    for user_id, user_info in followers.items():
-        if str(user_id) in followed_data:
-            continue
-        if user_id in already_following:
-            continue
-        if followed_count >= FOLLOW_LIMIT_PER_CYCLE:
-            break
+            if datetime.now() - followed_time >= timedelta(hours=UNFOLLOW_AFTER_HOURS):
+                if int(user_id) not in my_follower_ids:
+                    try:
+                        cl.user_unfollow(int(user_id))
+                        print(f"Takipten çıkıldı: {info['username']}")
+                        remove_list.append(user_id)
+                        time.sleep(10)
 
-        try:
-            cl.user_follow(user_id)
-            now = datetime.utcnow()
-            followed_data[str(user_id)] = {
-                "username": user_info.username,
-                "followed_at": now.isoformat()
-            }
-            print(f"➕ Takip edildi: {user_info.username} ({now.strftime('%H:%M:%S')})")
-            followed_count += 1
-            time.sleep(FOLLOW_DELAY)
-        except ClientError as e:
-            print(f"⚠️ {user_info.username} takip hatası: {e}")
-            time.sleep(5)
+                    except Exception as e:
+                        print(f"Çıkış hatası {info['username']}: {e}")
+                else:
+                    print(f"Geri takip etti: {info['username']}")
+                    remove_list.append(user_id)
 
-def main():
-    print("=== Instagram Takip Botu (Termux) ===\n")
-    print("⚠️ Uyarı: Bot kullanımı Instagram kurallarına aykırıdır, hesabınız askıya alınabilir.")
-    cl = login_client()
-    followed_data = load_data()
+        for uid in remove_list:
+            followed_data.pop(uid, None)
 
-    print(f"Hedef: @{TARGET_USERNAME}")
-    print(f"Takip aralığı: {FOLLOW_DELAY} saniye")
-    print(f"Takipsizlik süresi: {UNFOLLOW_AFTER_HOURS} saat")
-    print("Bot başlatıldı. Durdurmak için Ctrl+C\n")
-
-    try:
-        while True:
-            print("🔄 Kontroller yapılıyor...")
-            unfollow_if_needed(cl, followed_data)
-            follow_target_followers(cl, followed_data)
-            save_data(followed_data)
-            print(f"⏳ {FOLLOW_DELAY} saniye bekleniyor...\n")
-            time.sleep(FOLLOW_DELAY)
-    except KeyboardInterrupt:
-        print("\n🛑 Bot durduruldu.")
         save_data(followed_data)
 
-if __name__ == "__main__":
-    main()
+        print(f"{CHECK_INTERVAL} saniye bekleniyor...")
+        time.sleep(CHECK_INTERVAL)
+
+    except Exception as e:
+        print("Ana döngü hatası:", e)
+        time.sleep(60)
